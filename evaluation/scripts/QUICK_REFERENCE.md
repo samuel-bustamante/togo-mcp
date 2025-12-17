@@ -1,242 +1,367 @@
-# TogoMCP Evaluation - Quick Reference Card
+# TogoMCP Evaluation Scripts - Quick Reference
 
-## 🚀 Getting Started (2 minutes)
+## ⚡ 30-Second Start
 
 ```bash
-cd evaluation/scripts
 export ANTHROPIC_API_KEY="your-key"
-./quick_start_evaluation.sh
+python automated_test_runner.py example_questions.json
+python results_analyzer.py evaluation_results.csv
+python generate_dashboard.py evaluation_results.csv --open
 ```
-
-Done! Review the output and generated report.
-
-## 📋 File Guide
-
-| File | Purpose | When to Use |
-|------|---------|-------------|
-| `quick_start_evaluation.sh` | Demo the complete system | First time, quick tests |
-| `automated_test_runner.py` | Run baseline vs TogoMCP tests | Every evaluation |
-| `results_analyzer.py` | Analyze test results | After running tests |
-| `USAGE_GUIDE.md` | Complete workflow guide | Learning the system |
-| `ANALYZER_README.md` | Analysis tool details | Understanding metrics |
-| `example_questions.json` | Sample questions | Learning question format |
-| `config.json` | MCP configuration | Customizing servers |
 
 ## 🎯 Common Commands
 
 ### Run Evaluation
 ```bash
+# Basic
 python automated_test_runner.py questions.json
+
+# With custom output
+python automated_test_runner.py questions.json -o results.csv
+
+# With config
+python automated_test_runner.py questions.json -c config.json
+
+# JSON format output
+python automated_test_runner.py questions.json --format json
+```
+
+### Validate Questions
+```bash
+# Basic validation
+python validate_questions.py questions.json
+
+# Strict mode
+python validate_questions.py questions.json --strict
+
+# With cost estimate
+python validate_questions.py questions.json --estimate-cost
 ```
 
 ### Analyze Results
 ```bash
-python results_analyzer.py evaluation_results.csv
-```
-
-### Detailed Analysis
-```bash
-python results_analyzer.py evaluation_results.csv -v
-```
-
-### Export Report
-```bash
-python results_analyzer.py evaluation_results.csv --export report.md
-```
-
-### Complete Workflow
-```bash
-# 1. Create/edit questions
-vim my_questions.json
-
-# 2. Run tests
-python automated_test_runner.py my_questions.json -o results.csv
-
-# 3. Analyze
+# Basic analysis
 python results_analyzer.py results.csv
 
-# 4. Export
-python results_analyzer.py results.csv --export analysis_$(date +%Y%m%d).md
+# Verbose (show all questions)
+python results_analyzer.py results.csv -v
+
+# Export report
+python results_analyzer.py results.csv --export report.md
 ```
 
-## 📊 Question Categories (Need 3-5 of each)
+### Generate Dashboard
+```bash
+# Generate dashboard
+python generate_dashboard.py results.csv
 
-| Category | Example Question | Tests |
-|----------|-----------------|-------|
-| **Precision** | "What is the UniProt ID for human BRCA1?" | Exact IDs, sequences |
-| **Completeness** | "How many genes in GO:0006281?" | Counts, comprehensive lists |
-| **Integration** | "Convert UniProt P04637 to NCBI Gene ID" | Cross-database linking |
-| **Currency** | "SARS-CoV-2 pathways in Reactome?" | Recent information |
-| **Specificity** | "MeSH ID for Erdheim-Chester disease?" | Niche topics |
+# Custom output path
+python generate_dashboard.py results.csv -o dashboard.html
+
+# Generate and open
+python generate_dashboard.py results.csv --open
+```
+
+## 📊 Complete Workflow
+
+```bash
+# 1. Create questions file (see format below)
+vim my_questions.json
+
+# 2. Validate
+python validate_questions.py my_questions.json --estimate-cost
+
+# 3. Run evaluation
+python automated_test_runner.py my_questions.json -o results_$(date +%Y%m%d).csv
+
+# 4. Analyze
+python results_analyzer.py results_$(date +%Y%m%d).csv -v
+
+# 5. Visualize
+python generate_dashboard.py results_$(date +%Y%m%d).csv --open
+
+# 6. Export report
+python results_analyzer.py results_$(date +%Y%m%d).csv --export analysis_$(date +%Y%m%d).md
+```
+
+## 📝 Question File Format
+
+```json
+[
+  {
+    "id": 1,
+    "category": "Precision",
+    "question": "What is the UniProt ID for human BRCA1?",
+    "expected_answer": "P38398",
+    "notes": "Test basic ID lookup"
+  }
+]
+```
+
+**Required**: `question`  
+**Recommended**: `id`, `category`, `expected_answer`, `notes`
+
+## 📂 Scripts at a Glance
+
+| Script | Purpose | Input | Output |
+|--------|---------|-------|--------|
+| `automated_test_runner.py` | Run evaluations | questions.json | results.csv |
+| `results_analyzer.py` | Analyze results | results.csv | statistics + report.md |
+| `validate_questions.py` | Validate questions | questions.json | validation report |
+| `generate_dashboard.py` | Create dashboard | results.csv | dashboard.html |
+
+## 🎓 Question Categories
+
+| Category | Example | Purpose |
+|----------|---------|---------|
+| **Precision** | "What is UniProt ID for BRCA1?" | Exact IDs, values |
+| **Completeness** | "How many genes in GO:0006281?" | Counts, lists |
+| **Integration** | "Convert UniProt P04637 to Gene ID" | Cross-database |
+| **Currency** | "SARS-CoV-2 pathways in Reactome?" | Recent info |
+| **Specificity** | "MeSH ID for Erdheim-Chester?" | Niche topics |
 | **Structured Query** | "Find all kinases in UniProt+ChEMBL" | Complex queries |
 
-## 🎓 Understanding Results
+**Target**: 3-5 questions per category
 
-### Success Patterns
+## 📈 Understanding Results
 
-| Pattern | Count | Meaning |
-|---------|-------|---------|
-| Both succeeded | High | Questions may be too easy |
-| Only baseline succeeded | >0 | **Problem**: TogoMCP issues |
-| Only TogoMCP succeeded | High | **Good**: Clear value-add |
-| Both failed | >0 | Questions need revision |
-
-### Assessment Categories
+### Value-Add Categories
 
 | Score | Category | Meaning | Action |
 |-------|----------|---------|--------|
-| 15-18 | CRITICAL | Essential value-add | Include in benchmarks |
-| 9-14 | VALUABLE | Significant improvement | Include in eval set |
-| 4-8 | MARGINAL | Minor improvement | Consider revising |
-| 0-3 | REDUNDANT | No value-add | Exclude |
+| 15-18 | **CRITICAL** | Baseline failed, TogoMCP succeeded | Use for benchmarks |
+| 9-14 | **VALUABLE** | Significant improvement | Include in eval |
+| 4-8 | **MARGINAL** | Minor improvement | Consider revising |
+| 0-3 | **REDUNDANT** | No improvement | Exclude |
+
+### Success Patterns
+
+| Pattern | Count | Interpretation |
+|---------|-------|----------------|
+| Both have expected | High | May be too easy |
+| Only baseline | >0 | **Problem**: Check TogoMCP |
+| Only TogoMCP | High | **Good**: Clear value-add |
+| Neither | >0 | Revise questions |
 
 ### Tool Usage
 
-| Rate | Interpretation | Action |
-|------|----------------|--------|
-| >70% | Good coverage | Continue |
-| 50-70% | Moderate | Add more database-focused questions |
-| <50% | Too simple | Revise questions to require databases |
+| Rate | Meaning | Action |
+|------|---------|--------|
+| >70% | Excellent | Continue |
+| 50-70% | Good | Add more DB-focused questions |
+| <50% | Too simple | Revise questions |
 
-## ⚡ Quick Troubleshooting
+## 🔧 Configuration
 
-| Issue | Solution |
-|-------|----------|
+### config.json Structure
+
+```json
+{
+  "model": "claude-sonnet-4-20250514",
+  "mcp_servers": {
+    "togomcp": {
+      "type": "http",
+      "url": "https://togomcp.rdfportal.org/mcp"
+    }
+  }
+}
+```
+
+### Environment Variables
+
+```bash
+export ANTHROPIC_API_KEY="sk-ant-..."
+```
+
+## 🚨 Quick Troubleshooting
+
+| Problem | Solution |
+|---------|----------|
 | API key error | `export ANTHROPIC_API_KEY="sk-ant-..."` |
 | SDK not found | `pip install claude-agent-sdk anthropic` |
-| MCP connection failed | Check server URL, network, online status |
-| Tests failing | Review error messages, simplify questions |
-| No tools used | Questions too simple, add database requirements |
-| Low success rate | Simplify questions, check MCP config |
+| MCP failed | Check URL, network, server status |
+| No tools used | Questions too simple, add DB requirements |
+| Low success | Simplify questions or check config |
 
-## 📈 Evaluation Scale Guide
+## 📊 Output Files
 
-### Small (5-10 questions)
-- **Time**: 1-2 hours
-- **Approach**: Automated + all manual templates
-- **Purpose**: Initial testing, learning
+### evaluation_results.csv
 
-### Medium (20-40 questions)
-- **Time**: 3-6 hours
-- **Approach**: Automated + manual for top questions
-- **Purpose**: Comprehensive evaluation
+**Key Columns**:
+- `baseline_has_expected`: Did baseline include expected answer?
+- `togomcp_has_expected`: Did TogoMCP include expected answer?
+- `baseline_actually_answered`: Did baseline try to answer (vs "I don't know")?
+- `tools_used`: Comma-separated MCP tools used
+- `value_add`: Assessment (CRITICAL/VALUABLE/MARGINAL/REDUNDANT)
 
-### Large (50+ questions)
-- **Time**: 1-2 days
-- **Approach**: Automated + manual for CRITICAL only
-- **Purpose**: Benchmark creation, paper
+### analysis report (via --export)
 
-## 🎯 Best Practices Checklist
+**Sections**:
+- Overall Statistics
+- Category Breakdown
+- Success Patterns
+- Value-Add Assessment
+- Problematic Questions
+- Recommendations
 
-**Question Design:**
-- [ ] Realistic (researchers would ask this)
-- [ ] Verifiable (can check answer)
-- [ ] Clear success criteria
-- [ ] Covers all 6 categories
-- [ ] Not trivial, not impossible
+### dashboard.html
 
-**Testing:**
-- [ ] API key set
-- [ ] Dependencies installed
-- [ ] MCP servers configured
-- [ ] Questions file validated
-- [ ] Results saved with date
-
-**Analysis:**
-- [ ] Reviewed statistics
-- [ ] Identified high-value questions
-- [ ] Checked problematic questions
-- [ ] Noted category gaps
-- [ ] Followed recommendations
-
-**Documentation:**
-- [ ] Exported analysis report
-- [ ] Saved questions file
-- [ ] Noted configuration used
-- [ ] Documented insights
-- [ ] Version controlled
-
-## 🔄 Iteration Workflow
-
-```
-Create Questions → Run Tests → Analyze → Review
-       ↑                                    ↓
-       └──────────── Revise ←───────────────┘
-```
-
-**Stop when:**
-- 70%+ questions show TogoMCP value-add
-- All categories have 3+ questions
-- <10% problematic questions
-- Clear benchmark candidates identified
-
-## 📚 Documentation Priority
-
-**Must Read (30 min):**
-1. This card (you are here!)
-2. `/scripts/USAGE_GUIDE.md` - Complete workflow
-3. `/scripts/ANALYZER_README.md` - Understanding metrics
-
-**Should Read (1 hour):**
-4. `/EVALUATION_README.md` - System overview
-5. `/togomcp_evaluation_rubric.md` - Methodology
-6. `/scripts/README.md` - Automated testing details
-
-**Reference:**
-7. `/togomcp_evaluation_template.md` - Manual eval form
-8. `/togomcp_quick_eval_form.md` - Quick manual form
-9. `/scripts/MCP_CONFIGURATION.md` - MCP setup
+**Charts**:
+- Has Expected Answer comparison
+- Expected Answer pattern distribution
+- Category performance
+- Top tools used
+- Response time comparison
 
 ## 💡 Pro Tips
 
-1. **Start small**: 5 questions to learn, then scale
-2. **Use git**: Version control everything
-3. **Export often**: Save reports with dates
-4. **Iterate fast**: Run → Analyze → Refine → Repeat
-5. **Focus on CRITICAL**: These are your benchmarks
-6. **Fix problems early**: Don't ignore failed tests
-7. **Balance categories**: All 6 matter
-8. **Document insights**: Future you will thank you
+1. **Start Small**: 5-10 questions to learn, then scale
+2. **Validate First**: Always run `validate_questions.py` before evaluation
+3. **Use Dates**: Name outputs with dates (`results_20250117.csv`)
+4. **Git Everything**: Version control questions, configs, and reports
+5. **Focus on CRITICAL**: These show clearest value-add
+6. **Check Tool Usage**: If <50%, questions may be too simple
+7. **Iterate Fast**: Run → Analyze → Refine → Repeat
+8. **Export Reports**: Save analysis with dates for tracking
 
-## 📞 Help Resources
+## 🎯 Quality Checklist
 
-**Local Files:**
-- `USAGE_GUIDE.md` - Complete instructions
-- `ANALYZER_README.md` - Analysis details
-- `README.md` - Testing guide
-- `NEW_TOOLS_SUMMARY.md` - What's new
+**Good Question Set:**
+- [ ] 3-5 questions per category
+- [ ] >70% tool usage rate
+- [ ] >70% questions show TogoMCP value-add
+- [ ] <10% problematic questions
+- [ ] All questions have expected answers
+- [ ] Clear CRITICAL questions identified
 
-**Quick Commands:**
+**Good Workflow:**
+- [ ] Questions validated before running
+- [ ] Results saved with dates
+- [ ] Analysis reports exported
+- [ ] Dashboard generated and reviewed
+- [ ] Insights documented
+- [ ] Iterations tracked in git
+
+## 📐 Evaluation Scale Guide
+
+| Scale | Questions | Time | Approach |
+|-------|-----------|------|----------|
+| **Small** | 5-10 | 1-2h | Learn the system |
+| **Medium** | 20-40 | 3-6h | Comprehensive eval |
+| **Large** | 50+ | 1-2d | Benchmark creation |
+
+## 🔄 Iteration Loop
+
+```
+Create Questions → Validate → Run Eval → Analyze
+       ↑                                     ↓
+       └───────────── Refine ←───────────────┘
+```
+
+**Stop When:**
+- 70%+ questions show value-add
+- All categories have 3+ questions
+- <10% problematic questions
+- Clear CRITICAL candidates identified
+
+## 📚 Quick Help
+
 ```bash
+# View README
+cat README.md | less
+
 # Show this card
 cat QUICK_REFERENCE.md
 
-# View detailed guides
-less USAGE_GUIDE.md
-less ANALYZER_README.md
+# Check requirements
+cat requirements.txt
 
-# Run demo
-./quick_start_evaluation.sh
+# View example questions
+cat example_questions.json | jq
+
+# Check config
+cat config.json | jq
 ```
 
-## ✅ Success Checklist
+## 🔗 Related Files
 
-You know you're successful when:
-- [ ] Can run evaluation in <5 minutes
-- [ ] Understand all metrics in analysis
-- [ ] Can identify high-value questions
-- [ ] Know how to iterate based on recommendations
-- [ ] Have 20+ questions with 70%+ tool usage
-- [ ] Clear CRITICAL questions for benchmarks
-- [ ] <10% problematic questions
-- [ ] Documented insights and recommendations
+- **README.md**: Full documentation
+- **../EVALUATION_README.md**: System overview
+- **../togomcp_evaluation_rubric.md**: Evaluation methodology
+- **requirements.txt**: Python dependencies
+- **config.json**: MCP configuration
+- **example_questions.json**: Sample questions
+
+## ⚙️ Installation
+
+```bash
+# Install dependencies
+pip install -r requirements.txt
+
+# Or manually
+pip install claude-agent-sdk anthropic
+
+# Set API key
+export ANTHROPIC_API_KEY="sk-ant-..."
+
+# Verify installation
+python -c "import anthropic, claude_agent_sdk; print('OK')"
+```
+
+## 💰 Cost Estimation
+
+```bash
+# Estimate cost before running
+python validate_questions.py questions.json --estimate-cost
+
+# Typical costs (Claude Sonnet 4):
+# - Small eval (10 questions): ~$0.10-0.20
+# - Medium eval (40 questions): ~$0.40-0.80
+# - Large eval (100 questions): ~$1.00-2.00
+```
+
+## 🎨 Dashboard Features
+
+**Metrics Displayed**:
+- Total questions evaluated
+- Baseline "has expected" rate
+- TogoMCP "has expected" rate
+- Unique tools used
+- Total tool calls
+
+**Charts**:
+- Stacked bar: Has expected vs missing expected
+- Doughnut: Pattern distribution (both/only baseline/only TogoMCP/neither)
+- Bar: Category performance comparison
+- Horizontal bar: Top 10 tools used
+- Bar: Average response time comparison
+
+## 📞 Getting Help
+
+1. **Check README.md**: Full documentation
+2. **Run with --help**: `python script.py --help`
+3. **Check examples**: Review `example_questions.json`
+4. **Validate questions**: Find issues before running
+5. **Review errors**: Error messages usually point to the issue
+
+## ✅ Success Indicators
+
+You're on the right track when:
+- ✅ Evaluations complete without errors
+- ✅ >70% tool usage rate
+- ✅ Clear CRITICAL questions identified
+- ✅ All categories represented
+- ✅ Can explain each metric
+- ✅ Dashboard shows clear patterns
+- ✅ Iteration improves results
 
 ---
 
-**Remember:**
+**Remember**:
 - Quality > Quantity
-- Iteration is key
+- Start small, iterate fast
 - Document everything
-- Ask for help when stuck
+- Tool usage = question quality
+- CRITICAL questions = your benchmarks
 
-**You've got this!** 🎉
+**Need more details?** → Read [README.md](README.md)

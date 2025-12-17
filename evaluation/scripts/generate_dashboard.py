@@ -53,30 +53,30 @@ class DashboardGenerator:
             return default
     
     def get_success_rate_data(self) -> Dict:
-        """Get success rate comparison data."""
+        """Get success rate comparison data based on Has Expected Answer."""
         total = len(self.results)
-        baseline_success = sum(1 for r in self.results if self._parse_bool(r.get('baseline_success', 'False')))
-        togomcp_success = sum(1 for r in self.results if self._parse_bool(r.get('togomcp_success', 'False')))
+        baseline_has_expected = sum(1 for r in self.results if self._parse_bool(r.get('baseline_has_expected', 'False')))
+        togomcp_has_expected = sum(1 for r in self.results if self._parse_bool(r.get('togomcp_has_expected', 'False')))
         
         return {
             "labels": ["Baseline", "TogoMCP"],
-            "success": [baseline_success, togomcp_success],
-            "failure": [total - baseline_success, total - togomcp_success],
+            "has_expected": [baseline_has_expected, togomcp_has_expected],
+            "missing_expected": [total - baseline_has_expected, total - togomcp_has_expected],
             "total": total
         }
     
     def get_category_data(self) -> Dict:
-        """Get per-category statistics."""
+        """Get per-category statistics based on Has Expected Answer."""
         categories = defaultdict(lambda: {"baseline": 0, "togomcp": 0, "total": 0})
         
         for result in self.results:
             category = result.get('category', 'Unknown')
             categories[category]["total"] += 1
             
-            if self._parse_bool(result.get('baseline_success', 'False')):
+            if self._parse_bool(result.get('baseline_has_expected', 'False')):
                 categories[category]["baseline"] += 1
             
-            if self._parse_bool(result.get('togomcp_success', 'False')):
+            if self._parse_bool(result.get('togomcp_has_expected', 'False')):
                 categories[category]["togomcp"] += 1
         
         return {
@@ -128,28 +128,28 @@ class DashboardGenerator:
         }
     
     def get_success_pattern_data(self) -> Dict:
-        """Get success pattern breakdown."""
-        both_succeeded = 0
+        """Get pattern breakdown based on Has Expected Answer."""
+        both_have_expected = 0
         only_baseline = 0
         only_togomcp = 0
-        both_failed = 0
+        neither_have_expected = 0
         
         for result in self.results:
-            baseline_ok = self._parse_bool(result.get('baseline_success', 'False'))
-            togomcp_ok = self._parse_bool(result.get('togomcp_success', 'False'))
+            baseline_has = self._parse_bool(result.get('baseline_has_expected', 'False'))
+            togomcp_has = self._parse_bool(result.get('togomcp_has_expected', 'False'))
             
-            if baseline_ok and togomcp_ok:
-                both_succeeded += 1
-            elif baseline_ok and not togomcp_ok:
+            if baseline_has and togomcp_has:
+                both_have_expected += 1
+            elif baseline_has and not togomcp_has:
                 only_baseline += 1
-            elif not baseline_ok and togomcp_ok:
+            elif not baseline_has and togomcp_has:
                 only_togomcp += 1
             else:
-                both_failed += 1
+                neither_have_expected += 1
         
         return {
-            "labels": ["Both Succeeded", "Only Baseline", "Only TogoMCP", "Both Failed"],
-            "values": [both_succeeded, only_baseline, only_togomcp, both_failed],
+            "labels": ["Both Have Expected", "Only Baseline", "Only TogoMCP", "Neither Have Expected"],
+            "values": [both_have_expected, only_baseline, only_togomcp, neither_have_expected],
             "colors": ["#10b981", "#f59e0b", "#3b82f6", "#ef4444"]
         }
     
@@ -296,15 +296,15 @@ class DashboardGenerator:
             </div>
             
             <div class="stat-card">
-                <div class="stat-label">Baseline Success Rate</div>
-                <div class="stat-value">{success_data['success'][0] / success_data['total'] * 100:.1f}%</div>
-                <div class="stat-subvalue">{success_data['success'][0]}/{success_data['total']} succeeded</div>
+                <div class="stat-label">Baseline Has Expected Answer</div>
+                <div class="stat-value">{success_data['has_expected'][0] / success_data['total'] * 100:.1f}%</div>
+                <div class="stat-subvalue">{success_data['has_expected'][0]}/{success_data['total']} have expected</div>
             </div>
             
             <div class="stat-card">
-                <div class="stat-label">TogoMCP Success Rate</div>
-                <div class="stat-value">{success_data['success'][1] / success_data['total'] * 100:.1f}%</div>
-                <div class="stat-subvalue">{success_data['success'][1]}/{success_data['total']} succeeded</div>
+                <div class="stat-label">TogoMCP Has Expected Answer</div>
+                <div class="stat-value">{success_data['has_expected'][1] / success_data['total'] * 100:.1f}%</div>
+                <div class="stat-subvalue">{success_data['has_expected'][1]}/{success_data['total']} have expected</div>
             </div>
             
             <div class="stat-card">
@@ -316,14 +316,14 @@ class DashboardGenerator:
         
         <div class="charts-grid">
             <div class="chart-card">
-                <div class="chart-title">Success Rate Comparison</div>
+                <div class="chart-title">Has Expected Answer Comparison</div>
                 <div class="chart-container">
                     <canvas id="successChart"></canvas>
                 </div>
             </div>
             
             <div class="chart-card">
-                <div class="chart-title">Success Pattern Distribution</div>
+                <div class="chart-title">Expected Answer Pattern Distribution</div>
                 <div class="chart-container">
                     <canvas id="patternChart"></canvas>
                 </div>
@@ -357,20 +357,20 @@ class DashboardGenerator:
     </div>
     
     <script>
-        // Success Rate Chart
+        // Has Expected Answer Chart
         new Chart(document.getElementById('successChart'), {{
             type: 'bar',
             data: {{
                 labels: {json.dumps(success_data['labels'])},
                 datasets: [
                     {{
-                        label: 'Success',
-                        data: {json.dumps(success_data['success'])},
+                        label: 'Has Expected Answer',
+                        data: {json.dumps(success_data['has_expected'])},
                         backgroundColor: '#10b981'
                     }},
                     {{
-                        label: 'Failure',
-                        data: {json.dumps(success_data['failure'])},
+                        label: 'Missing Expected Answer',
+                        data: {json.dumps(success_data['missing_expected'])},
                         backgroundColor: '#ef4444'
                     }}
                 ]
@@ -388,7 +388,7 @@ class DashboardGenerator:
             }}
         }});
         
-        // Success Pattern Chart
+        // Expected Answer Pattern Chart
         new Chart(document.getElementById('patternChart'), {{
             type: 'doughnut',
             data: {{
