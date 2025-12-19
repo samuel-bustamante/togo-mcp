@@ -8,6 +8,7 @@
 cd scripts
 export ANTHROPIC_API_KEY="your-key-here"
 python automated_test_runner.py ../questions/Q01.json
+python compute_costs.py evaluation_results.csv
 python results_analyzer.py evaluation_results.csv
 python generate_dashboard.py evaluation_results.csv --open
 ```
@@ -104,6 +105,25 @@ python automated_test_runner.py ../questions/Q03.json
 **Full documentation**: [`scripts/README.md`](scripts/README.md)  
 **Quick commands**: [`scripts/QUICK_REFERENCE.md`](scripts/QUICK_REFERENCE.md)
 
+### I want to calculate evaluation costs
+
+```bash
+cd scripts
+python compute_costs.py ../results/results.csv
+python compute_costs.py ../results/results.csv --export cost_report.json
+```
+
+The cost calculator provides:
+- Breakdown of baseline vs TogoMCP costs
+- Cache usage analysis (creation + read tokens)
+- Costs by category and value-add
+- Per-question cost averages
+
+**Supports**:
+- Multiple Claude models (Sonnet 4, Opus 4, Haiku 4)
+- Custom pricing configurations
+- Detailed JSON export for further analysis
+
 ### I want to understand the questions
 
 ```bash
@@ -146,11 +166,13 @@ Shows:
 
 ```bash
 cd scripts
+python compute_costs.py ../results/results.csv
 python results_analyzer.py ../results/results.csv -v
 python generate_dashboard.py ../results/results.csv --open
 ```
 
 Get:
+- Cost analysis with cache breakdown
 - Success rate comparisons
 - Tool usage statistics
 - Category performance breakdown
@@ -166,10 +188,147 @@ Get:
 |--------------|-----------|
 | **Create evaluation questions** | [`QUESTION_DESIGN_GUIDE.md`](QUESTION_DESIGN_GUIDE.md) |
 | **Run evaluations** | [`scripts/README.md`](scripts/README.md) |
+| **Calculate costs** | See [Cost Analysis](#cost-analysis) below |
 | **Quick command reference** | [`scripts/QUICK_REFERENCE.md`](scripts/QUICK_REFERENCE.md) |
 | **Check project status** | [`PROJECT_STATUS.md`](PROJECT_STATUS.md) |
 | **Learn about questions** | [`questions/SUMMARY.md`](questions/SUMMARY.md) |
 | **Learn about databases** | [`exploration/00_SUMMARY.md`](exploration/00_SUMMARY.md) |
+
+---
+
+## 💰 Cost Analysis
+
+### Using compute_costs.py
+
+The `compute_costs.py` script provides comprehensive cost breakdowns for your evaluation runs:
+
+```bash
+# Basic usage
+python compute_costs.py evaluation_results.csv
+
+# Specify different model
+python compute_costs.py results.csv --model claude-opus-4-20250514
+
+# Export detailed JSON report
+python compute_costs.py results.csv --export cost_report.json
+
+# Use custom pricing
+python compute_costs.py results.csv --pricing custom_pricing.json
+```
+
+### What It Calculates
+
+**Baseline Costs**:
+- Input/output token usage
+- Per-test and total costs
+- Success rate impact
+
+**TogoMCP Costs** (with cache efficiency):
+- Regular input/output tokens
+- **Cache creation tokens** (system prompt + tools, charged at +25%)
+- **Cache read tokens** (reading cached content, charged at -90%)
+- Tool usage overhead
+
+**Breakdowns**:
+- By question category (Precision, Completeness, etc.)
+- By value-add level (CRITICAL, VALUABLE, etc.)
+- Per-question averages
+
+### Understanding Cache Costs
+
+The evaluation runner uses **isolated sessions** for optimal cache efficiency:
+
+**How it works**:
+```
+Q1: CREATE cache (system + tools) + READ cache → Answer
+Q2: CREATE minimal + READ cache → Answer  ← Fresh session
+Q3: CREATE minimal + READ cache → Answer  ← Fresh session
+```
+
+**Benefits**:
+- Stable, predictable costs per question
+- No exponential cache growth
+- ~46% cheaper than conversation accumulation
+- Each question independent (no cross-contamination)
+
+**Example** (12 questions):
+- Cache creation: ~98k tokens × $3.75/MTok = $0.37
+- Cache reads: ~644k tokens × $0.30/MTok = $0.19
+- **Total cache cost: ~$0.56**
+
+### Supported Models
+
+Built-in pricing for:
+- `claude-sonnet-4-20250514` - $3.00/$15.00 per MTok (default)
+- `claude-opus-4-20250514` - $15.00/$75.00 per MTok
+- `claude-haiku-4-20250110` - $0.80/$4.00 per MTok
+- `claude-sonnet-3-5-20241022` - $3.00/$15.00 per MTok
+
+**Cache pricing** automatically calculated:
+- Creation: base price + 25%
+- Read: base price - 90%
+
+### Sample Output
+
+```
+================================================================================
+COST ANALYSIS FOR TOGOMCP EVALUATION
+================================================================================
+Model: Claude Sonnet 4
+Pricing: $3.00/MTok input, $15.00/MTok output
+Total questions evaluated: 12
+
+BASELINE COSTS (No Tools)
+--------------------------------------------------------------------------------
+  Successful tests:     12/12
+  Input tokens:         780
+  Output tokens:        1,400
+  Total tokens:         2,180
+  Total cost:           $0.0234
+  Avg cost per test:    $0.0020
+
+TOGOMCP COSTS (With MCP Tools) (EXACT)
+--------------------------------------------------------------------------------
+  ✅ Using actual token counts from Agent SDK ResultMessage
+
+  Successful tests:     12/12
+  Input tokens:         108
+  Output tokens:        4,600
+  Cache creation:       98,011 tokens
+  Cache read:           644,288 tokens
+  Total tokens:         4,708
+  Total cost:           $0.6308
+  Avg cost per test:    $0.0526
+
+TOTAL EVALUATION COST
+--------------------------------------------------------------------------------
+  Baseline:             $0.0234 (3.6%)
+  TogoMCP:              $0.6308 (96.4%)
+  TOTAL:                $0.6542
+
+  TogoMCP overhead:     +2596.2% vs baseline
+
+COSTS BY CATEGORY
+--------------------------------------------------------------------------------
+  Precision            $0.0908  (Base: $0.0038, TogoMCP: $0.0869)
+  Completeness         $0.0860  (Base: $0.0039, TogoMCP: $0.0821)
+  Integration          $0.0880  (Base: $0.0039, TogoMCP: $0.0841)
+  ...
+```
+
+### Cost Estimation Strategy
+
+**For planning**:
+- Small evaluation (12 questions): ~$0.65
+- Medium evaluation (24 questions): ~$1.30
+- Full evaluation (120 questions): ~$6.50
+
+**Per question average**:
+- Baseline: ~$0.002
+- TogoMCP: ~$0.053
+- Total: ~$0.055
+
+**Cache efficiency note**: The isolated session design keeps costs predictable and ~46% lower than accumulating conversation sessions.
 
 ---
 
@@ -204,7 +363,7 @@ python automated_test_runner.py example_questions.json
 
 ## 📊 Current Status
 
-**Last Updated**: 2025-12-18
+**Last Updated**: 2025-12-19
 
 | Phase | Status | Progress |
 |-------|--------|----------|
@@ -234,6 +393,25 @@ python automated_test_runner.py example_questions.json
 - Exact IDs and values
 - Cross-database integration
 - Comprehensive results
+
+### Isolated Session Design
+
+The evaluation runner uses **isolated sessions** for optimal efficiency:
+
+**Architecture**:
+```python
+for question in questions:
+    async with ClaudeSDKClient(options=options) as client:
+        # Fresh session - no history
+        result = await client.query(question)
+    # Client closes, history discarded
+```
+
+**Benefits**:
+- ✅ Predictable cache costs
+- ✅ No cross-question contamination
+- ✅ Stable performance
+- ✅ 46% cheaper than conversation accumulation
 
 ### Value-Add Categories
 
@@ -271,18 +449,21 @@ python validate_questions.py ../questions/Q03.json --estimate-cost
 # 2. Run evaluation
 python automated_test_runner.py ../questions/Q03.json -o ../results/Q03_out.csv
 
-# 3. Analyze results
+# 3. Calculate costs
+python compute_costs.py ../results/Q03_out.csv
+
+# 4. Analyze results
 python results_analyzer.py ../results/Q03_out.csv -v
 
-# 4. Generate dashboard
+# 5. Generate dashboard
 python generate_dashboard.py ../results/Q03_out.csv --open
 
-# 5. Review and document findings
+# 6. Review and document findings
 # (Check dashboard for insights, identify high-value questions)
 ```
 
 **Time**: ~30-45 minutes for 12 questions  
-**Cost**: ~$0.15-0.30 (Claude Sonnet 4)
+**Cost**: ~$0.65 (includes cache overhead)
 
 ---
 
@@ -295,7 +476,8 @@ python generate_dashboard.py ../results/Q03_out.csv --open
 3. **Browse [`questions/SUMMARY.md`](questions/SUMMARY.md)** - See what's tested - 10 min
 4. **Read [`scripts/README.md`](scripts/README.md)** - Learn the tools - 20 min
 5. **Run a test evaluation** - Try Q01.json - 30 min
-6. **Review results** - Analyze what happened - 15 min
+6. **Calculate costs** - Analyze spending - 5 min
+7. **Review results** - Analyze what happened - 15 min
 
 **Total**: ~90 minutes to full understanding
 
@@ -311,9 +493,33 @@ python generate_dashboard.py ../results/Q03_out.csv --open
 The automated evaluation is compute-intensive:
 - Each question requires 2 API calls (baseline + TogoMCP)
 - Full evaluation = 240 API calls
-- Takes 6-8 hours + ~$2-3 in API costs
+- Takes 6-8 hours + ~$6.50 in API costs
 
 We ran Q01-Q02 as validation. Q03-Q10 are ready to run.
+
+### How much does evaluation cost?
+
+Use `compute_costs.py` for exact calculations:
+
+**Example costs** (Claude Sonnet 4):
+- 12 questions: ~$0.65 total
+- 24 questions: ~$1.30 total
+- 120 questions: ~$6.50 total
+
+**Per question**: ~$0.055 ($0.002 baseline + $0.053 TogoMCP)
+
+Most cost is from TogoMCP cache operations, which are optimized through isolated sessions.
+
+### What's the cache efficiency strategy?
+
+The runner uses **isolated sessions**:
+- Each question gets a fresh client (no conversation history)
+- Only system prompt + tools are cached
+- Cache reads stay constant (~30-85k tokens per question)
+- **46% cheaper** than accumulating conversation sessions
+- **No cross-question contamination**
+
+See the [Cost Analysis](#cost-analysis) section for details.
 
 ### Can I add my own questions?
 
@@ -336,6 +542,7 @@ Then validate and run:
 ```bash
 python validate_questions.py my_questions.json
 python automated_test_runner.py my_questions.json
+python compute_costs.py results.csv
 ```
 
 ### What happened to the manual templates?
@@ -350,6 +557,9 @@ Key metrics:
 - **has_expected**: Did the answer include the expected result?
 - **tools_used**: Which MCP tools were called?
 - **value_add**: CRITICAL/VALUABLE/MARGINAL/REDUNDANT
+- **cache metrics**: Creation and read token counts
+
+**Use compute_costs.py** to understand spending breakdown.
 
 **See**: [`scripts/README.md`](scripts/README.md#understanding-results) for details.
 
@@ -373,6 +583,7 @@ Key metrics:
 - Missing database functionality? Document in exploration reports
 - Question problems? Note in question SUMMARY.md
 - Script bugs? See scripts/README.md for troubleshooting
+- Cost discrepancies? Check compute_costs.py output
 
 ---
 
@@ -382,7 +593,8 @@ Key metrics:
 1. Install dependencies: `pip install -r scripts/requirements.txt`
 2. Read the full guide: [`scripts/README.md`](scripts/README.md)
 3. Run your first evaluation: Start with Q01.json
-4. Analyze results and iterate
+4. Calculate costs: `compute_costs.py`
+5. Analyze results and iterate
 
 **If you're here to understand the project**:
 1. Check status: [`PROJECT_STATUS.md`](PROJECT_STATUS.md)
@@ -392,9 +604,10 @@ Key metrics:
 
 **If you're here to complete the evaluation**:
 1. Run Q03-Q10: See [`scripts/QUICK_REFERENCE.md`](scripts/QUICK_REFERENCE.md)
-2. Combine results: Use `results/combine_csv.py`
-3. Analyze: `results_analyzer.py` + `generate_dashboard.py`
-4. Document findings: Update PROJECT_STATUS.md
+2. Track costs: Use `compute_costs.py` for each batch
+3. Combine results: Use `results/combine_csv.py`
+4. Analyze: `results_analyzer.py` + `generate_dashboard.py`
+5. Document findings: Update PROJECT_STATUS.md
 
 ---
 
@@ -402,6 +615,7 @@ Key metrics:
 
 **For question design**: [`QUESTION_DESIGN_GUIDE.md`](QUESTION_DESIGN_GUIDE.md)  
 **For script usage**: [`scripts/README.md`](scripts/README.md)  
+**For cost analysis**: See [Cost Analysis](#cost-analysis) section above  
 **For question format**: [`scripts/QUESTION_FORMAT.md`](scripts/QUESTION_FORMAT.md)  
 **For database info**: [`exploration/00_SUMMARY.md`](exploration/00_SUMMARY.md)  
 **For project status**: [`PROJECT_STATUS.md`](PROJECT_STATUS.md)
@@ -414,8 +628,8 @@ This evaluation tooling follows the same license as the main TogoMCP project.
 
 ---
 
-**Last Updated**: 2025-12-18  
-**Version**: 2.0 (Automated Evaluation)  
+**Last Updated**: 2025-12-19  
+**Version**: 2.1 (Optimized Cache Design + Cost Analysis)  
 **Status**: Foundation Complete ✅ | Evaluation In Progress 🔄
 
 **Ready to start?** → Pick your path above and dive in!

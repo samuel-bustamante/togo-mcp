@@ -5,6 +5,7 @@
 ```bash
 export ANTHROPIC_API_KEY="your-key"
 python automated_test_runner.py example_questions.json
+python compute_costs.py evaluation_results.csv
 python results_analyzer.py evaluation_results.csv
 python generate_dashboard.py evaluation_results.csv --open
 ```
@@ -24,6 +25,21 @@ python automated_test_runner.py questions.json -c config.json
 
 # JSON format output
 python automated_test_runner.py questions.json --format json
+```
+
+### Calculate Costs
+```bash
+# Basic cost analysis
+python compute_costs.py results.csv
+
+# Different model
+python compute_costs.py results.csv --model claude-opus-4-20250514
+
+# Export detailed report
+python compute_costs.py results.csv --export cost_report.json
+
+# Custom pricing
+python compute_costs.py results.csv --pricing custom_pricing.json
 ```
 
 ### Validate Questions
@@ -68,20 +84,24 @@ python generate_dashboard.py results.csv --open
 # 1. Create questions file (see format below)
 vim my_questions.json
 
-# 2. Validate
+# 2. Validate with cost estimate
 python validate_questions.py my_questions.json --estimate-cost
 
 # 3. Run evaluation
 python automated_test_runner.py my_questions.json -o results_$(date +%Y%m%d).csv
 
-# 4. Analyze
+# 4. Calculate actual costs
+python compute_costs.py results_$(date +%Y%m%d).csv
+
+# 5. Analyze results
 python results_analyzer.py results_$(date +%Y%m%d).csv -v
 
-# 5. Visualize
+# 6. Generate dashboard
 python generate_dashboard.py results_$(date +%Y%m%d).csv --open
 
-# 6. Export report
+# 7. Export reports
 python results_analyzer.py results_$(date +%Y%m%d).csv --export analysis_$(date +%Y%m%d).md
+python compute_costs.py results_$(date +%Y%m%d).csv --export cost_$(date +%Y%m%d).json
 ```
 
 ## 📝 Question File Format
@@ -106,6 +126,7 @@ python results_analyzer.py results_$(date +%Y%m%d).csv --export analysis_$(date 
 | Script | Purpose | Input | Output |
 |--------|---------|-------|--------|
 | `automated_test_runner.py` | Run evaluations | questions.json | results.csv |
+| `compute_costs.py` | Calculate costs | results.csv | cost breakdown |
 | `results_analyzer.py` | Analyze results | results.csv | statistics + report.md |
 | `validate_questions.py` | Validate questions | questions.json | validation report |
 | `generate_dashboard.py` | Create dashboard | results.csv | dashboard.html |
@@ -122,6 +143,39 @@ python results_analyzer.py results_$(date +%Y%m%d).csv --export analysis_$(date 
 | **Structured Query** | "Find all kinases in UniProt+ChEMBL" | Complex queries |
 
 **Target**: 3-5 questions per category
+
+## 💰 Cost Information
+
+### Typical Costs (Claude Sonnet 4)
+
+| Evaluation Size | Baseline | TogoMCP | Total |
+|----------------|----------|---------|-------|
+| **12 questions** | $0.02 | $0.63 | **$0.65** |
+| **24 questions** | $0.05 | $1.25 | **$1.30** |
+| **120 questions** | $0.24 | $6.26 | **$6.50** |
+
+**Per question**: ~$0.055 ($0.002 baseline + $0.053 TogoMCP)
+
+### Cache Breakdown
+
+TogoMCP uses **isolated sessions** for efficiency:
+- Cache creation: ~8k tokens/question (@$3.75/MTok)
+- Cache reads: ~50k tokens/question (@$0.30/MTok)
+- No conversation accumulation
+- Predictable costs
+
+### Cost Commands
+
+```bash
+# Estimate before running
+python validate_questions.py questions.json --estimate-cost
+
+# Calculate after running
+python compute_costs.py results.csv
+
+# Export detailed breakdown
+python compute_costs.py results.csv --export cost_report.json
+```
 
 ## 📈 Understanding Results
 
@@ -173,6 +227,14 @@ python results_analyzer.py results_$(date +%Y%m%d).csv --export analysis_$(date 
 export ANTHROPIC_API_KEY="sk-ant-..."
 ```
 
+### Supported Models
+
+| Model | Input/Output ($/MTok) | Cache Create | Cache Read |
+|-------|-----------------------|--------------|------------|
+| Sonnet 4 | $3.00 / $15.00 | $3.75 | $0.30 |
+| Opus 4 | $15.00 / $75.00 | $18.75 | $1.50 |
+| Haiku 4 | $0.80 / $4.00 | $1.00 | $0.08 |
+
 ## 🚨 Quick Troubleshooting
 
 | Problem | Solution |
@@ -182,6 +244,7 @@ export ANTHROPIC_API_KEY="sk-ant-..."
 | MCP failed | Check URL, network, server status |
 | No tools used | Questions too simple, add DB requirements |
 | Low success | Simplify questions or check config |
+| High costs | Check cache metrics with compute_costs.py |
 
 ## 📊 Output Files
 
@@ -191,10 +254,21 @@ export ANTHROPIC_API_KEY="sk-ant-..."
 - `baseline_has_expected`: Did baseline include expected answer?
 - `togomcp_has_expected`: Did TogoMCP include expected answer?
 - `baseline_actually_answered`: Did baseline try to answer (vs "I don't know")?
+- `togomcp_cache_creation_input_tokens`: Cache creation tokens
+- `togomcp_cache_read_input_tokens`: Cache read tokens
 - `tools_used`: Comma-separated MCP tools used
 - `value_add`: Assessment (CRITICAL/VALUABLE/MARGINAL/REDUNDANT)
 
-### analysis report (via --export)
+### Cost Report (via compute_costs.py)
+
+**Shows**:
+- Baseline vs TogoMCP cost comparison
+- Cache creation and read breakdown
+- Costs by category
+- Costs by value-add
+- Per-question averages
+
+### Analysis Report (via results_analyzer.py --export)
 
 **Sections**:
 - Overall Statistics
@@ -215,14 +289,16 @@ export ANTHROPIC_API_KEY="sk-ant-..."
 
 ## 💡 Pro Tips
 
-1. **Start Small**: 5-10 questions to learn, then scale
-2. **Validate First**: Always run `validate_questions.py` before evaluation
-3. **Use Dates**: Name outputs with dates (`results_20250117.csv`)
-4. **Git Everything**: Version control questions, configs, and reports
-5. **Focus on CRITICAL**: These show clearest value-add
-6. **Check Tool Usage**: If <50%, questions may be too simple
-7. **Iterate Fast**: Run → Analyze → Refine → Repeat
-8. **Export Reports**: Save analysis with dates for tracking
+1. **Estimate First**: Use `--estimate-cost` to budget before running
+2. **Calculate After**: Run `compute_costs.py` to verify spending
+3. **Start Small**: 5-10 questions to learn, then scale
+4. **Use Dates**: Name outputs with dates (`results_20250117.csv`)
+5. **Git Everything**: Version control questions, configs, and reports
+6. **Focus on CRITICAL**: These show clearest value-add
+7. **Check Tool Usage**: If <50%, questions may be too simple
+8. **Monitor Costs**: Track spending across iterations
+9. **Export Reports**: Save both cost and analysis reports
+10. **Iterate Fast**: Run → Calculate → Analyze → Refine → Repeat
 
 ## 🎯 Quality Checklist
 
@@ -233,10 +309,13 @@ export ANTHROPIC_API_KEY="sk-ant-..."
 - [ ] <10% problematic questions
 - [ ] All questions have expected answers
 - [ ] Clear CRITICAL questions identified
+- [ ] Costs within budget
 
 **Good Workflow:**
 - [ ] Questions validated before running
+- [ ] Cost estimated before running
 - [ ] Results saved with dates
+- [ ] Costs calculated after running
 - [ ] Analysis reports exported
 - [ ] Dashboard generated and reviewed
 - [ ] Insights documented
@@ -244,18 +323,20 @@ export ANTHROPIC_API_KEY="sk-ant-..."
 
 ## 📐 Evaluation Scale Guide
 
-| Scale | Questions | Time | Approach |
-|-------|-----------|------|----------|
-| **Small** | 5-10 | 1-2h | Learn the system |
-| **Medium** | 20-40 | 3-6h | Comprehensive eval |
-| **Large** | 50+ | 1-2d | Benchmark creation |
+| Scale | Questions | Time | Cost (Sonnet 4) | Approach |
+|-------|-----------|------|-----------------|----------|
+| **Small** | 5-10 | 1-2h | ~$0.30 | Learn the system |
+| **Medium** | 20-40 | 3-6h | ~$1.30 | Comprehensive eval |
+| **Large** | 50+ | 1-2d | ~$3.00+ | Benchmark creation |
 
 ## 🔄 Iteration Loop
 
 ```
-Create Questions → Validate → Run Eval → Analyze
-       ↑                                     ↓
-       └───────────── Refine ←───────────────┘
+Create Questions → Validate (+ estimate cost) → Run Eval
+       ↑                                            ↓
+       |                                     Calculate Costs
+       |                                            ↓
+       └─────────── Refine ←────────── Analyze Results
 ```
 
 **Stop When:**
@@ -263,11 +344,12 @@ Create Questions → Validate → Run Eval → Analyze
 - All categories have 3+ questions
 - <10% problematic questions
 - Clear CRITICAL candidates identified
+- Costs are within budget
 
 ## 📚 Quick Help
 
 ```bash
-# View README
+# View full README
 cat README.md | less
 
 # Show this card
@@ -281,13 +363,19 @@ cat example_questions.json | jq
 
 # Check config
 cat config.json | jq
+
+# Get script help
+python automated_test_runner.py --help
+python compute_costs.py --help
+python results_analyzer.py --help
 ```
 
 ## 🔗 Related Files
 
-- **README.md**: Full documentation
-- **../EVALUATION_README.md**: System overview
-- **../togomcp_evaluation_rubric.md**: Evaluation methodology
+- **README.md**: Full documentation with cost analysis section
+- **../README.md**: Main evaluation system overview
+- **../QUESTION_DESIGN_GUIDE.md**: How to create questions
+- **../PROJECT_STATUS.md**: Current progress and timeline
 - **requirements.txt**: Python dependencies
 - **config.json**: MCP configuration
 - **example_questions.json**: Sample questions
@@ -299,25 +387,13 @@ cat config.json | jq
 pip install -r requirements.txt
 
 # Or manually
-pip install claude-agent-sdk anthropic
+pip install claude-agent-sdk anthropic pandas
 
 # Set API key
 export ANTHROPIC_API_KEY="sk-ant-..."
 
 # Verify installation
 python -c "import anthropic, claude_agent_sdk; print('OK')"
-```
-
-## 💰 Cost Estimation
-
-```bash
-# Estimate cost before running
-python validate_questions.py questions.json --estimate-cost
-
-# Typical costs (Claude Sonnet 4):
-# - Small eval (10 questions): ~$0.10-0.20
-# - Medium eval (40 questions): ~$0.40-0.80
-# - Large eval (100 questions): ~$1.00-2.00
 ```
 
 ## 🎨 Dashboard Features
@@ -336,32 +412,60 @@ python validate_questions.py questions.json --estimate-cost
 - Horizontal bar: Top 10 tools used
 - Bar: Average response time comparison
 
+## 📊 Cache Efficiency
+
+The runner uses **isolated sessions**:
+- Each question = fresh Claude session
+- No conversation history between questions
+- Stable cache costs (~50k read tokens per question)
+- 46% cheaper than conversation accumulation
+
+**Why it matters**:
+- Predictable costs at scale
+- No exponential growth
+- Better reproducibility
+- Cleaner methodology
+
 ## 📞 Getting Help
 
-1. **Check README.md**: Full documentation
+1. **Check README.md**: Full documentation with cost analysis
 2. **Run with --help**: `python script.py --help`
 3. **Check examples**: Review `example_questions.json`
 4. **Validate questions**: Find issues before running
-5. **Review errors**: Error messages usually point to the issue
+5. **Calculate costs**: Understand your spending
+6. **Review errors**: Error messages usually point to the issue
 
 ## ✅ Success Indicators
 
 You're on the right track when:
 - ✅ Evaluations complete without errors
+- ✅ Costs match estimates (±10%)
 - ✅ >70% tool usage rate
 - ✅ Clear CRITICAL questions identified
 - ✅ All categories represented
 - ✅ Can explain each metric
 - ✅ Dashboard shows clear patterns
 - ✅ Iteration improves results
+- ✅ Spending is within budget
+
+## 🎯 Cost Optimization Tips
+
+1. **Remove REDUNDANT questions**: They don't show value-add
+2. **Focus on CRITICAL**: Most bang for buck
+3. **Batch evaluations**: Run multiple question sets together
+4. **Use Haiku for testing**: Much cheaper for question development
+5. **Track spending**: Monitor trends with compute_costs.py
+6. **Plan ahead**: Use --estimate-cost before large runs
 
 ---
 
 **Remember**:
 - Quality > Quantity
+- Estimate → Run → Calculate → Analyze → Iterate
 - Start small, iterate fast
 - Document everything
 - Tool usage = question quality
 - CRITICAL questions = your benchmarks
+- Costs are predictable with isolated sessions
 
 **Need more details?** → Read [README.md](README.md)
