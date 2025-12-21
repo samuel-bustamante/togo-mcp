@@ -11,11 +11,14 @@ Create an HTML page for researchers in biology and medicine who are not necessar
 - Setup guide
 - List of available databases
 - List of available tools
+- Other MCP Servers
+- Related Resources
 
 ## Style
 - Use https://togomcp.rdfportal.org/ as a template.
 - Follow the style of DBCLS's default CSS at https://dbcls.rois.ac.jp/style/default.css.
 - However, make it readable both on PC and smartphone.
+- Put the DBCLS Logo with the link at the page top.
 - Mind the contrast! 
 - The hero section should show the MCP endpoint URL.
 
@@ -89,6 +92,9 @@ The footer should include the following
         <p class="footer__organism-sub">Research Organization of Information and Systems</p>
     </div>
 ```
+- Also add the link to each item.
+- Make sure all the links are alive and correct.
+
 **IMPORTANT!**
 - Make sure to follow the style of DBCLS's default CSS at https://dbcls.rois.ac.jp/style/default.css in the footer.
 - The footer should be center-aligned.
