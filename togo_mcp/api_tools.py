@@ -234,7 +234,7 @@ async def search_pdb_entity(db: str, query: str, limit: int = 20) -> str:
     return json.dumps(response_dict)
 
 # DB: MeSH
-@mcp.tool()
+@mcp.tool(enabled=True)
 async def search_mesh_entity(query: str, limit: int = 10) -> str:
     """
     Search for MeSH ID by query.
