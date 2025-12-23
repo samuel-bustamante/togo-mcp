@@ -18,9 +18,10 @@ import os
 import asyncio
 import httpx
 from typing import Optional, List, Dict, Any
-from mcp.server import Server
-from mcp.types import Tool, TextContent
-from .server import *
+from mcp.types import TextContent
+from .server import toolcall_log
+from fastmcp import FastMCP
+
 
 # Get API key from environment
 NCBI_API_KEY = os.environ.get("NCBI_API_KEY")
@@ -36,7 +37,76 @@ class NCBISearchError(Exception):
     pass
 
 
-async def ncbi_esearch(
+# Database configuration with metadata
+NCBI_DATABASES = {
+    "gene": {
+        "label": "NCBI Gene",
+        "id_label": "Gene IDs",
+        "url_template": "https://www.ncbi.nlm.nih.gov/gene/{id}",
+        "description": "Search for genes by name, symbol, or other identifiers",
+        "example_query": "BRCA1 AND human[organism]",
+        "supported_fields": ["organism", "gene"],
+    },
+    "taxonomy": {
+        "label": "NCBI Taxonomy",
+        "id_label": "Taxonomy IDs (TaxIDs)",
+        "url_template": "https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id={id}",
+        "description": "Search for organisms and taxonomic information",
+        "example_query": "Escherichia coli",
+        "supported_fields": ["scientific name", "common name"],
+    },
+    "clinvar": {
+        "label": "ClinVar",
+        "id_label": "Variation IDs",
+        "url_template": "https://www.ncbi.nlm.nih.gov/clinvar/variation/{id}",
+        "description": "Search for genetic variants and clinical interpretations",
+        "example_query": "BRCA1 AND pathogenic",
+        "supported_fields": ["gene", "condition"],
+    },
+    "medgen": {
+        "label": "MedGen",
+        "id_label": "Concept IDs (CUIs)",
+        "url_template": "https://www.ncbi.nlm.nih.gov/medgen/{id}",
+        "description": "Search for medical genetics concepts and conditions",
+        "example_query": "breast cancer",
+        "supported_fields": ["concept", "condition"],
+    },
+    "pubmed": {
+        "label": "PubMed",
+        "id_label": "PubMed IDs (PMIDs)",
+        "url_template": "https://pubmed.ncbi.nlm.nih.gov/{id}",
+        "description": "Search biomedical literature",
+        "example_query": "CRISPR gene editing",
+        "supported_fields": ["title", "author", "journal"],
+    },
+    "pccompound": {
+        "label": "PubChem Compound",
+        "id_label": "Compound IDs (CIDs)",
+        "url_template": "https://pubchem.ncbi.nlm.nih.gov/compound/{id}",
+        "description": "Search for unique chemical structures",
+        "example_query": "aspirin",
+        "supported_fields": ["name", "formula", "molecular weight"],
+    },
+    "pcsubstance": {
+        "label": "PubChem Substance",
+        "id_label": "Substance IDs (SIDs)",
+        "url_template": "https://pubchem.ncbi.nlm.nih.gov/substance/{id}",
+        "description": "Search for depositor-provided chemical records",
+        "example_query": "caffeine",
+        "supported_fields": ["name", "source"],
+    },
+    "pcassay": {
+        "label": "PubChem BioAssay",
+        "id_label": "Assay IDs (AIDs)",
+        "url_template": "https://pubchem.ncbi.nlm.nih.gov/assay/assay.cgi?aid={id}",
+        "description": "Search for biological screening data",
+        "example_query": "kinase inhibitor",
+        "supported_fields": ["target", "assay type"],
+    },
+}
+
+
+async def _ncbi_esearch_api(
     db: str,
     term: str,
     retmax: int = 20,
@@ -100,7 +170,7 @@ async def ncbi_esearch(
             raise NCBISearchError(f"Error querying NCBI: {str(e)}")
 
 
-def format_esearch_result(data: Dict[str, Any], db: str, query: str) -> str:
+def _format_esearch_result(data: Dict[str, Any], db: str, query: str) -> str:
     """Format esearch results for display"""
     esearch_result = data.get("esearchresult", {})
     
@@ -110,21 +180,13 @@ def format_esearch_result(data: Dict[str, Any], db: str, query: str) -> str:
     retstart = esearch_result.get("retstart", "0")
     query_translation = esearch_result.get("querytranslation", "N/A")
     
-    # Database-specific labels
-    db_labels = {
-        "gene": "Gene IDs",
-        "taxonomy": "Taxonomy IDs (TaxIDs)",
-        "clinvar": "Variation IDs",
-        "medgen": "Concept IDs (CUIs)",
-        "pubmed": "PubMed IDs (PMIDs)",
-        "pccompound": "Compound IDs (CIDs)",
-        "pcsubstance": "Substance IDs (SIDs)",
-        "pcassay": "Assay IDs (AIDs)"
-    }
+    # Get database metadata
+    db_info = NCBI_DATABASES.get(db, {})
+    db_label = db_info.get("label", db.upper())
+    id_label = db_info.get("id_label", "IDs")
+    url_template = db_info.get("url_template")
     
-    id_label = db_labels.get(db, "IDs")
-    
-    result = f"""NCBI {db.upper()} Search Results
+    result = f"""{db_label} Search Results
 =====================================
 Query: {query}
 Query Translation: {query_translation}
@@ -138,268 +200,139 @@ Returned: {len(ids)} (showing {retstart}-{int(retstart) + len(ids)})
     if esearch_result.get("warninglist"):
         result += f"\nWarnings: {esearch_result['warninglist']}"
     
-    # Add helpful links for results
-    if db == "pccompound" and ids:
-        result += f"\n\nView first result: https://pubchem.ncbi.nlm.nih.gov/compound/{ids[0]}"
-    elif db == "pcsubstance" and ids:
-        result += f"\n\nView first result: https://pubchem.ncbi.nlm.nih.gov/substance/{ids[0]}"
-    elif db == "pcassay" and ids:
-        result += f"\n\nView first result: https://pubchem.ncbi.nlm.nih.gov/assay/assay.cgi?aid={ids[0]}"
-    elif db == "gene" and ids:
-        result += f"\n\nView first result: https://www.ncbi.nlm.nih.gov/gene/{ids[0]}"
-    elif db == "taxonomy" and ids:
-        result += f"\n\nView first result: https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id={ids[0]}"
-    elif db == "pubmed" and ids:
-        result += f"\n\nView first result: https://pubmed.ncbi.nlm.nih.gov/{ids[0]}"
+    # Add helpful link for first result
+    if url_template and ids:
+        first_url = url_template.format(id=ids[0])
+        result += f"\n\nView first result: {first_url}"
     
     return result
 
-# Individual Tool Implementation Functions
+
 @ncbi_mcp.tool()
-async def search_ncbigene_entity(
+async def ncbi_esearch(
+    database: str,
     query: str,
     max_results: int = 20,
-    organism: Optional[str] = None
+    start_index: int = 0,
+    sort_by: Optional[str] = None,
+    search_field: Optional[str] = None
 ) -> List[TextContent]:
     """
-    Search NCBI Gene database for genes matching keywords.
+    Search NCBI databases using E-utilities esearch API.
+    
+    Supports multiple NCBI databases including Gene, Taxonomy, ClinVar, MedGen,
+    PubMed, and PubChem (Compound, Substance, BioAssay).
     
     Args:
-        query: Search query (supports Entrez syntax)
-        max_results: Maximum number of results to return
-        organism: Optional organism filter (e.g., 'Homo sapiens', 'human')
+        database: NCBI database name. Supported values:
+            - "gene" or "ncbigene": NCBI Gene database
+            - "taxonomy": NCBI Taxonomy (organism information)
+            - "clinvar": ClinVar (genetic variants)
+            - "medgen": MedGen (medical genetics concepts)
+            - "pubmed": PubMed (biomedical literature)
+            - "pccompound": PubChem Compound
+            - "pcsubstance": PubChem Substance
+            - "pcassay": PubChem BioAssay
+        query: Search query (supports Entrez/PubMed syntax with field tags and boolean operators)
+        max_results: Maximum number of results to return (default: 20)
+        start_index: Starting index for pagination (default: 0)
+        sort_by: Optional sort order (e.g., "relevance", "pub_date" for PubMed)
+        search_field: Optional specific field to search in
     
     Returns:
-        Formatted search results with gene IDs
+        Formatted search results with database-specific IDs
+    
+    Examples:
+        - Search for human BRCA1 gene: database="gene", query="BRCA1 AND human[organism]"
+        - Search PubMed: database="pubmed", query="CRISPR gene editing"
+        - Search for E. coli: database="taxonomy", query="Escherichia coli"
+        - Search PubChem: database="pccompound", query="aspirin"
     """
-    toolcall_log("search_ncbigene_entity")
+    toolcall_log("ncbi_esearch")
+    
+    # Normalize database name (handle aliases)
+    db_aliases = {
+        "ncbigene": "gene",
+    }
+    normalized_db = db_aliases.get(database.lower(), database.lower())
+    
+    # Validate database
+    if normalized_db not in NCBI_DATABASES:
+        supported_dbs = ", ".join(NCBI_DATABASES.keys())
+        return [TextContent(
+            type="text",
+            text=f"Error: Unsupported database '{database}'. Supported databases: {supported_dbs}"
+        )]
+    
     try:
-        # Add organism filter if provided
-        search_query = query
-        if organism:
-            search_query = f"{query} AND {organism}[organism]"
-        
-        data = await ncbi_esearch("gene", search_query, retmax=max_results)
-        result = format_esearch_result(data, "gene", search_query)
+        data = await _ncbi_esearch_api(
+            db=normalized_db,
+            term=query,
+            retmax=max_results,
+            retstart=start_index,
+            sort=sort_by,
+            field=search_field
+        )
+        result = _format_esearch_result(data, normalized_db, query)
         
         return [TextContent(type="text", text=result)]
     
     except NCBISearchError as e:
-        return [TextContent(type="text", text=f"Error searching NCBI Gene: {str(e)}")]
+        return [TextContent(type="text", text=f"Error searching NCBI {database}: {str(e)}")]
     except Exception as e:
         return [TextContent(type="text", text=f"Unexpected error: {str(e)}")]
 
-@ncbi_mcp.tool()
-async def search_taxonomy_entity(
-    query: str,
-    max_results: int = 20
-) -> List[TextContent]:
-    """
-    Search NCBI Taxonomy database for organisms.
-    
-    Args:
-        query: Search query for organism names or taxonomy
-        max_results: Maximum number of results to return
-    
-    Returns:
-        Formatted search results with taxonomy IDs
-    """
-    toolcall_log("search_taxonomy_entity")
-    try:
-        data = await ncbi_esearch("taxonomy", query, retmax=max_results)
-        result = format_esearch_result(data, "taxonomy", query)
-        
-        return [TextContent(type="text", text=result)]
-    
-    except NCBISearchError as e:
-        return [TextContent(type="text", text=f"Error searching NCBI Taxonomy: {str(e)}")]
-    except Exception as e:
-        return [TextContent(type="text", text=f"Unexpected error: {str(e)}")]
 
 @ncbi_mcp.tool()
-async def search_clinvar_entity(
-    query: str,
-    max_results: int = 20
-) -> List[TextContent]:
+async def ncbi_list_databases() -> List[TextContent]:
     """
-    Search ClinVar for genetic variants and clinical interpretations.
-    
-    Args:
-        query: Search query for variants, genes, or conditions
-        max_results: Maximum number of results to return
+    List all supported NCBI databases with descriptions and example queries.
     
     Returns:
-        Formatted search results with ClinVar variation IDs
+        Formatted list of available databases
     """
-    toolcall_log("search_clinvar_entity")
-    try:
-        data = await ncbi_esearch("clinvar", query, retmax=max_results)
-        result = format_esearch_result(data, "clinvar", query)
-        
-        return [TextContent(type="text", text=result)]
+    toolcall_log("ncbi_list_databases")
     
-    except NCBISearchError as e:
-        return [TextContent(type="text", text=f"Error searching ClinVar: {str(e)}")]
-    except Exception as e:
-        return [TextContent(type="text", text=f"Unexpected error: {str(e)}")]
-
-@ncbi_mcp.tool()
-async def search_medgen_entity(
-    query: str,
-    max_results: int = 20
-) -> List[TextContent]:
-    """
-    Search MedGen for medical genetics concepts and conditions.
+    result = "Supported NCBI Databases\n" + "=" * 50 + "\n\n"
     
-    Args:
-        query: Search query for medical genetics concepts
-        max_results: Maximum number of results to return
+    for db_name, db_info in NCBI_DATABASES.items():
+        result += f"{db_info['label']} (database=\"{db_name}\")\n"
+        result += f"  Description: {db_info['description']}\n"
+        result += f"  ID Type: {db_info['id_label']}\n"
+        result += f"  Example Query: {db_info['example_query']}\n"
+        result += f"  Supported Fields: {', '.join(db_info['supported_fields'])}\n\n"
     
-    Returns:
-        Formatted search results with MedGen concept IDs
-    """
-    toolcall_log("search_medgen_entity")
-    try:
-        data = await ncbi_esearch("medgen", query, retmax=max_results)
-        result = format_esearch_result(data, "medgen", query)
-        
-        return [TextContent(type="text", text=result)]
+    result += "\nUsage:\n"
+    result += "  Use ncbi_esearch(database=\"<db_name>\", query=\"<your_query>\")\n"
+    result += "  Example: ncbi_esearch(database=\"gene\", query=\"BRCA1 AND human[organism]\")\n"
     
-    except NCBISearchError as e:
-        return [TextContent(type="text", text=f"Error searching MedGen: {str(e)}")]
-    except Exception as e:
-        return [TextContent(type="text", text=f"Unexpected error: {str(e)}")]
-
-@ncbi_mcp.tool()
-async def search_pubmed_entity(
-    query: str,
-    max_results: int = 20,
-    sort_by: str = "relevance"
-) -> List[TextContent]:
-    """
-    Search PubMed via NCBI E-utilities for biomedical literature.
-    
-    Args:
-        query: Search query (supports PubMed/Entrez syntax)
-        max_results: Maximum number of results to return
-        sort_by: Sort order ('relevance' or 'pub_date')
-    
-    Returns:
-        Formatted search results with PubMed IDs (PMIDs)
-    """
-    toolcall_log("search_pubmed_entity")
-    try:
-        data = await ncbi_esearch("pubmed", query, retmax=max_results, sort=sort_by)
-        result = format_esearch_result(data, "pubmed", query)
-        
-        return [TextContent(type="text", text=result)]
-    
-    except NCBISearchError as e:
-        return [TextContent(type="text", text=f"Error searching PubMed: {str(e)}")]
-    except Exception as e:
-        return [TextContent(type="text", text=f"Unexpected error: {str(e)}")]
-
-@ncbi_mcp.tool()
-async def search_pubchem_compound_entity(
-    query: str,
-    max_results: int = 20
-) -> List[TextContent]:
-    """
-    Search PubChem Compound database for unique chemical structures.
-    
-    Args:
-        query: Search query for chemical compounds
-        max_results: Maximum number of results to return
-    
-    Returns:
-        Formatted search results with PubChem Compound IDs (CIDs)
-    """
-    toolcall_log("search_pubchem_compound_entity")
-    try:
-        data = await ncbi_esearch("pccompound", query, retmax=max_results)
-        result = format_esearch_result(data, "pccompound", query)
-        
-        return [TextContent(type="text", text=result)]
-    
-    except NCBISearchError as e:
-        return [TextContent(type="text", text=f"Error searching PubChem Compound: {str(e)}")]
-    except Exception as e:
-        return [TextContent(type="text", text=f"Unexpected error: {str(e)}")]
-
-@ncbi_mcp.tool()
-async def search_pubchem_substance_entity(
-    query: str,
-    max_results: int = 20
-) -> List[TextContent]:
-    """
-    Search PubChem Substance database for depositor-provided chemical records.
-    
-    Args:
-        query: Search query for substance records
-        max_results: Maximum number of results to return
-    
-    Returns:
-        Formatted search results with PubChem Substance IDs (SIDs)
-    """
-    toolcall_log("search_pubchem_substance_entity")
-    try:
-        data = await ncbi_esearch("pcsubstance", query, retmax=max_results)
-        result = format_esearch_result(data, "pcsubstance", query)
-        
-        return [TextContent(type="text", text=result)]
-    
-    except NCBISearchError as e:
-        return [TextContent(type="text", text=f"Error searching PubChem Substance: {str(e)}")]
-    except Exception as e:
-        return [TextContent(type="text", text=f"Unexpected error: {str(e)}")]
-
-@ncbi_mcp.tool()
-async def search_pubchem_assay_entity(
-    query: str,
-    max_results: int = 20
-) -> List[TextContent]:
-    """
-    Search PubChem BioAssay database for biological screening data.
-    
-    Args:
-        query: Search query for bioassay data
-        max_results: Maximum number of results to return
-    
-    Returns:
-        Formatted search results with PubChem Assay IDs (AIDs)
-    """
-    toolcall_log("search_pubchem_assay_entity")
-    try:
-        data = await ncbi_esearch("pcassay", query, retmax=max_results)
-        result = format_esearch_result(data, "pcassay", query)
-        
-        return [TextContent(type="text", text=result)]
-    
-    except NCBISearchError as e:
-        return [TextContent(type="text", text=f"Error searching PubChem BioAssay: {str(e)}")]
-    except Exception as e:
-        return [TextContent(type="text", text=f"Unexpected error: {str(e)}")]
+    return [TextContent(type="text", text=result)]
 
 
 # Additional utility functions for future use
 @ncbi_mcp.tool()
-async def esummary(db: str, ids: List[str]) -> Dict[str, Any]:
+async def ncbi_esummary(database: str, ids: List[str]) -> List[TextContent]:
     """
     Fetch summary information for given IDs using esummary.
     Useful for getting detailed info after esearch.
     
     Args:
-        db: NCBI database name
+        database: NCBI database name
         ids: List of IDs to fetch summaries for
     
     Returns:
         Parsed JSON response with summary data
     """
-    toolcall_log("esummary")
+    toolcall_log("ncbi_esummary")
+    
+    # Normalize database name
+    db_aliases = {"ncbigene": "gene"}
+    normalized_db = db_aliases.get(database.lower(), database.lower())
+    
     base_url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi"
     
     params = {
-        "db": db,
+        "db": normalized_db,
         "id": ",".join(ids),
         "retmode": "json",
         "tool": "TogoMCP",
@@ -411,33 +344,54 @@ async def esummary(db: str, ids: List[str]) -> Dict[str, Any]:
     
     await asyncio.sleep(RATE_LIMIT_DELAY)
     
-    async with httpx.AsyncClient(timeout=30.0) as client:
-        response = await client.get(base_url, params=params)
-        response.raise_for_status()
-        return response.json()
+    try:
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            response = await client.get(base_url, params=params)
+            response.raise_for_status()
+            data = response.json()
+            
+            # Format the response nicely
+            import json
+            formatted_json = json.dumps(data, indent=2)
+            return [TextContent(type="text", text=formatted_json)]
+            
+    except Exception as e:
+        return [TextContent(type="text", text=f"Error fetching summaries: {str(e)}")]
+
 
 @ncbi_mcp.tool()
-async def efetch(db: str, ids: List[str], rettype: str = "xml") -> str:
+async def ncbi_efetch(
+    database: str,
+    ids: List[str],
+    rettype: str = "xml",
+    retmode: str = "text"
+) -> List[TextContent]:
     """
     Fetch full records using efetch.
     Returns actual data (sequences, records, etc.)
     
     Args:
-        db: NCBI database name
+        database: NCBI database name
         ids: List of IDs to fetch
         rettype: Return type (xml, fasta, gb, etc.)
+        retmode: Return mode (text, xml, json where applicable)
     
     Returns:
         Response text in requested format
     """
-    toolcall_log("efetch")
+    toolcall_log("ncbi_efetch")
+    
+    # Normalize database name
+    db_aliases = {"ncbigene": "gene"}
+    normalized_db = db_aliases.get(database.lower(), database.lower())
+    
     base_url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi"
     
     params = {
-        "db": db,
+        "db": normalized_db,
         "id": ",".join(ids),
         "rettype": rettype,
-        "retmode": "text",
+        "retmode": retmode,
         "tool": "TogoMCP",
         "email": NCBI_EMAIL
     }
@@ -447,7 +401,11 @@ async def efetch(db: str, ids: List[str], rettype: str = "xml") -> str:
     
     await asyncio.sleep(RATE_LIMIT_DELAY)
     
-    async with httpx.AsyncClient(timeout=30.0) as client:
-        response = await client.get(base_url, params=params)
-        response.raise_for_status()
-        return response.text
+    try:
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            response = await client.get(base_url, params=params)
+            response.raise_for_status()
+            return [TextContent(type="text", text=response.text)]
+            
+    except Exception as e:
+        return [TextContent(type="text", text=f"Error fetching records: {str(e)}")]

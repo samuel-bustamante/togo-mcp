@@ -1,363 +1,229 @@
-question_id,date,category,question_text,baseline_success,baseline_text,baseline_error,baseline_time,baseline_input_tokens,baseline_output_tokens,togomcp_success,togomcp_text,togomcp_error,togomcp_time,tools_used,tool_details,expected_answer,notes
-1,2025-12-15,Precision,What is the UniProt ID for human BRCA1?,True,The UniProt ID for human BRCA1 is P38398.,,4.707756996154785,51,20,True,"Perfect! The UniProt ID for human BRCA1 is **P38398**.
+question_id,date,category,question_text,baseline_success,baseline_actually_answered,baseline_has_expected,baseline_confidence,baseline_text,baseline_error,baseline_time,baseline_input_tokens,baseline_output_tokens,togomcp_success,togomcp_has_expected,togomcp_confidence,togomcp_text,togomcp_error,togomcp_time,togomcp_input_tokens,togomcp_output_tokens,togomcp_cache_creation_input_tokens,togomcp_cache_read_input_tokens,tools_used,tool_details,value_add,expected_answer,notes
+1,2025-12-18,Precision,What is the UniProt ID for the CRISPR-associated endonuclease Cas9 from Streptococcus pyogenes serotype M1?,True,True,True,1.0,"The UniProt ID for the CRISPR-associated endonuclease Cas9 from Streptococcus pyogenes serotype M1 is **Q99ZW2**.
 
-From the search results, I can see that P38398 corresponds to the ""Breast cancer type 1 susceptibility protein"" in *Homo sapiens* (Human), which is the full name for BRCA1. This protein is also described as:
-- EC 2.3.2.27 (enzyme classification)
-- RING finger protein 53
-- RING-type E3 ubiquitin transferase BRCA1
+This is the most commonly referenced and studied Cas9 protein, particularly the one from S. pyogenes strain SF370 (serotype M1), which is widely used in CRISPR-Cas9 genome editing applications.",,4.1611487865448,76,100,True,True,1.0,"The UniProt ID for the CRISPR-associated endonuclease Cas9 from Streptococcus pyogenes serotype M1 is **Q99ZW2**.
 
-So the answer to your question is: **P38398**",,12.517577886581421,mcp__togomcp__search_uniprot_entity,"[{""name"": ""mcp__togomcp__search_uniprot_entity"", ""input"": {""query"": ""human BRCA1""}}]",P38398,Test basic UniProt ID lookup
-2,2025-12-15,Precision,What is the PubChem Compound ID for aspirin?,True,"The PubChem Compound ID (CID) for aspirin is **2244**.
+This entry corresponds to the CRISPR-associated endonuclease Cas9/Csn1 (also known as SpCas9 or SpyCas9) from Streptococcus pyogenes serotype M1. This is the widely used Cas9 protein in genome editing applications.",,10.264228105545044,9,269,16699,16359,mcp__togomcp__search_uniprot_entity,"[{""name"": ""mcp__togomcp__search_uniprot_entity"", ""input"": {""query"": ""CRISPR-associated endonuclease Cas9 Streptococcus pyogenes serotype M1"", ""limit"": 10}}]",VALUABLE,Q99ZW2,"Tests precise protein identification across species. Verified using search_uniprot_entity for 'CRISPR-associated protein Cas9'. This is SpCas9, the most commonly used Cas9 variant in genome editing. Database: UniProt. The SpyCas9 variant is distinguished from other Cas9 orthologs."
+2,2025-12-18,Precision,What is the MONDO disease ontology identifier for Fabry disease?,True,True,True,1.0,"The MONDO disease ontology identifier for Fabry disease is MONDO:0010526.
 
-Aspirin, chemically known as acetylsalicylic acid, is a well-documented compound in the PubChem database with this specific identifier.",,3.240767002105713,51,59,True,The PubChem Compound ID for aspirin is **2244**.,,10.866184949874878,mcp__togomcp__get_pubchem_compound_id,"[{""name"": ""mcp__togomcp__get_pubchem_compound_id"", ""input"": {""compound_name"": ""aspirin""}}]",2244,Test compound ID lookup
-3,2025-12-15,Completeness,How many human genes are annotated with the GO term 'DNA repair' (GO:0006281)?,True,"I don't have access to current gene ontology databases or real-time information about the exact number of human genes currently annotated with GO:0006281 (DNA repair). The number of genes annotated with any GO term can change over time as new research emerges and annotations are updated.
+Fabry disease is a rare X-linked lysosomal storage disorder caused by deficiency of the enzyme alpha-galactosidase A, and this is how it's classified in the Monarch Disease Ontology (MONDO) system.",,3.342072010040283,52,77,True,True,1.0,"The MONDO disease ontology identifier for Fabry disease is **MONDO:0010526**.
 
-However, I can tell you that DNA repair is a fundamental cellular process, and hundreds of human genes are involved in various DNA repair pathways, including:
+Here's the complete information about Fabry disease from the MONDO database:
 
-- Base excision repair (BER)
-- Nucleotide excision repair (NER)
-- Mismatch repair (MMR)
-- Homologous recombination
-- Non-homologous end joining
-- Direct repair mechanisms
+**MONDO ID:** MONDO:0010526
 
-To get the current, accurate count of human genes annotated with GO:0006281, you would need to query a current gene ontology database such as:
-- QuickGO (EBI)
-- AmiGO (Gene Ontology Consortium)
-- NCBI Gene database
+**Definition:** Fabry disease (FD) is a progressive, inherited, multisystemic lysosomal storage disease characterized by specific neurological, cutaneous, renal, cardiovascular, cochleo-vestibular and cerebrovascular manifestations.
 
-These resources would provide you with the most up-to-date annotation counts.",,6.179703950881958,60,235,True,"Excellent! It seems human gene IDs tend to be smaller numbers. Looking back at our original TogoID results, I can see many smaller numbers in the results. Let me estimate the count by using a more systematic approach. 
+**Synonyms:**
+- Anderson-Fabry disease
+- angiokeratoma corporis diffusum
+- diffuse angiokeratoma
+- FD (abbreviation)
+- alpha galactosidase deficiency
+- Alpha-galactosidase A deficiency
+- deficiency of melibiase
+- Fabry's disease
 
-Based on the data we've gathered and the patterns I can observe:
+**Cross-references to other databases:**
+- OMIM: 301500
+- Orphanet: 324
+- UMLS: C0002986
+- MESH: D000795
+- GARD: 6400
+- DOID: 14499
+- NCIT: C84701
+- SCTID: 16652001
+- And many others
 
-1. The TogoID conversion from GO:0006281 to ncbigene returned thousands of gene IDs
-2. The output was truncated due to size limits, indicating a very large number
-3. From the visible portion, I can count and extrapolate
+This comprehensive entry in MONDO provides a unified identifier that links to multiple other disease databases, making it useful for research and clinical applications.",,29.38838815689087,21,1026,17987,76986,"mcp__togomcp__get_MIE_file, mcp__togomcp__run_sparql, mcp__togomcp__run_sparql","[{""name"": ""mcp__togomcp__get_MIE_file"", ""input"": {""dbname"": ""mondo""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""mondo"", ""sparql_query"": ""PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\nPREFIX owl: <http://www.w3.org/2002/07/owl#>\nPREFIX oboInOwl: <http://www.geneontology.org/formats/oboInOwl#>\n\nSELECT ?disease ?mondoId ?label ?sc\nFROM <http://rdfportal.org/ontology/mondo>\nWHERE {\n  ?disease a owl:Class ;\n    rdfs:label ?label ;\n    oboInOwl:id ?mondoId .\n  ?label bif:contains \""'Fabry'\"" option (score ?sc)\n}\nORDER BY DESC(?sc)\nLIMIT 10""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""mondo"", ""sparql_query"": ""PREFIX obo: <http://purl.obolibrary.org/obo/>\nPREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\nPREFIX oboInOwl: <http://www.geneontology.org/formats/oboInOwl#>\nPREFIX IAO: <http://purl.obolibrary.org/obo/IAO_>\n\nSELECT ?label ?definition ?synonym ?xref\nFROM <http://rdfportal.org/ontology/mondo>\nWHERE {\n  obo:MONDO_0010526 rdfs:label ?label .\n  OPTIONAL { obo:MONDO_0010526 IAO:0000115 ?definition }\n  OPTIONAL { obo:MONDO_0010526 oboInOwl:hasExactSynonym ?synonym }\n  OPTIONAL { obo:MONDO_0010526 oboInOwl:hasDbXref ?xref }\n}""}}]",VALUABLE,MONDO:0010526,Tests rare disease identification in ontology databases. Verified using OLS4 searchClasses for 'Fabry disease'. Fabry disease is a lysosomal storage disorder that requires precise identification for clinical research. Database: MONDO.
+3,2025-12-18,Completeness,How many protein structure entries are available in the PDB database for CRISPR Cas9?,True,False,True,1.0,"I don't have access to real-time PDB database statistics, so I cannot provide the exact current number of Cas9 protein structure entries. The number of structures in the PDB is constantly growing as researchers deposit new structures.
 
-Let me count what I can see in the first result and provide an estimate:
+However, I can tell you that as of my last training data, there were dozens of Cas9-related structures in the PDB, including:
 
-From the first TogoID query result, I can count approximately 10,000 gene IDs before truncation. However, this includes genes from all species, not just humans.
+- Structures of Cas9 from different species (primarily *Streptococcus pyogenes*, but also *Staphylococcus aureus* and others)
+- Cas9 in different conformational states (apo form, DNA-bound, RNA-bound)
+- Cas9 in complex with guide RNAs and target DNA
+- Various Cas9 variants and engineered versions
 
-Based on the biological knowledge that DNA repair is a fundamental process conserved across many species, and given that:
-- The Gene Ontology annotation for ""DNA repair"" (GO:0006281) includes genes from bacteria, plants, fungi, and animals
-- Human genes typically have lower NCBI Gene IDs (as we confirmed with our taxonomy queries)
-- DNA repair pathways are well-studied in humans with hundreds of known genes involved
+To get the most current and accurate count, I'd recommend:
+1. Searching the PDB directly (rcsb.org) using terms like ""Cas9"" or ""CRISPR""
+2. Using more specific searches for particular Cas9 proteins (e.g., ""Streptococcus pyogenes Cas9"")
+3. Checking recent literature reviews on CRISPR-Cas9 structural biology
 
-Let me provide you with the most accurate information I can determine:
+The number has been steadily increasing over the past decade as CRISPR research has expanded rapidly.",,7.946079969406128,58,296,True,True,1.0,"Based on the search results from the PDB database, there are **461 protein structure entries** available for CRISPR Cas9.
 
-**Based on the available data from the TogoID service, there are several thousand genes across all species annotated with the GO term 'DNA repair' (GO:0006281). However, I cannot provide an exact count specifically for human genes due to the data volume limitations in the query responses.**
+The search returned a diverse collection of Cas9-related structures, including:
 
-From what is known in the literature, **approximately 150-200 human genes are directly involved in DNA repair pathways**, including genes involved in:
+1. **Various Cas9 variants** from different species:
+   - SpCas9 (Streptococcus pyogenes) - the most common
+   - SaCas9 (Staphylococcus aureus)
+   - FnCas9 (Francisella novicida)
+   - NmeCas9 (Neisseria meningitidis)
+   - St1Cas9 (Streptococcus thermophilus)
 
-- Base excision repair (BER)
-- Nucleotide excision repair (NER) 
-- Mismatch repair (MMR)
-- Homologous recombination
-- Non-homologous end joining
-- Direct repair mechanisms
+2. **Different complex states**:
+   - Cas9 bound to guide RNA (gRNA/sgRNA) only
+   - Cas9-gRNA-DNA ternary complexes
+   - Cas9 with various DNA substrates and PAM sequences
+   - Cas9 in different conformational states (open, closed, kinked)
 
-Some well-known examples include BRCA1, BRCA2, TP53, ATM, PARP1, XRCC1, MLH1, MSH2, and many others.
+3. **Engineered variants**:
+   - SpRY-Cas9 variants with altered PAM specificity
+   - Cas9 variants with different targeting capabilities
 
-If you need the exact count of human genes annotated with GO:0006281, I would recommend using a more specialized tool or database that can handle the large dataset and filter by taxonomy, such as the Gene Ontology Consortium's website or Ensembl BioMart.",,207.75464391708374,"mcp__togomcp__run_sparql, mcp__togomcp__get_MIE_file, mcp__togomcp__get_sparql_example, mcp__togomcp__get_graph_list, mcp__togomcp__run_sparql, mcp__togomcp__run_sparql, mcp__togomcp__run_sparql, mcp__togomcp__run_sparql, mcp__togomcp__togoid_getRelation, mcp__togomcp__togoid_convertId, mcp__togomcp__togoid_convertId, mcp__togomcp__togoid_countId, mcp__togomcp__togoid_convertId, mcp__togomcp__togoid_convertId, mcp__togomcp__run_sparql, mcp__togomcp__togoid_convertId, mcp__togomcp__togoid_convertId, mcp__togomcp__togoid_convertId","[{""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""go"", ""sparql_query"": ""PREFIX go: <http://purl.obolibrary.org/obo/>\nPREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\nPREFIX obo: <http://purl.obolibrary.org/obo/>\n\nSELECT (COUNT(DISTINCT ?gene) AS ?geneCount)\nWHERE {\n  ?gene obo:RO_0002331 go:GO_0006281 .\n  ?gene rdfs:label ?geneLabel .\n  FILTER(CONTAINS(LCASE(?geneLabel), \""homo sapiens\"") || CONTAINS(LCASE(?geneLabel), \""human\""))\n}""}}, {""name"": ""mcp__togomcp__get_MIE_file"", ""input"": {""dbname"": ""go""}}, {""name"": ""mcp__togomcp__get_sparql_example"", ""input"": {""dbname"": ""go""}}, {""name"": ""mcp__togomcp__get_graph_list"", ""input"": {""dbname"": ""go""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""go"", ""sparql_query"": ""PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\nPREFIX go: <http://purl.obolibrary.org/obo/GO_>\nPREFIX obo: <http://purl.obolibrary.org/obo/>\n\nSELECT (COUNT(DISTINCT ?gene) AS ?geneCount)\nFROM <http://purl.jp/bio/11/goa>\nWHERE {\n  ?annotation ?predicate go:0006281 .\n  ?annotation ?hasGene ?gene .\n  ?gene ?taxonPredicate ?taxon .\n  FILTER(CONTAINS(STR(?taxon), \""9606\""))\n}""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""go"", ""sparql_query"": ""PREFIX obo: <http://purl.obolibrary.org/obo/>\n\nSELECT DISTINCT ?p ?o\nFROM <http://purl.jp/bio/11/goa>\nWHERE {\n  ?s ?p ?o .\n  FILTER(CONTAINS(STR(?o), \""0006281\""))\n}\nLIMIT 10""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""go"", ""sparql_query"": ""PREFIX obo: <http://purl.obolibrary.org/obo/>\n\nSELECT DISTINCT ?p (COUNT(*) as ?count)\nFROM <http://purl.jp/bio/11/goa>\nWHERE {\n  ?s ?p ?o .\n}\nGROUP BY ?p\nORDER BY DESC(?count)\nLIMIT 20""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""ncbigene"", ""sparql_query"": ""PREFIX obo: <http://purl.obolibrary.org/obo/>\nPREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n\nSELECT (COUNT(DISTINCT ?gene) AS ?geneCount)\nWHERE {\n  ?gene obo:RO_0002331 obo:GO_0006281 .\n  ?gene ?taxonPredicate ?taxon .\n  FILTER(CONTAINS(STR(?taxon), \""9606\""))\n}\nLIMIT 10""}}, {""name"": ""mcp__togomcp__togoid_getRelation"", ""input"": {""source"": ""ncbigene"", ""target"": ""go""}}, {""name"": ""mcp__togomcp__togoid_convertId"", ""input"": {""ids"": ""GO:0006281"", ""route"": ""go,ncbigene"", ""limit"": 10000}}, {""name"": ""mcp__togomcp__togoid_convertId"", ""input"": {""ids"": ""GO:0006281"", ""route"": ""go,ncbigene""}}, {""name"": ""mcp__togomcp__togoid_countId"", ""input"": {""source"": ""go"", ""target"": ""ncbigene"", ""ids"": ""GO:0006281""}}, {""name"": ""mcp__togomcp__togoid_convertId"", ""input"": {""ids"": ""GO:0006281"", ""route"": ""go,ncbigene"", ""limit"": 10000}}, {""name"": ""mcp__togomcp__togoid_convertId"", ""input"": {""ids"": ""GO:0006281"", ""route"": ""go,ncbigene,taxonomy"", ""limit"": 10000}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""ncbigene"", ""sparql_query"": ""PREFIX obo: <http://purl.obolibrary.org/obo/>\nPREFIX ncbigene: <http://identifiers.org/ncbigene/>\nPREFIX taxon: <http://purl.obolibrary.org/obo/NCBITaxon_>\n\nSELECT (COUNT(DISTINCT ?gene) AS ?geneCount)\nWHERE {\n  ?gene ?hasTaxon taxon:9606 .\n  ?gene ?hasAnnotation obo:GO_0006281 .\n}""}}, {""name"": ""mcp__togomcp__togoid_convertId"", ""input"": {""ids"": ""814672,814803,815941,816391,816467"", ""route"": ""ncbigene,taxonomy""}}, {""name"": ""mcp__togomcp__togoid_convertId"", ""input"": {""ids"": ""1,2,3,4,5"", ""route"": ""ncbigene,taxonomy""}}, {""name"": ""mcp__togomcp__togoid_convertId"", ""input"": {""ids"": ""100,200,300,400,500"", ""route"": ""ncbigene,taxonomy""}}]",Check actual count in GO database,Tests ability to query and count GO annotations
-4,2025-12-15,Integration,Find the ChEMBL target IDs associated with PubChem compound 5288826 (resveratrol).,True,"I don't have access to real-time database queries to look up the specific ChEMBL target IDs associated with PubChem compound 5288826 (resveratrol). 
+4. **Anti-CRISPR complexes**:
+   - Structures with anti-CRISPR proteins (AcrII family)
 
-However, I can tell you that resveratrol is a well-studied polyphenolic compound that has been shown to interact with numerous biological targets. Some of the major target classes that resveratrol is known to modulate include:
+5. **Different functional states**:
+   - Catalytically active forms
+   - Dead Cas9 (dCas9) variants
+   - Various intermediate states during DNA cleavage
 
-- Sirtuins (particularly SIRT1)
-- Cyclooxygenases (COX-1, COX-2)
-- Lipoxygenases
-- Various kinases
-- Nuclear receptors
-- Antioxidant enzymes
+This large number of structures reflects the extensive research interest in CRISPR-Cas9 technology and the detailed structural characterization of this important genome editing tool across different conditions, variants, and functional states.",,15.701310157775879,9,555,3447,32524,mcp__togomcp__search_pdb_entity,"[{""name"": ""mcp__togomcp__search_pdb_entity"", ""input"": {""db"": ""pdb"", ""query"": ""CRISPR Cas9"", ""limit"": 100}}]",CRITICAL,461 structures,Tests ability to count comprehensive structural data. Verified using search_pdb_entity with query 'CRISPR Cas9' which returned 461 total results. This number may change over time as new structures are deposited. Database: PDB.
+4,2025-12-18,Completeness,How many descendant terms does the Gene Ontology term 'autophagy' (GO:0006914) have?,True,False,True,1.0,"I don't have access to real-time Gene Ontology database information, so I cannot provide the exact current number of descendant terms for GO:0006914 (autophagy).
 
-To find the specific ChEMBL target IDs for resveratrol, you would need to:
+The number of descendant terms for any GO term can change over time as the ontology is updated with new annotations, term additions, or structural modifications. To get the accurate and current count of descendant terms for GO:0006914, you would need to:
 
-1. Search the ChEMBL database directly using either the compound name ""resveratrol"" or its ChEMBL ID
-2. Cross-reference PubChem CID 5288826 with ChEMBL compound identifiers
-3. Use the ChEMBL web interface or API to retrieve associated target information
+1. Query the Gene Ontology database directly (http://geneontology.org/)
+2. Use tools like AmiGO, QuickGO, or other GO browsers
+3. Access the GO through programmatic interfaces like the GO API
 
-The ChEMBL database (www.ebi.ac.uk/chembl/) would provide the most accurate and up-to-date target association data for this compound.",,7.855219125747681,65,295,True,"Perfect! Now I have a comprehensive list of ChEMBL target IDs associated with PubChem compound 445154 (resveratrol). Let me summarize the findings:
+These resources would provide you with the most up-to-date count of all child terms (direct descendants) and their descendants (indirect descendants) under the autophagy term.",,6.2479798793792725,64,190,True,True,1.0,"The Gene Ontology term 'autophagy' (GO:0006914) has **32 descendant terms**. 
 
-## ChEMBL Target IDs Associated with PubChem Compound 445154 (Resveratrol)
+This count includes all the more specific GO terms that are subclasses of autophagy, representing the various types, processes, and regulatory aspects of autophagy that are catalogued in the Gene Ontology hierarchy.",,9.638118743896484,9,303,410,32530,mcp__togomcp__run_sparql,"[{""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""go"", ""sparql_query"": ""PREFIX go: <http://purl.obolibrary.org/obo/>\nPREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n\nSELECT (COUNT(?descendant) AS ?count)\nWHERE {\n  ?descendant rdfs:subClassOf* go:GO_0006914 .\n  FILTER(?descendant != go:GO_0006914)\n}""}}]",CRITICAL,25 descendant terms,"Tests ability to navigate ontology hierarchies and count complete sets. Verified using OLS4 getDescendants which returned totalElements: 25. This includes all child terms like macroautophagy, microautophagy, etc. Database: GO."
+5,2025-12-18,Integration,What is the NCBI Gene ID corresponding to UniProt ID P04637?,True,False,False,0.0,"I don't have the specific NCBI Gene ID for UniProt ID P04637 readily available in my training knowledge. To find this information accurately, you would need to:
 
-I found that **PubChem compound 445154 (resveratrol) corresponds to ChEMBL compound CHEMBL165**. Here are the key ChEMBL target IDs associated with resveratrol, organized by the number of bioactivity measurements:
+1. Look up P04637 in the UniProt database
+2. Check the cross-references section for NCBI Gene IDs
+3. Or use database mapping tools like UniProt's ID mapping service
 
-### Top Human Protein Targets (Single Proteins):
-1. **CHEMBL2487** - Beta amyloid A4 protein (66 activities)
-2. **CHEMBL4506** - NAD-dependent deacetylase sirtuin 1 (36 activities)
-3. **CHEMBL230** - Cyclooxygenase-2 (14 activities)
-4. **CHEMBL1293224** - Microtubule-associated protein tau (12 activities)
-5. **CHEMBL3959** - Quinone reductase 2 (12 activities)
-6. **CHEMBL1978** - Cytochrome P450 19A1 (11 activities)
-7. **CHEMBL206** - Estrogen receptor alpha (11 activities)
-8. **CHEMBL1075138** - Tyrosyl-DNA phosphodiesterase 1 (10 activities)
-9. **CHEMBL340** - Cytochrome P450 3A4 (9 activities)
-10. **CHEMBL1075094** - Nuclear factor erythroid 2-related factor 2 (8 activities)
+I cannot provide the specific Gene ID with certainty without accessing these database resources directly. If you need this information, I'd recommend checking the UniProt entry for P04637 or using their cross-reference tools.",,5.681567907333374,55,134,True,True,1.0,"The NCBI Gene ID corresponding to UniProt ID P04637 is **7157**.
 
-### Other Notable Target Categories:
-- **Cell Line Targets**: CHEMBL387 (MCF7), CHEMBL383 (HL-60), CHEMBL400 (MDA-MB-231), etc.
-- **Organism Targets**: CHEMBL375 (Mus musculus), CHEMBL378 (HIV-1), CHEMBL376 (Rattus norvegicus)
-- **Protein Family Targets**: Various kinases, receptors, and enzymes
+This UniProt ID P04637 corresponds to the TP53 gene (tumor protein p53), which is a well-known tumor suppressor gene. The conversion shows that UniProt entry P04637 maps to NCBI Gene ID 7157.",,9.28591775894165,8,208,298,32521,mcp__togomcp__togoid_convertId,"[{""name"": ""mcp__togomcp__togoid_convertId"", ""input"": {""ids"": ""P04637"", ""route"": ""uniprot,ncbigene""}}]",CRITICAL,7157,"Tests cross-database ID conversion. Verified using togoid_convertId from uniprot to ncbigene, converting P04637 (TP53 tumor suppressor protein) to gene ID 7157. This is a fundamental integration task. Databases: UniProt, NCBI Gene."
+6,2025-12-18,Integration,"What is the ChEBI identifier for the immunosuppressive drug sirolimus, also known as rapamycin?",True,True,True,1.0,"The ChEBI identifier for sirolimus (rapamycin) is CHEBI:9168.
 
-### Key Biological Activities:
-Resveratrol shows activity against targets involved in:
-- **Neurodegeneration** (Beta amyloid, tau protein)
-- **Aging/Longevity** (SIRT1)
-- **Inflammation** (COX-2, NF-κB pathway)
-- **Cancer** (Various cancer cell lines)
-- **Oxidative stress** (Nrf2, quinone reductase)
-- **Hormone regulation** (Estrogen receptor, aromatase)
-
-The most extensively studied targets are SIRT1 (sirtuin 1) and beta-amyloid protein, which aligns with resveratrol's well-known roles in longevity research and neuroprotection.",,98.5068998336792,"mcp__togomcp__get_compound_attributes_from_pubchem, mcp__togomcp__get_pubchem_compound_id, mcp__togomcp__get_compound_attributes_from_pubchem, mcp__togomcp__search_chembl_molecule, mcp__togomcp__search_chembl_molecule, mcp__togomcp__togoid_convertId, mcp__togomcp__togoid_getRelation, mcp__togomcp__togoid_getAllDataset, mcp__togomcp__togoid_convertId, mcp__togomcp__run_sparql, mcp__togomcp__get_MIE_file, mcp__togomcp__run_sparql, mcp__togomcp__run_sparql","[{""name"": ""mcp__togomcp__get_compound_attributes_from_pubchem"", ""input"": {""pubchem_compound_id"": ""5288826""}}, {""name"": ""mcp__togomcp__get_pubchem_compound_id"", ""input"": {""compound_name"": ""resveratrol""}}, {""name"": ""mcp__togomcp__get_compound_attributes_from_pubchem"", ""input"": {""pubchem_compound_id"": ""445154""}}, {""name"": ""mcp__togomcp__search_chembl_molecule"", ""input"": {""query"": ""resveratrol"", ""limit"": 20}}, {""name"": ""mcp__togomcp__search_chembl_molecule"", ""input"": {""query"": ""C1=CC(=CC=C1C=CC2=CC(=CC(=C2)O)O)O"", ""limit"": 10}}, {""name"": ""mcp__togomcp__togoid_convertId"", ""input"": {""ids"": ""445154"", ""route"": ""pubchem.compound,chembl.compound"", ""limit"": 100}}, {""name"": ""mcp__togomcp__togoid_getRelation"", ""input"": {""source"": ""pubchem.compound"", ""target"": ""chembl.compound""}}, {""name"": ""mcp__togomcp__togoid_getAllDataset"", ""input"": {}}, {""name"": ""mcp__togomcp__togoid_convertId"", ""input"": {""ids"": ""445154"", ""route"": ""pubchem_compound,chembl_compound"", ""limit"": 100}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""chembl"", ""sparql_query"": ""PREFIX chembl: <http://rdf.ebi.ac.uk/terms/chembl#>\nPREFIX dcterms: <http://purl.org/dc/terms/>\n\nSELECT DISTINCT ?target ?targetId ?targetName ?targetType ?organism\nWHERE {\n  ?activity chembl:hasMolecule <http://rdf.ebi.ac.uk/resource/chembl/molecule/CHEMBL165> ;\n            chembl:hasAssay ?assay ;\n            chembl:hasTarget ?target .\n  \n  ?target dcterms:identifier ?targetId ;\n          dcterms:title ?targetName ;\n          chembl:targetType ?targetType .\n  \n  OPTIONAL { ?target chembl:organism ?organism }\n}\nORDER BY ?targetId""}}, {""name"": ""mcp__togomcp__get_MIE_file"", ""input"": {""dbname"": ""chembl""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""chembl"", ""sparql_query"": ""PREFIX cco: <http://rdf.ebi.ac.uk/terms/chembl#>\n\nSELECT DISTINCT ?target ?targetLabel ?targetId ?targetType\nFROM <http://rdf.ebi.ac.uk/dataset/chembl>\nWHERE {\n  ?activity a cco:Activity ;\n            cco:hasMolecule <http://rdf.ebi.ac.uk/resource/chembl/molecule/CHEMBL165> ;\n            cco:hasAssay/cco:hasTarget ?target .\n  \n  ?target rdfs:label ?targetLabel ;\n          cco:chemblId ?targetId ;\n          cco:targetType ?targetType .\n}\nORDER BY ?targetId\nLIMIT 100""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""chembl"", ""sparql_query"": ""PREFIX cco: <http://rdf.ebi.ac.uk/terms/chembl#>\n\nSELECT DISTINCT ?targetId ?targetLabel ?targetType ?organism \n       (COUNT(?activity) AS ?activityCount)\nFROM <http://rdf.ebi.ac.uk/dataset/chembl>\nWHERE {\n  ?activity a cco:Activity ;\n            cco:hasMolecule <http://rdf.ebi.ac.uk/resource/chembl/molecule/CHEMBL165> ;\n            cco:hasAssay/cco:hasTarget ?target .\n  \n  ?target rdfs:label ?targetLabel ;\n          cco:chemblId ?targetId ;\n          cco:targetType ?targetType .\n  \n  OPTIONAL { ?target cco:organismName ?organism }\n}\nGROUP BY ?targetId ?targetLabel ?targetType ?organism\nORDER BY DESC(?activityCount) ?targetId\nLIMIT 50""}}]",Multiple ChEMBL targets,Tests cross-database linking: PubChem to ChEMBL
-5,2025-12-15,Currency,What pathways in Reactome involve SARS-CoV-2 proteins?,True,"Based on my knowledge of Reactome pathways related to SARS-CoV-2, several key pathways involve SARS-CoV-2 proteins:
-
-## Major SARS-CoV-2 Related Pathways:
-
-1. **SARS-CoV-2 Infection pathway** - This is the primary pathway that describes the viral lifecycle, including:
-   - Viral entry via ACE2 receptor binding (Spike protein)
-   - Membrane fusion and endocytosis
-   - Viral replication and transcription
-   - Assembly and release
-
-2. **SARS-CoV-2 modulates host translation machinery** - Involving:
-   - Nsp1 protein inhibiting host translation
-   - Manipulation of ribosomal function
-   - Selective translation of viral proteins
-
-3. **Innate immune system modulation** - Including:
-   - Interferon signaling disruption by various viral proteins
-   - Pattern recognition receptor evasion
-   - Cytokine response modulation
-
-4. **Autophagy pathway interactions** - Where viral proteins like:
-   - Nsp6 and other proteins affect autophagy
-   - ORF3a involvement in autophagosome formation
-
-5. **ER stress and unfolded protein response** - Triggered by:
-   - High viral protein production
-   - ORF8 and other accessory proteins
-
-6. **Apoptosis and cell death pathways** - Modulated by various viral proteins including ORF3a, ORF7a
+Sirolimus is indeed an immunosuppressive drug that's commonly used to prevent organ transplant rejection and has also found applications in treating certain cancers and other conditions. It works by inhibiting the mTOR (mechanistic target of rapamycin) pathway.",,3.8423678874969482,63,84,True,True,1.0,"Perfect! I found the ChEBI identifier for sirolimus (rapamycin). Based on my search of the ChEBI database:
 
-However, I should note that Reactome is actively updated, and the specific organization and naming of these pathways may have evolved since my last training. For the most current and detailed pathway information, I'd recommend checking the Reactome database directly.",,10.136672019958496,56,409,True,"Based on my search of the Reactome database, I can provide you with comprehensive information about the pathways that involve SARS-CoV-2 proteins. Here's what I found:
+**The ChEBI identifier for sirolimus/rapamycin is: CHEBI:9168**
 
-## Major SARS-CoV-2 Pathways in Reactome
+The database confirms that this entry includes both names:
+- **Primary name**: sirolimus
+- **Related synonyms** include: ""rapamycin"", ""(-)-Rapamycin"", ""Rapamune"", and ""Antibiotic AY 22989""
 
-### 1. **Main SARS-CoV-2 Infection Pathway**
-The primary pathway is **""SARS-CoV-2 Infection""** which encompasses the complete viral infection process and contains multiple sub-pathways.
+Additional information about this compound:
+- **Molecular formula**: C₅₁H₇₉NO₁₃
+- **Molecular weight**: 914.17190 g/mol
+- **Definition**: A macrolide lactam isolated from *Streptomyces hygroscopicus* consisting of a 29-membered ring containing 4 trans double bonds, three of which are conjugated. It is an antibiotic, immunosuppressive and antineoplastic agent.
 
-### 2. **Key Sub-pathways Involving SARS-CoV-2 Proteins:**
+So sirolimus and rapamycin are indeed the same compound, with sirolimus being the preferred name in ChEBI and rapamycin being listed as a related synonym.",,39.53437113761902,32,1914,14231,126216,"mcp__togomcp__get_MIE_file, mcp__togomcp__run_sparql, mcp__togomcp__run_sparql, mcp__togomcp__run_sparql, mcp__togomcp__run_sparql","[{""name"": ""mcp__togomcp__get_MIE_file"", ""input"": {""dbname"": ""chebi""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""chebi"", ""sparql_query"": ""PREFIX owl: <http://www.w3.org/2002/07/owl#>\nPREFIX oboInOwl: <http://www.geneontology.org/formats/oboInOwl#>\n\nSELECT ?entity ?label ?id ?synonym ?definition ?sc\nFROM <http://rdf.ebi.ac.uk/dataset/chebi>\nWHERE {\n  ?entity a owl:Class ;\n          rdfs:label ?label ;\n          oboInOwl:id ?id .\n  \n  # Search for sirolimus or rapamycin in labels and synonyms\n  {\n    ?label bif:contains \""'sirolimus'\"" option (score ?sc) .\n  } UNION {\n    ?label bif:contains \""'rapamycin'\"" option (score ?sc) .\n  } UNION {\n    ?entity oboInOwl:hasExactSynonym ?synonym .\n    ?synonym bif:contains \""'sirolimus'\"" option (score ?sc) .\n  } UNION {\n    ?entity oboInOwl:hasExactSynonym ?synonym .\n    ?synonym bif:contains \""'rapamycin'\"" option (score ?sc) .\n  } UNION {\n    ?entity oboInOwl:hasRelatedSynonym ?synonym .\n    ?synonym bif:contains \""'sirolimus'\"" option (score ?sc) .\n  } UNION {\n    ?entity oboInOwl:hasRelatedSynonym ?synonym .\n    ?synonym bif:contains \""'rapamycin'\"" option (score ?sc) .\n  }\n  \n  OPTIONAL { ?entity obo:IAO_0000115 ?definition }\n  OPTIONAL { ?entity oboInOwl:hasExactSynonym ?synonym }\n  OPTIONAL { ?entity oboInOwl:hasRelatedSynonym ?synonym }\n}\nORDER BY DESC(?sc)\nLIMIT 10""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""chebi"", ""sparql_query"": ""PREFIX owl: <http://www.w3.org/2002/07/owl#>\nPREFIX obo: <http://purl.obolibrary.org/obo/>\nPREFIX oboInOwl: <http://www.geneontology.org/formats/oboInOwl#>\n\nSELECT ?entity ?label ?id ?sc\nFROM <http://rdf.ebi.ac.uk/dataset/chebi>\nWHERE {\n  ?entity a owl:Class ;\n          rdfs:label ?label ;\n          oboInOwl:id ?id .\n  \n  ?label bif:contains \""'sirolimus'\"" option (score ?sc) .\n}\nORDER BY DESC(?sc)\nLIMIT 10""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""chebi"", ""sparql_query"": ""PREFIX owl: <http://www.w3.org/2002/07/owl#>\nPREFIX obo: <http://purl.obolibrary.org/obo/>\nPREFIX oboInOwl: <http://www.geneontology.org/formats/oboInOwl#>\n\nSELECT ?entity ?label ?id ?sc\nFROM <http://rdf.ebi.ac.uk/dataset/chebi>\nWHERE {\n  ?entity a owl:Class ;\n          rdfs:label ?label ;\n          oboInOwl:id ?id .\n  \n  ?label bif:contains \""'rapamycin'\"" option (score ?sc) .\n}\nORDER BY DESC(?sc)\nLIMIT 10""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""chebi"", ""sparql_query"": ""PREFIX owl: <http://www.w3.org/2002/07/owl#>\nPREFIX obo: <http://purl.obolibrary.org/obo/>\nPREFIX oboInOwl: <http://www.geneontology.org/formats/oboInOwl#>\nPREFIX chebi: <http://purl.obolibrary.org/obo/chebi/>\n\nSELECT ?label ?definition ?exactSynonym ?relatedSynonym ?formula ?mass ?smiles\nFROM <http://rdf.ebi.ac.uk/dataset/chebi>\nWHERE {\n  obo:CHEBI_9168 rdfs:label ?label .\n  OPTIONAL { obo:CHEBI_9168 obo:IAO_0000115 ?definition }\n  OPTIONAL { obo:CHEBI_9168 oboInOwl:hasExactSynonym ?exactSynonym }\n  OPTIONAL { obo:CHEBI_9168 oboInOwl:hasRelatedSynonym ?relatedSynonym }\n  OPTIONAL { obo:CHEBI_9168 chebi:formula ?formula }\n  OPTIONAL { obo:CHEBI_9168 chebi:mass ?mass }\n  OPTIONAL { obo:CHEBI_9168 chebi:smiles ?smiles }\n}""}}]",VALUABLE,CHEBI:9168,Tests chemical entity identification across naming systems. Verified using OLS4 searchClasses in ChEBI ontology for 'rapamycin'. Sirolimus/rapamycin is a macrolide lactam with immunosuppressive properties. Database: ChEBI.
+7,2025-12-18,Currency,What biochemical pathways in the Reactome database involve the mTOR protein?,True,False,True,0.6666666666666666,"Based on my knowledge of biochemical pathways and mTOR signaling, the mTOR (mechanistic Target of Rapamycin) protein is involved in several key pathways that would likely be represented in the Reactome database:
 
-**Early Infection Events:**
-- **Attachment and Entry** - involves the spike protein binding to host cell receptors
-- **Early SARS-CoV-2 Infection Events**
-- **Translation of Replicase and Assembly of the Replication Transcription Complex**
+**Primary mTOR-related pathways include:**
 
-**Viral Replication and Transcription:**
-- **Assembly of the SARS-CoV-2 Replication-Transcription Complex (RTC)** - involves non-structural proteins (nsp1-16)
-- **SARS-CoV-2 Genome Replication and Transcription**
-- **Replication of the SARS-CoV-2 genome**
-- **Transcription of SARS-CoV-2 sgRNAs**
+1. **mTOR signaling pathway** - The core pathway involving mTORC1 and mTORC2 complexes
+2. **PI3K/AKT signaling pathway** - mTOR is a key downstream effector of AKT
+3. **Insulin signaling pathway** - mTOR mediates many metabolic effects of insulin
+4. **Growth factor signaling** - Various growth factors activate mTOR
+5. **Amino acid sensing and signaling** - mTOR responds to amino acid availability
+6. **Autophagy regulation** - mTORC1 negatively regulates autophagy
+7. **Protein synthesis/translation initiation** - mTOR regulates ribosome biogenesis and translation
+8. **Lipid metabolism** - mTOR influences lipogenesis
+9. **Glucose metabolism** - mTOR affects glycolysis and gluconeogenesis
+10. **Cell cycle regulation** - mTOR influences cell growth and proliferation
 
-**Protein Maturation:**
-- **Maturation of replicase proteins** - involves nsp1-16 proteins
-- **Maturation of spike protein**
-- **Maturation of nucleoprotein**
-- **Maturation of protein 3a**
-- **Maturation of protein E (envelope)**
-- **Maturation of protein M (membrane)**
+However, I should note that I don't have direct access to the current Reactome database to provide the exact pathway names, identifiers, or current organizational structure. The specific way these pathways are categorized and named in Reactome may differ from my general description. For the most accurate and up-to-date information about mTOR pathways in Reactome, I'd recommend checking the database directly.",,7.991970062255859,55,379,True,True,0.8888888888888888,"Based on my analysis of the Reactome database, I can provide you with comprehensive information about the biochemical pathways involving the mTOR protein:
 
-**Late Infection Events:**
-- **Late SARS-CoV-2 Infection Events**
-- **Translation of Structural Proteins** - spike, nucleocapsid, membrane, envelope
-- **Translation of Accessory Proteins** - ORF3a, ORF6, ORF7a, ORF8, ORF9b, etc.
-- **Virion Assembly and Release**
-- **Induction of Cell-Cell Fusion**
+## Major mTOR-Related Pathways in Reactome
 
-### 3. **Host-Virus Interaction Pathways:**
+### 1. **Core mTOR Signaling Pathway**
+- **MTOR signalling** - This is the main umbrella pathway for all mTOR-related processes
 
-**Immune Response Modulation:**
-- **SARS-CoV-2 activates/modulates innate and adaptive immune responses** - This extensive pathway describes how SARS-CoV-2 proteins interact with host immune signaling, including:
-  - Recognition by pattern recognition receptors (TLR7, TLR8, RIG-I, MDA5)
-  - Viral evasion mechanisms involving nsp14, nsp16, nsp15, nsp3, nsp6, M protein, N protein
-  - Inflammasome activation by ORF3a and E proteins
+### 2. **mTORC1-mediated signalling**
+This is one of the most important mTOR pathways, representing the mechanistic target of rapamycin complex 1 (mTORC1) signaling cascade. mTORC1 is a key regulator of:
+- Protein synthesis
+- Cell growth and proliferation
+- Metabolic processes
+- Ribosome biogenesis
 
-**Cellular Process Disruption:**
-- **SARS-CoV-2 targets host intracellular signalling and regulatory pathways**
-- **SARS-CoV-2 modulates autophagy**
-- **SARS-CoV-2 modulates host translation machinery**
-- **SARS-CoV-2 targets PDZ proteins in cell-cell junction**
+### 3. **Energy-dependent regulation of mTOR by LKB1-AMPK**
+This pathway represents the energy-sensing mechanism that regulates mTOR activity:
+- **LKB1** (liver kinase B1) activates **AMPK** (AMP-activated protein kinase)
+- AMPK acts as a cellular energy sensor
+- When energy levels are low, AMPK inhibits mTOR to conserve energy and promote catabolic processes
 
-### 4. **Key SARS-CoV-2 Proteins Involved:**
+### 4. **Amino acids regulate mTORC1**
+This pathway shows how amino acid availability regulates mTORC1 activity:
+- Amino acids (particularly leucine, arginine, and glutamine) activate mTORC1
+- This regulation occurs through the Rag GTPases and Ragulator complex
+- Essential for nutrient sensing and metabolic adaptation
 
-**Non-structural proteins (nsp1-16):** These are involved in viral replication and host immune evasion
-- nsp1-4, nsp5 (3CLpro), nsp6, nsp7, nsp8, nsp9, nsp10, nsp12 (RdRp), nsp13, nsp14, nsp15, nsp16
+## Related Pathways Connected to mTOR Signaling
 
-**Structural proteins:**
-- Spike protein (various glycosylated forms)
-- Nucleocapsid (N) protein
-- Membrane (M) protein  
-- Envelope (E) protein
+### 5. **PI3K/AKT Signaling Pathways**
+Multiple pathways in this category connect to mTOR:
+- **PI3K/AKT activation**
+- **PI3K Cascade**
+- **PKB-mediated events** (PKB is another name for AKT)
+- **Activation of PKB**
 
-**Accessory proteins:**
-- ORF3a, ORF6, ORF7a, ORF8, ORF9b
+The PI3K/AKT pathway is upstream of mTOR and activates mTORC1 through:
+- Growth factor signaling → PI3K → AKT → TSC1/2 inhibition → mTORC1 activation
 
-### 5. **Specific Host Interactions:**
-The pathways detail numerous specific protein-protein interactions, such as:
-- SARS-CoV-2 N protein binding to TRIM25, NLRP3, MASP2
-- M protein binding to PDPK1, TBK1, MAVS
-- ORF6 interacting with importin KPNA2
-- ORF8 binding to IL17RA
-- ORF9b targeting TOMM70
+### 6. **Insulin and Growth Factor Signaling**
+- **Signaling by Insulin receptor**
+- **Signaling by Type 1 Insulin-like Growth Factor 1 Receptor (IGF1R)**
 
-These pathways represent a comprehensive, manually curated collection of SARS-CoV-2 protein functions and their interactions with host cellular processes, making it one of the most detailed molecular-level descriptions of COVID-19 pathogenesis available in pathway databases.",,53.37594413757324,"mcp__togomcp__get_MIE_file, mcp__togomcp__run_sparql, mcp__togomcp__run_sparql, mcp__togomcp__run_sparql, mcp__togomcp__run_sparql","[{""name"": ""mcp__togomcp__get_MIE_file"", ""input"": {""dbname"": ""reactome""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""reactome"", ""sparql_query"": ""PREFIX bp: <http://www.biopax.org/release/biopax-level3.owl#>\n\nSELECT ?pathway ?name ?comment\nFROM <http://rdf.ebi.ac.uk/dataset/reactome>\nWHERE {\n  ?pathway a bp:Pathway ;\n           bp:displayName ?name .\n  OPTIONAL { ?pathway bp:comment ?comment }\n  ?name bif:contains \""'SARS-CoV-2'\"" option (score ?sc)\n}\nORDER BY DESC(?sc)\nLIMIT 20""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""reactome"", ""sparql_query"": ""PREFIX bp: <http://www.biopax.org/release/biopax-level3.owl#>\n\nSELECT DISTINCT ?pathway ?pathwayName ?protein ?proteinName\nFROM <http://rdf.ebi.ac.uk/dataset/reactome>\nWHERE {\n  ?pathway a bp:Pathway ;\n           bp:displayName ?pathwayName ;\n           bp:pathwayComponent*/bp:left ?protein .\n  ?protein a bp:Protein ;\n           bp:displayName ?proteinName .\n  FILTER(CONTAINS(LCASE(?proteinName), \""sars-cov-2\"") || \n         CONTAINS(LCASE(?proteinName), \""nsp\"") ||\n         CONTAINS(LCASE(?proteinName), \""orf\""))\n}\nLIMIT 50""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""reactome"", ""sparql_query"": ""PREFIX bp: <http://www.biopax.org/release/biopax-level3.owl#>\n\nSELECT DISTINCT ?subPathway ?subPathwayName\nFROM <http://rdf.ebi.ac.uk/dataset/reactome>\nWHERE {\n  ?mainPathway a bp:Pathway ;\n               bp:displayName ?mainName ;\n               bp:pathwayComponent+ ?subPathway .\n  ?subPathway a bp:Pathway ;\n              bp:displayName ?subPathwayName .\n  ?mainName bif:contains \""'SARS-CoV-2'\"" option (score ?sc)\n}\nORDER BY ?subPathwayName\nLIMIT 50""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""reactome"", ""sparql_query"": ""PREFIX bp: <http://www.biopax.org/release/biopax-level3.owl#>\n\nSELECT DISTINCT ?protein ?proteinName ?pathway ?pathwayName\nFROM <http://rdf.ebi.ac.uk/dataset/reactome>\nWHERE {\n  ?pathway a bp:Pathway ;\n           bp:displayName ?pathwayName ;\n           bp:pathwayComponent*/bp:left ?protein .\n  ?protein a bp:Protein ;\n           bp:displayName ?proteinName .\n  FILTER(CONTAINS(LCASE(?proteinName), \""spike\"") || \n         CONTAINS(LCASE(?proteinName), \""nucleocapsid\"") ||\n         CONTAINS(LCASE(?proteinName), \""membrane\"") ||\n         CONTAINS(LCASE(?proteinName), \""envelope\"") ||\n         CONTAINS(LCASE(?proteinName), \""orf\""))\n  FILTER(CONTAINS(LCASE(?pathwayName), \""sars-cov-2\""))\n}\nORDER BY ?proteinName\nLIMIT 30""}}]",Recent COVID-19 related pathways,Tests access to recent database additions
-6,2025-12-15,Specificity,What is the MeSH descriptor ID for Erdheim-Chester disease?,True,"I don't have the specific MeSH descriptor ID for Erdheim-Chester disease memorized with certainty. MeSH descriptor IDs are very specific alphanumeric codes (like D######) that would require looking up in the current MeSH database to provide accurately.
+These pathways activate mTOR through the PI3K/AKT cascade in response to growth signals and nutrient availability.
 
-If you need this information for research or indexing purposes, I'd recommend checking the official MeSH database at https://meshb.nlm.nih.gov/ or the PubMed MeSH browser to find the current descriptor ID for Erdheim-Chester disease.",,4.691481113433838,53,123,True,"The MeSH descriptor ID for Erdheim-Chester disease is **T459455**.
+### 7. **Autophagy**
+- **Autophagy** pathways are negatively regulated by mTORC1
+- When mTORC1 is active (nutrients abundant), autophagy is suppressed
+- When mTORC1 is inactive (nutrients scarce), autophagy is promoted for cellular recycling
 
-The full MeSH resource URI is `http://id.nlm.nih.gov/mesh/T459455`, and it's labeled as ""Erdheim-Chester Disease"" in the MeSH vocabulary.",,12.225489139556885,mcp__togomcp__search_mesh_entity,"[{""name"": ""mcp__togomcp__search_mesh_entity"", ""input"": {""query"": ""Erdheim-Chester disease""}}]",D031249,Tests rare disease information retrieval
-7,2025-12-15,Structured Query,Find all human kinase proteins in UniProt that are also targets in ChEMBL.,True,"I don't have the ability to directly query UniProt or ChEMBL databases to provide you with a real-time, comprehensive list of all human kinase proteins that are targets in both databases. To get this information, you would need to perform database queries directly.
+## Biological Significance
 
-However, I can tell you that this is a common type of analysis in drug discovery research. Here's how you could approach finding this information:
+The mTOR protein serves as a central hub integrating multiple cellular signals:
 
-**Approach 1: Using database APIs or downloads**
-1. Query UniProt for human kinase proteins (using taxonomy ID 9606 for humans and Gene Ontology terms or protein family classifications for kinases)
-2. Query ChEMBL for all target proteins with bioactivity data
-3. Cross-reference the UniProt IDs between the two datasets
+1. **Nutrient availability** (amino acids, glucose)
+2. **Growth factors** (insulin, IGF-1)
+3. **Energy status** (ATP/AMP ratio via AMPK)
+4. **Oxygen levels** and stress conditions
 
-**Approach 2: Using existing integrated resources**
-- The Kinase SARfari database (part of ChEMBL) specifically focuses on kinase targets and their inhibitors
-- Open Targets platform integrates data from multiple sources including UniProt and ChEMBL
+mTOR coordinates these inputs to control:
+- **Anabolic processes** (protein synthesis, lipid synthesis, nucleotide synthesis)
+- **Catabolic processes** (autophagy regulation)
+- **Cell growth and proliferation**
+- **Metabolic homeostasis**
 
-**What I can tell you generally:**
-- There are approximately 500+ human protein kinases
-- Many of these are well-studied drug targets, especially in cancer research
-- Common kinase targets in ChEMBL include protein kinases like EGFR, CDKs, PI3K, mTOR, and many others
+These pathways are crucial for understanding cellular metabolism, cancer biology, aging, and metabolic diseases, making mTOR a significant target for therapeutic interventions.",,73.5804831981659,47,3200,13187,233351,"mcp__togomcp__get_MIE_file, mcp__togomcp__run_sparql, mcp__togomcp__run_sparql, mcp__togomcp__run_sparql, mcp__togomcp__run_sparql, mcp__togomcp__run_sparql, mcp__togomcp__run_sparql, mcp__togomcp__run_sparql, mcp__togomcp__run_sparql","[{""name"": ""mcp__togomcp__get_MIE_file"", ""input"": {""dbname"": ""reactome""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""reactome"", ""sparql_query"": ""PREFIX bp: <http://www.biopax.org/release/biopax-level3.owl#>\nPREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n\nSELECT DISTINCT ?pathway ?pathwayName ?reaction ?reactionName\nFROM <http://rdf.ebi.ac.uk/dataset/reactome>\nWHERE {\n  # Find pathways that contain reactions involving mTOR\n  ?pathway a bp:Pathway ;\n           bp:displayName ?pathwayName ;\n           bp:pathwayComponent* ?reaction .\n  \n  ?reaction a bp:BiochemicalReaction ;\n            bp:displayName ?reactionName .\n  \n  # Look for mTOR in reaction participants (left or right)\n  {\n    ?reaction bp:left ?entity .\n  } UNION {\n    ?reaction bp:right ?entity .\n  }\n  \n  # Find proteins or complexes containing mTOR\n  {\n    ?entity a bp:Protein ;\n            bp:entityReference ?proteinRef .\n    ?proteinRef bp:name ?proteinName .\n    FILTER(CONTAINS(LCASE(?proteinName), \""mtor\""))\n  } UNION {\n    ?entity a bp:Complex ;\n            bp:component ?component .\n    ?component bp:entityReference ?componentRef .\n    ?componentRef bp:name ?componentName .\n    FILTER(CONTAINS(LCASE(?componentName), \""mtor\""))\n  }\n}\nORDER BY ?pathwayName ?reactionName\nLIMIT 100""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""reactome"", ""sparql_query"": ""PREFIX bp: <http://www.biopax.org/release/biopax-level3.owl#>\n\nSELECT DISTINCT ?pathway ?pathwayName\nFROM <http://rdf.ebi.ac.uk/dataset/reactome>\nWHERE {\n  ?pathway a bp:Pathway ;\n           bp:displayName ?pathwayName .\n  ?pathwayName bif:contains \""'mTOR'\"" option (score ?sc)\n}\nORDER BY DESC(?sc)\nLIMIT 20""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""reactome"", ""sparql_query"": ""PREFIX bp: <http://www.biopax.org/release/biopax-level3.owl#>\nPREFIX reactome: <http://www.reactome.org/biopax/68/49646#>\n\nSELECT DISTINCT ?subPathway ?subPathwayName ?description\nFROM <http://rdf.ebi.ac.uk/dataset/reactome>\nWHERE {\n  reactome:Pathway1596 bp:pathwayComponent ?subPathway .\n  ?subPathway a bp:Pathway ;\n              bp:displayName ?subPathwayName .\n  OPTIONAL { ?subPathway bp:comment ?description }\n}\nORDER BY ?subPathwayName""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""reactome"", ""sparql_query"": ""PREFIX bp: <http://www.biopax.org/release/biopax-level3.owl#>\n\nSELECT DISTINCT ?pathway ?pathwayName\nFROM <http://rdf.ebi.ac.uk/dataset/reactome>\nWHERE {\n  ?pathway a bp:Pathway ;\n           bp:displayName ?pathwayName .\n  {\n    ?pathwayName bif:contains \""'mTOR'\"" option (score ?sc1)\n  } UNION {\n    ?pathwayName bif:contains \""'MTOR'\"" option (score ?sc2)  \n  } UNION {\n    ?pathwayName bif:contains \""'mTORC1'\"" option (score ?sc3)\n  } UNION {\n    ?pathwayName bif:contains \""'mTORC2'\"" option (score ?sc4)\n  }\n}\nORDER BY ?pathwayName\nLIMIT 50""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""reactome"", ""sparql_query"": ""PREFIX bp: <http://www.biopax.org/release/biopax-level3.owl#>\n\nSELECT DISTINCT ?pathway ?pathwayName\nFROM <http://rdf.ebi.ac.uk/dataset/reactome>\nWHERE {\n  ?pathway a bp:Pathway ;\n           bp:displayName ?pathwayName .\n  ?pathwayName bif:contains \""'mTORC1' OR 'mTORC2' OR 'raptor' OR 'rictor'\"" option (score ?sc)\n}\nORDER BY DESC(?sc)\nLIMIT 30""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""reactome"", ""sparql_query"": ""PREFIX bp: <http://www.biopax.org/release/biopax-level3.owl#>\n\nSELECT DISTINCT ?pathway ?pathwayName\nFROM <http://rdf.ebi.ac.uk/dataset/reactome>\nWHERE {\n  ?pathway a bp:Pathway ;\n           bp:displayName ?pathwayName .\n  ?pathwayName bif:contains \""'insulin' AND ('signaling' OR 'signalling')\"" option (score ?sc)\n}\nORDER BY DESC(?sc)\nLIMIT 20""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""reactome"", ""sparql_query"": ""PREFIX bp: <http://www.biopax.org/release/biopax-level3.owl#>\n\nSELECT DISTINCT ?pathway ?pathwayName\nFROM <http://rdf.ebi.ac.uk/dataset/reactome>\nWHERE {\n  ?pathway a bp:Pathway ;\n           bp:displayName ?pathwayName .\n  ?pathwayName bif:contains \""'PI3K' OR 'AKT' OR 'PKB'\"" option (score ?sc)\n}\nORDER BY DESC(?sc)\nLIMIT 20""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""reactome"", ""sparql_query"": ""PREFIX bp: <http://www.biopax.org/release/biopax-level3.owl#>\n\nSELECT DISTINCT ?pathway ?pathwayName\nFROM <http://rdf.ebi.ac.uk/dataset/reactome>\nWHERE {\n  ?pathway a bp:Pathway ;\n           bp:displayName ?pathwayName .\n  ?pathwayName bif:contains \""'autophagy'\"" option (score ?sc)\n}\nORDER BY DESC(?sc)\nLIMIT 15""}}]",CRITICAL,"Multiple pathways including mTOR signaling, nutrient sensing, autophagy regulation",Tests access to current pathway information. mTOR (mechanistic target of rapamycin) is a central regulator of cell growth. The exact number and names of pathways may vary with database updates. Requires querying Reactome pathway database. Database: Reactome.
+8,2025-12-18,Specificity,What is the MeSH term identifier for Niemann-Pick disease?,True,True,False,0.0,"The MeSH term identifier for Niemann-Pick disease is **D009542**.
 
-For the most current and complete data, I recommend directly querying these databases or using bioinformatics tools like Python with libraries such as chembl_webresource_client and biopython to perform this analysis programmatically.",,9.321652889251709,58,360,True,"## Summary
+Niemann-Pick disease is classified in MeSH under lipid metabolism disorders and sphingolipidoses, as it involves defects in sphingomyelin metabolism and cholesterol transport.",,3.460324764251709,53,65,True,True,0.5,"Based on the search results, there are several MeSH term identifiers related to Niemann-Pick disease:
 
-I have successfully found all human kinase proteins in UniProt that are also targets in ChEMBL. Here are the key findings:
+The main MeSH term identifier for **Niemann-Pick Disease** is:
+- **D009542** (extracted from the URI T028436)
 
-### Results Summary:
+However, the search results show multiple specific subtypes and variants of Niemann-Pick disease, each with their own MeSH identifiers:
 
-1. **UniProt Human Kinases**: I identified **698 human kinase proteins** in UniProt (Swiss-Prot reviewed entries) by searching for proteins with ""kinase"" in their names from *Homo sapiens*.
+1. **Niemann-Pick Disease** (general term) - D009542
+2. **Niemann-Pick Disease Type C** - T000998961
+3. **Niemann-Pick Disease Type D** - T751077
+4. **ASM-Deficient Niemann-Pick Disease** - T001134177
+5. **Acid Sphingomyelinase-Deficient Niemann-Pick Disease** - T001141697
+6. **Classical Niemann-Pick Disease** - T369718
+7. **Niemann-Pick Disease, Acute Neuronopathic Form** - T369721
+8. **Niemann-Pick Disease, Acute Neurovisceral Form** - T369743
 
-2. **ChEMBL Kinase Targets**: I found **516 human kinase targets** in ChEMBL that correspond to UniProt kinase proteins.
+The primary MeSH identifier **D009542** would be the most appropriate for the general term ""Niemann-Pick disease,"" while the other identifiers are for specific subtypes or variants of the condition.",,18.372658252716064,9,402,679,32519,mcp__togomcp__search_mesh_entity,"[{""name"": ""mcp__togomcp__search_mesh_entity"", ""input"": {""query"": ""Niemann-Pick disease""}}]",CRITICAL,T028436 or http://id.nlm.nih.gov/mesh/T028436,"Tests retrieval of specific medical terminology for a rare lysosomal storage disorder. Verified using search_mesh_entity which returned the main term as T028436. This is distinct from the specific subtypes (Type A, B, C). Database: MeSH."
+9,2025-12-18,Specificity,What is the molecular formula of the cancer drug imatinib according to PubChem?,True,False,False,0.0,"I don't have access to PubChem or any database tools to look up the current molecular formula for imatinib. While I know that imatinib is indeed a cancer drug used primarily to treat certain types of leukemia and gastrointestinal stromal tumors, I cannot provide you with its specific molecular formula from PubChem without being able to access that database directly.
 
-3. **Coverage**: This means approximately **74% of the human kinases** from UniProt are also represented as targets in ChEMBL, indicating excellent coverage for drug discovery research.
+If you need the exact molecular formula from PubChem, I'd recommend visiting the PubChem website and searching for ""imatinib"" to get the most accurate and up-to-date information.",,3.7958860397338867,57,133,True,False,0.0,"According to PubChem, the molecular formula of imatinib is **C₂₉H₃₁N₇O**.
 
-### Key Examples of Human Kinases Found in Both Databases:
+This compound (PubChem CID: 5291) is identified as 4-[(4-methylpiperazin-1-yl)methyl]-N-[4-methyl-3-[(4-pyridin-3-ylpyrimidin-2-yl)amino]phenyl]benzamide, with a molecular weight of 493.6 g/mol. Imatinib is indeed a well-known cancer drug, primarily used to treat chronic myelogenous leukemia (CML) and gastrointestinal stromal tumors (GIST).",,14.893126010894775,15,384,858,49027,"mcp__togomcp__get_pubchem_compound_id, mcp__togomcp__get_compound_attributes_from_pubchem","[{""name"": ""mcp__togomcp__get_pubchem_compound_id"", ""input"": {""compound_name"": ""imatinib""}}, {""name"": ""mcp__togomcp__get_compound_attributes_from_pubchem"", ""input"": {""pubchem_compound_id"": ""5291""}}]",CRITICAL,C29H31N7O,Tests retrieval of specific molecular properties. Verified using get_pubchem_compound_id (CID 5291) then get_compound_attributes_from_pubchem which returned molecular_formula: C29H31N7O. Imatinib is used to treat chronic myeloid leukemia. Database: PubChem.
+10,2025-12-18,Structured Query,What are the direct parent terms of the Gene Ontology term 'macroautophagy' (GO:0016236)?,True,False,False,0.0,"I don't have the exact direct parent terms for GO:0016236 (macroautophagy) memorized with certainty. While I know that macroautophagy is a type of autophagy process in the Gene Ontology, I cannot definitively state its immediate parent terms without risking providing incorrect information.
 
-- **CHEMBL267**: Tyrosine-protein kinase SRC (UniProt: P12931)
-- **CHEMBL258**: Tyrosine-protein kinase LCK (UniProt: P06239)  
-- **CHEMBL260**: MAP kinase p38 alpha (UniProt: Q16539)
-- **CHEMBL262**: Glycogen synthase kinase-3 beta (UniProt: P49841)
-- **CHEMBL299**: Protein kinase C alpha (UniProt: P17252)
-- **CHEMBL308**: Cyclin-dependent kinase 1 (UniProt: P06493)
-- **CHEMBL331**: Cyclin-dependent kinase 4 (UniProt: P11802)
+To get the accurate direct parent terms for this GO term, you would need to consult the Gene Ontology database directly or use GO browsing tools like AmiGO or QuickGO, which provide the current hierarchical relationships and parent-child term structures.",,4.9903459548950195,66,131,True,True,0.5,"Based on the SPARQL query results, the direct parent term of the Gene Ontology term 'macroautophagy' (GO:0016236) is:
 
-The kinases span various families including:
-- **Tyrosine kinases** (SRC, LCK, etc.)
-- **Serine/threonine kinases** (PKC family, CDKs, etc.)
-- **MAP kinases and their regulatory kinases**
-- **Metabolic kinases** (glycogen synthase kinase, etc.)
-- **Cell cycle kinases** (CDKs, Aurora kinases, etc.)
+**GO:0006914 - autophagy**
 
-### Methodology:
-1. Used SPARQL to query UniProt RDF for all human proteins containing ""kinase"" in their names
-2. Applied ID conversion using TogoID service to map UniProt IDs to ChEMBL target IDs  
-3. Validated the mappings by querying ChEMBL RDF to confirm these are indeed human kinase targets
-4. Cross-referenced to ensure proper organism and protein type matching
-
-This comprehensive dataset represents the intersection of well-annotated human kinase proteins (UniProt) with experimentally validated drug targets (ChEMBL), making it highly valuable for kinase-focused drug discovery efforts.",,282.0206503868103,"mcp__togomcp__get_sparql_example, mcp__togomcp__get_MIE_file, mcp__togomcp__run_sparql, mcp__togomcp__run_sparql, mcp__togomcp__run_sparql, mcp__togomcp__run_sparql, TodoWrite, mcp__togomcp__run_sparql, mcp__togomcp__run_sparql, TodoWrite, mcp__togomcp__togoid_getAllDataset, mcp__togomcp__togoid_getRelation, mcp__togomcp__togoid_convertId, mcp__togomcp__togoid_convertId, mcp__togomcp__togoid_convertId, mcp__togomcp__togoid_convertId, mcp__togomcp__togoid_convertId, mcp__togomcp__togoid_convertId, mcp__togomcp__togoid_convertId, TodoWrite, mcp__togomcp__search_chembl_target, mcp__togomcp__get_sparql_example, mcp__togomcp__get_MIE_file, mcp__togomcp__run_sparql, mcp__togomcp__run_sparql, mcp__togomcp__run_sparql, TodoWrite","[{""name"": ""mcp__togomcp__get_sparql_example"", ""input"": {""dbname"": ""uniprot""}}, {""name"": ""mcp__togomcp__get_MIE_file"", ""input"": {""dbname"": ""uniprot""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""uniprot"", ""sparql_query"": ""PREFIX up: <http://purl.uniprot.org/core/>\n\nSELECT DISTINCT ?protein ?mnemonic ?fullName\nWHERE {\n  ?protein a up:Protein ;\n           up:mnemonic ?mnemonic ;\n           up:reviewed 1 ;\n           up:organism <http://purl.uniprot.org/taxonomy/9606> ;\n           up:recommendedName ?name .\n  ?name up:fullName ?fullName .\n  ?fullName bif:contains \""'kinase'\""\n}\nLIMIT 50""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""uniprot"", ""sparql_query"": ""PREFIX up: <http://purl.uniprot.org/core/>\n\nSELECT DISTINCT ?protein ?uniprot_id ?mnemonic ?fullName\nWHERE {\n  ?protein a up:Protein ;\n           up:mnemonic ?mnemonic ;\n           up:reviewed 1 ;\n           up:organism <http://purl.uniprot.org/taxonomy/9606> ;\n           up:recommendedName ?name ;\n           dcterms:identifier ?uniprot_id .\n  ?name up:fullName ?fullName .\n  ?fullName bif:contains \""'kinase'\""\n}\nORDER BY ?uniprot_id\nLIMIT 100""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""uniprot"", ""sparql_query"": ""PREFIX up: <http://purl.uniprot.org/core/>\n\nSELECT DISTINCT ?uniprot_id ?mnemonic ?fullName\nWHERE {\n  ?protein a up:Protein ;\n           up:mnemonic ?mnemonic ;\n           up:reviewed 1 ;\n           up:organism <http://purl.uniprot.org/taxonomy/9606> ;\n           up:recommendedName ?name ;\n           dcterms:identifier ?uniprot_id .\n  ?name up:fullName ?fullName .\n  ?fullName bif:contains \""'kinase'\""\n}\nORDER BY ?uniprot_id\nLIMIT 200""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""uniprot"", ""sparql_query"": ""PREFIX up: <http://purl.uniprot.org/core/>\n\nSELECT DISTINCT ?uniprot_id ?mnemonic ?fullName\nWHERE {\n  ?protein a up:Protein ;\n           up:mnemonic ?mnemonic ;\n           up:reviewed 1 ;\n           up:organism <http://purl.uniprot.org/taxonomy/9606> ;\n           up:recommendedName ?name ;\n           dcterms:identifier ?uniprot_id .\n  ?name up:fullName ?fullName .\n  ?fullName bif:contains \""'kinase'\""\n}\nORDER BY ?uniprot_id\nOFFSET 200\nLIMIT 200""}}, {""name"": ""TodoWrite"", ""input"": {""todos"": [{""content"": ""Extract all human kinase proteins from UniProt"", ""status"": ""in_progress"", ""activeForm"": ""Extracting all human kinase proteins from UniProt""}, {""content"": ""Convert UniProt IDs to ChEMBL target IDs using ID mapping"", ""status"": ""pending"", ""activeForm"": ""Converting UniProt IDs to ChEMBL target IDs""}, {""content"": ""Verify which kinases are actual targets in ChEMBL"", ""status"": ""pending"", ""activeForm"": ""Verifying which kinases are actual targets in ChEMBL""}, {""content"": ""Compile final list of human kinases that are ChEMBL targets"", ""status"": ""pending"", ""activeForm"": ""Compiling final list of human kinases that are ChEMBL targets""}]}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""uniprot"", ""sparql_query"": ""PREFIX up: <http://purl.uniprot.org/core/>\n\nSELECT COUNT(DISTINCT ?protein) as ?count\nWHERE {\n  ?protein a up:Protein ;\n           up:mnemonic ?mnemonic ;\n           up:reviewed 1 ;\n           up:organism <http://purl.uniprot.org/taxonomy/9606> ;\n           up:recommendedName ?name .\n  ?name up:fullName ?fullName .\n  ?fullName bif:contains \""'kinase'\""\n}""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""uniprot"", ""sparql_query"": ""PREFIX up: <http://purl.uniprot.org/core/>\n\nSELECT DISTINCT ?uniprot_id\nWHERE {\n  ?protein a up:Protein ;\n           up:mnemonic ?mnemonic ;\n           up:reviewed 1 ;\n           up:organism <http://purl.uniprot.org/taxonomy/9606> ;\n           up:recommendedName ?name ;\n           dcterms:identifier ?uniprot_id .\n  ?name up:fullName ?fullName .\n  ?fullName bif:contains \""'kinase'\""\n}\nORDER BY ?uniprot_id""}}, {""name"": ""TodoWrite"", ""input"": {""todos"": [{""content"": ""Extract all human kinase proteins from UniProt"", ""status"": ""completed"", ""activeForm"": ""Extracting all human kinase proteins from UniProt""}, {""content"": ""Convert UniProt IDs to ChEMBL target IDs using ID mapping"", ""status"": ""in_progress"", ""activeForm"": ""Converting UniProt IDs to ChEMBL target IDs""}, {""content"": ""Verify which kinases are actual targets in ChEMBL"", ""status"": ""pending"", ""activeForm"": ""Verifying which kinases are actual targets in ChEMBL""}, {""content"": ""Compile final list of human kinases that are ChEMBL targets"", ""status"": ""pending"", ""activeForm"": ""Compiling final list of human kinases that are ChEMBL targets""}]}}, {""name"": ""mcp__togomcp__togoid_getAllDataset"", ""input"": {}}, {""name"": ""mcp__togomcp__togoid_getRelation"", ""input"": {""source"": ""uniprot"", ""target"": ""chembl_target""}}, {""name"": ""mcp__togomcp__togoid_convertId"", ""input"": {""ids"": ""A0A0B4J2F2,A0A1B0GTH6,A2RU49,A4QPH2,A7MCY6,O00141,O00142,O00311,O00329,O00418,O00443,O00444,O00459,O00506,O00746,O00750,O00764,O14519,O14578,O14730,O14733,O14757,O14874,O14920,O14964,O14965,O14976,O14986,O15021,O15075,O15111,O15146,O15264,O15530,O43187,O43283,O43293,O43314,O43318,O43353,O43422,O43572,O43683,O43687,O43741,O43781,O43823,O43914,O43930,O60271,O60285,O60307,O60331,O60336,O60361,O60566,O60674,O60825,O75116,O75191,O75385,O75414,O75460,O75563,O75569,O75582,O75676,O75716,O75747,O75912,O75914,O75956,O75969,O76039,O94768,O94804,O94806,O94921,O95382,O95544,O95747,O95819,O95835,O96013,O96017,P00519,P00540,P00558,P00568,P04049,P04183,P04626,P05129,P05771,P06239,P06241,P06493,P06732,P07205,P07332,P07947,P07948,P07949"", ""route"": ""uniprot,chembl_target"", ""limit"": 200}}, {""name"": ""mcp__togomcp__togoid_convertId"", ""input"": {""ids"": ""P08631,P08922,P09769,P0C1S8,P0C263,P0C264,P0CW23,P10398,P10644,P11309,P11801,P11802,P12277,P12532,P12931,P13861,P14618,P15056,P15531,P15735,P16118,P16591,P17252,P17540,P17612,P19525,P19784,P20794,P21127,P21860,P22392,P22612,P22694,P23443,P23458,P23677,P23743,P23919,P24588,P24723,P24941,P25098,P27144,P27361,P27448,P27707,P27986,P27987,P28482,P29376,P29597,P29966,P30085,P30291,P30530,P30613,P31152,P31321,P31323,P31749,P31751,P32189,P32298,P33981,P34925,P34947,P35590,P35626,P35790,P36507,P36888,P37023,P38936,P41240,P41279,P41743,P42336,P42338,P42345,P42356,P42679,P42680,P42681,P42684,P42685,P42771,P42772,P42773,P43250,P43403,P43405,P45983,P45984,P45985,P46019,P46020,P46527,P46734"", ""route"": ""uniprot,chembl_target"", ""limit"": 200}}, {""name"": ""mcp__togomcp__togoid_convertId"", ""input"": {""ids"": ""P48426,P48729,P48730,P48736,P49137,P49336,P49619,P49674,P49759,P49760,P49761,P49771,P49840,P49841,P49842,P49918,P50613,P50750,P51451,P51617,P51812,P51813,P51817,P51948,P51955,P51956,P51957,P52333,P52429,P52564,P52824,P53350,P53355,P53667,P53671,P53778,P53779,P54619,P54646,P54819,P55263,P55273,P56597,P57058,P57059,P57078,P61925,P63208,P67870,P68400,P78356,P78362,P78368,P78527,P80192,Q00526,Q00532,Q00534,Q00535,Q00536,Q00537,Q01415,Q01973,Q01974,Q02040,Q02156,Q02750,Q02779,Q02952,Q03426,Q04759,Q05397,Q05513,Q05655,Q06187,Q06418,Q07002,Q07912,Q08881,Q09013,Q0P6D2,Q12802,Q12851,Q12852,Q12866,Q12929,Q13023,Q13043,Q13131,Q13153,Q13163,Q13164,Q13177,Q13188,Q13232,Q13233,Q13237,Q13308,Q13309,Q13315"", ""route"": ""uniprot,chembl_target"", ""limit"": 200}}, {""name"": ""mcp__togomcp__togoid_convertId"", ""input"": {""ids"": ""Q13319,Q13387,Q13418,Q13464,Q13470,Q13523,Q13535,Q13546,Q13554,Q13555,Q13557,Q13572,Q13574,Q13627,Q13882,Q13976,Q14004,Q14012,Q14164,Q14289,Q14296,Q14409,Q14410,Q14680,Q14CZ7,Q15078,Q15118,Q15119,Q15120,Q15126,Q15131,Q15139,Q15208,Q15303,Q15349,Q15418,Q15569,Q15746,Q15750,Q15759,Q15772,Q15831,Q15835,Q16512,Q16513,Q16539,Q16566,Q16584,Q16644,Q16654,Q16659,Q16667,Q16760,Q16774,Q16816,Q16854,Q16875,Q16877,Q2M2I8,Q2M3C7,Q32MK0,Q38SD2,Q3MIX3,Q496M5,Q49MI3,Q4G0N4,Q504Y2,Q52WX2,Q53H12,Q53R41,Q56UN5,Q59H18,Q5EBM0,Q5H9B9,Q5JQC9,Q5KSL6,Q5MAI5,Q5S007,Q5SY16,Q5T7M9,Q5T9C9,Q5TCQ9,Q5TCS8,Q5TCX8,Q5TCY1,Q5UE93,Q5VSY0,Q5VT25,Q5VUD6,Q5VVH5,Q5VZ66,Q68DQ2,Q6A1A2,Q6DT37,Q6IQ55,Q6J9G0,Q6P0Q8,Q6P2M8,Q6P3R8"", ""route"": ""uniprot,chembl_target"", ""limit"": 200}}, {""name"": ""mcp__togomcp__togoid_convertId"", ""input"": {""ids"": ""Q6P5Z2,Q6P9H4,Q6PFW1,Q6PHR2,Q6SA08,Q6UWH4,Q6VAB6,Q6XUX3,Q6ZMQ8,Q6ZN16,Q6ZS86,Q6ZUJ8,Q6ZVC0,Q6ZWH5,Q70IA6,Q70IA8,Q70UQ0,Q76MJ5,Q76NI1,Q7KZI7,Q7L7X3,Q7L8L6,Q7L9L4,Q7RTN6,Q7Z2Y5,Q7Z695,Q7Z7A4,Q7Z7J9,Q86SG6,Q86TA1,Q86TB3,Q86TW2,Q86UE8,Q86UL8,Q86UN6,Q86UX6,Q86V86,Q86WV1,Q86XP1,Q86Y07,Q86YV5,Q86YV6,Q86Z02,Q8IU85,Q8IV42,Q8IV63,Q8IVH8,Q8IVS8,Q8IVT5,Q8IVW4,Q8IW41,Q8IWB6,Q8IWQ3,Q8IWU2,Q8IXL6,Q8IY84,Q8IYT8,Q8IZL9,Q8N0W3,Q8N165,Q8N1F8,Q8N2I9,Q8N4C8,Q8N568,Q8N5C8,Q8N5S9,Q8N752,Q8N8J0,Q8NB16,Q8NCB2,Q8NDZ4,Q8NE28,Q8NE63,Q8NEB9,Q8NEV1,Q8NFD2,Q8NG66,Q8NI60,Q8TAS1,Q8TBX8,Q8TCG2,Q8TCT0,Q8TD08,Q8TD19,Q8TDC3,Q8TDR2,Q8TDX7,Q8TE04,Q8TE67,Q8TE68,Q8TEA7,Q8TF76,Q8WTQ7,Q8WU08,Q8WVC6,Q8WXG6,Q8WXI2,Q8WYR1,Q92551,Q92569,Q92630,Q92667"", ""route"": ""uniprot,chembl_target"", ""limit"": 200}}, {""name"": ""mcp__togomcp__togoid_convertId"", ""input"": {""ids"": ""Q92772,Q92832,Q92918,Q92989,Q93100,Q969G6,Q969H4,Q969Z0,Q96AA8,Q96B97,Q96BR1,Q96BX8,Q96C11,Q96C45,Q96D53,Q96DU7,Q96FE7,Q96GD4,Q96GX5,Q96J92,Q96KB5,Q96KG9,Q96L34,Q96L96,Q96LW2,Q96M32,Q96M69,Q96MA6,Q96N16,Q96NX5,Q96PC2,Q96PF2,Q96PN8,Q96PY6,Q96Q04,Q96Q15,Q96Q40,Q96QP1,Q96QS6,Q96QZ7,Q96RG2,Q96RR4,Q96S38,Q96S53,Q96S95,Q96SB4,Q96T60,Q99435,Q99558,Q99570,Q99640,Q99683,Q99755,Q99759,Q99986,Q99996,Q9BQI3,Q9BRS2,Q9BSF0,Q9BTU6,Q9BUB5,Q9BUH8,Q9BVS4,Q9BW66,Q9BWU1,Q9BXA6,Q9BXA7,Q9BXM7,Q9BXU1,Q9BY11,Q9BYP7,Q9BYT3,Q9BZ23,Q9BZL6,Q9BZX2,Q9C010,Q9C098,Q9C0H9,Q9C0K7,Q9H093,Q9H0C8,Q9H0K1,Q9H1E3,Q9H1R3,Q9H2G2,Q9H2K8,Q9H2X6,Q9H3Y6,Q9H422,Q9H479,Q9H4A3,Q9H4B4,Q9H5K3,Q9H6S3,Q9H792,Q9H7T9,Q9H7Y0,Q9H8S9,Q9H8X2,Q9H999,Q9HA47,Q9HA64"", ""route"": ""uniprot,chembl_target"", ""limit"": 200}}, {""name"": ""mcp__togomcp__togoid_convertId"", ""input"": {""ids"": ""Q9HAZ1,Q9HBH9,Q9HBU6,Q9HBY8,Q9HC98,Q9HCP0,Q9NPI5,Q9NQ31,Q9NQU5,Q9NR20,Q9NRA0,Q9NRH2,Q9NRM7,Q9NRP7,Q9NSY1,Q9NVF9,Q9NWT1,Q9NWW6,Q9NWZ3,Q9NWZ5,Q9NY57,Q9NYA1,Q9NYJ8,Q9NYL2,Q9NYV4,Q9NYY3,Q9NYY8,Q9NZJ5,Q9P0L2,Q9P0M2,Q9P1W9,Q9P242,Q9P286,Q9P289,Q9P2D0,Q9P2K8,Q9UBE8,Q9UBF8,Q9UBS0,Q9UEE5,Q9UEW8,Q9UFP1,Q9UGI9,Q9UGJ0,Q9UHD2,Q9UHH9,Q9UIG0,Q9UIK4,Q9UJ70,Q9UJT2,Q9UK32,Q9UKA4,Q9UKE5,Q9UKI8,Q9UKS6,Q9UL54,Q9ULH0,Q9ULX6,Q9UM73,Q9UNF0,Q9UPE1,Q9UPQ8,Q9UPT6,Q9UPZ9,Q9UQ07,Q9UQ88,Q9UQB9,Q9UQF2,Q9UQM7,Q9Y223,Q9Y243,Q9Y259,Q9Y2B9,Q9Y2H1,Q9Y2H9,Q9Y2I7,Q9Y2K2,Q9Y2U5,Q9Y3D8,Q9Y3F4,Q9Y3S1,Q9Y463,Q9Y478,Q9Y4K4,Q9Y572,Q9Y5B8,Q9Y5S2,Q9Y616,Q9Y6E0,Q9Y6K8,Q9Y6M4,Q9Y6R4,Q9Y6S9,Q9Y6T7"", ""route"": ""uniprot,chembl_target"", ""limit"": 200}}, {""name"": ""TodoWrite"", ""input"": {""todos"": [{""content"": ""Extract all human kinase proteins from UniProt"", ""status"": ""completed"", ""activeForm"": ""Extracting all human kinase proteins from UniProt""}, {""content"": ""Convert UniProt IDs to ChEMBL target IDs using ID mapping"", ""status"": ""completed"", ""activeForm"": ""Converting UniProt IDs to ChEMBL target IDs""}, {""content"": ""Verify which kinases are actual targets in ChEMBL"", ""status"": ""in_progress"", ""activeForm"": ""Verifying which kinases are actual targets in ChEMBL""}, {""content"": ""Compile final list of human kinases that are ChEMBL targets"", ""status"": ""pending"", ""activeForm"": ""Compiling final list of human kinases that are ChEMBL targets""}]}}, {""name"": ""mcp__togomcp__search_chembl_target"", ""input"": {""query"": ""CHEMBL267"", ""limit"": 5}}, {""name"": ""mcp__togomcp__get_sparql_example"", ""input"": {""dbname"": ""chembl""}}, {""name"": ""mcp__togomcp__get_MIE_file"", ""input"": {""dbname"": ""chembl""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""chembl"", ""sparql_query"": ""PREFIX cco: <http://rdf.ebi.ac.uk/terms/chembl#>\nPREFIX skos: <http://www.w3.org/2004/02/skos/core#>\n\nSELECT DISTINCT ?target ?targetLabel ?chemblId ?uniprot\nFROM <http://rdf.ebi.ac.uk/dataset/chembl>\nWHERE {\n  VALUES ?chemblId { \""CHEMBL267\"" \""CHEMBL331\"" \""CHEMBL258\"" \""CHEMBL308\"" \""CHEMBL299\"" \""CHEMBL262\"" \""CHEMBL260\"" \""CHEMBL2343\"" \""CHEMBL4580\"" \""CHEMBL5443\"" }\n  ?target a cco:SingleProtein ;\n          rdfs:label ?targetLabel ;\n          cco:chemblId ?chemblId ;\n          cco:organismName \""Homo sapiens\"" ;\n          cco:hasTargetComponent ?component .\n  ?component skos:exactMatch ?uniprot .\n  FILTER(STRSTARTS(STR(?uniprot), \""http://purl.uniprot.org/uniprot/\""))\n}\nLIMIT 50""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""chembl"", ""sparql_query"": ""PREFIX cco: <http://rdf.ebi.ac.uk/terms/chembl#>\nPREFIX skos: <http://www.w3.org/2004/02/skos/core#>\n\nSELECT DISTINCT ?target ?targetLabel ?chemblId ?uniprot \nFROM <http://rdf.ebi.ac.uk/dataset/chembl>\nWHERE {\n  ?target a cco:SingleProtein ;\n          rdfs:label ?targetLabel ;\n          cco:chemblId ?chemblId ;\n          cco:organismName \""Homo sapiens\"" ;\n          cco:hasTargetComponent ?component .\n  ?component skos:exactMatch ?uniprot .\n  ?targetLabel bif:contains \""'kinase'\"" option (score ?sc)\n  FILTER(STRSTARTS(STR(?uniprot), \""http://purl.uniprot.org/uniprot/\""))\n}\nORDER BY DESC(?sc)\nLIMIT 100""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""chembl"", ""sparql_query"": ""PREFIX cco: <http://rdf.ebi.ac.uk/terms/chembl#>\nPREFIX skos: <http://www.w3.org/2004/02/skos/core#>\n\nSELECT COUNT(DISTINCT ?target) as ?count\nFROM <http://rdf.ebi.ac.uk/dataset/chembl>\nWHERE {\n  ?target a cco:SingleProtein ;\n          rdfs:label ?targetLabel ;\n          cco:organismName \""Homo sapiens\"" ;\n          cco:hasTargetComponent ?component .\n  ?component skos:exactMatch ?uniprot .\n  ?targetLabel bif:contains \""'kinase'\"" \n  FILTER(STRSTARTS(STR(?uniprot), \""http://purl.uniprot.org/uniprot/\""))\n}""}}, {""name"": ""TodoWrite"", ""input"": {""todos"": [{""content"": ""Extract all human kinase proteins from UniProt"", ""status"": ""completed"", ""activeForm"": ""Extracting all human kinase proteins from UniProt""}, {""content"": ""Convert UniProt IDs to ChEMBL target IDs using ID mapping"", ""status"": ""completed"", ""activeForm"": ""Converting UniProt IDs to ChEMBL target IDs""}, {""content"": ""Verify which kinases are actual targets in ChEMBL"", ""status"": ""completed"", ""activeForm"": ""Verifying which kinases are actual targets in ChEMBL""}, {""content"": ""Compile final list of human kinases that are ChEMBL targets"", ""status"": ""completed"", ""activeForm"": ""Compiling final list of human kinases that are ChEMBL targets""}]}}]",List of kinase protein IDs,Complex query requiring multiple database operations
-8,2025-12-15,Integration,Convert the UniProt ID P04637 to its corresponding NCBI Gene ID.,True,"P04637 is the UniProt ID for the human TP53 gene, which encodes the p53 tumor suppressor protein. The corresponding NCBI Gene ID for TP53 is 7157.
-
-However, I should note that while I'm confident about this conversion based on my training knowledge, UniProt and NCBI databases are regularly updated, so I'd recommend verifying this mapping through the official databases if you need it for research or clinical purposes.",,5.390004873275757,56,105,True,"The UniProt ID P04637 corresponds to NCBI Gene ID **7157**.
-
-For reference, this UniProt ID P04637 represents the TP53 gene (tumor protein p53), which is a well-known tumor suppressor gene. The corresponding NCBI Gene ID 7157 refers to the same gene in the NCBI Gene database.",,9.817048072814941,mcp__togomcp__togoid_convertId,"[{""name"": ""mcp__togomcp__togoid_convertId"", ""input"": {""ids"": ""P04637"", ""route"": ""uniprot,ncbigene""}}]",7157 (TP53),ID conversion test
-9,2025-12-15,Completeness,List all biochemical reactions in Rhea database that involve ATP as a substrate.,True,"I don't have access to the Rhea database or any external databases, so I cannot provide a specific list of all biochemical reactions in Rhea that involve ATP as a substrate.
-
-However, I can tell you that ATP (adenosine triphosphate) is involved in thousands of biochemical reactions as a substrate, including:
-
-**Major categories of ATP-involving reactions:**
-- Kinase reactions (phosphorylation of proteins, metabolites)
-- Ligase reactions (forming bonds with energy from ATP hydrolysis)
-- Transport reactions (active transport across membranes)
-- Motor protein reactions (muscle contraction, cellular movement)
-- Metabolic reactions (glycolysis, fatty acid synthesis, etc.)
-
-**Some common examples:**
-- Hexokinase: ATP + glucose → ADP + glucose-6-phosphate
-- Protein kinases: ATP + protein → ADP + phosphoprotein
-- Aminoacyl-tRNA synthetases: ATP + amino acid + tRNA → AMP + aminoacyl-tRNA + PPi
-- Na+/K+-ATPase: ATP + Na+ + K+ → ADP + Pi (with ion transport)
-
-To get the complete list from Rhea, you would need to:
-1. Access the Rhea database directly (https://www.rhea-db.org/)
-2. Search for reactions containing ""ATP"" as a reactant/substrate
-3. Use their API or download their data files for programmatic access
-
-The Rhea database contains tens of thousands of reactions, so the ATP-involving subset would be quite extensive.",,8.370224237442017,54,359,True,"Based on my query of the Rhea database, I found **1,276 biochemical reactions** that involve ATP as a substrate. Here's a comprehensive summary of the types of ATP-involving reactions in the database:
-
-## Summary of ATP-Involving Reactions in Rhea Database
-
-### Major Categories of ATP Reactions:
-
-1. **Phosphorylation Reactions** - The most common type, where ATP transfers a phosphate group to various substrates:
-   - Protein phosphorylation (kinase reactions)
-   - Sugar phosphorylation (hexokinase-type reactions)
-   - Small molecule phosphorylation
-
-2. **Aminoacyl-tRNA Synthetase Reactions** - ATP-dependent attachment of amino acids to tRNA molecules for protein synthesis
-
-3. **Acyl-CoA Synthetase Reactions** - ATP-dependent activation of fatty acids and other carboxylic acids by forming CoA esters
-
-4. **Transport/Efflux Reactions** - ATP-powered active transport across cellular membranes:
-   - Ion transport (K+, Na+, Zn2+, etc.)
-   - Amino acid transport
-   - Sugar transport
-   - Drug efflux
-
-5. **Nucleotide Metabolism** - ATP serving as phosphate donor for nucleotide synthesis and interconversion
-
-6. **Biosynthetic Reactions** - ATP providing energy for the formation of complex molecules:
-   - Peptide bond formation
-   - Nucleotide synthesis
-   - Coenzyme synthesis
-
-### Examples of Key ATP Reactions:
-
-**Energy Production/Consumption:**
-- `RHEA:20988`: ATP + 2 H2O = AMP + 2 H(+) + 2 phosphate (ATP hydrolysis)
-- `RHEA:29423`: ATP + diphosphate = ADP + H(+) + triphosphate
-
-**Protein Phosphorylation:**
-- `RHEA:46608`: ATP + L-threonyl-[protein] = ADP + H(+) + O-phospho-L-threonyl-[protein]
-- `RHEA:43384`: ATP + L-arginyl-[protein] = ADP + H(+) + N(omega)-phospho-L-arginyl-[protein]
-
-**Metabolic Phosphorylation:**
-- `RHEA:21644`: ATP + glycerol = ADP + H(+) + sn-glycerol 3-phosphate
-- `RHEA:20780`: ATP + GMP = ADP + GDP
-
-**Aminoacyl-tRNA Synthesis:**
-- `RHEA:20301`: ATP + L-arginine + tRNA(Arg) = AMP + diphosphate + L-arginyl-tRNA(Arg)
-- `RHEA:23540`: ATP + L-glutamate + tRNA(Glu) = AMP + diphosphate + L-glutamyl-tRNA(Glu)
-
-**Fatty Acid Activation:**
-- `RHEA:30751`: ATP + CoA + hexadecanoate = AMP + diphosphate + hexadecanoyl-CoA
-- `RHEA:33615`: ATP + CoA + octadecanoate = AMP + diphosphate + octadecanoyl-CoA
-
-**Transport Reactions:**
-- `RHEA:20852`: ATP + H(+)(in) + H2O = ADP + 2 H(+)(out) + phosphate (H+ pump)
-- `RHEA:22044`: ATP + H(+)(in) + H2O + K(+)(out) = ADP + 2 H(+)(out) + K(+)(in) + phosphate (K+ transport)
-
-All of these reactions are **approved** and **chemically balanced** in the Rhea database, making them reliable references for biochemical research and metabolic pathway analysis.",,51.33012294769287,"mcp__togomcp__get_MIE_file, mcp__togomcp__get_sparql_example, mcp__togomcp__run_sparql, mcp__togomcp__run_sparql, mcp__togomcp__run_sparql","[{""name"": ""mcp__togomcp__get_MIE_file"", ""input"": {""dbname"": ""rhea""}}, {""name"": ""mcp__togomcp__get_sparql_example"", ""input"": {""dbname"": ""rhea""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""rhea"", ""sparql_query"": ""PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\nPREFIX rhea: <http://rdf.rhea-db.org/>\n\nSELECT DISTINCT ?reaction ?accession ?equation ?label\nWHERE {\n  ?reaction rdfs:subClassOf rhea:Reaction ;\n            rhea:equation ?equation ;\n            rhea:accession ?accession ;\n            rdfs:label ?label ;\n            rhea:status rhea:Approved .\n  ?equation bif:contains \""'ATP'\"" option (score ?sc) .\n}\nORDER BY DESC(?sc)\nLIMIT 100""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""rhea"", ""sparql_query"": ""PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\nPREFIX rhea: <http://rdf.rhea-db.org/>\n\nSELECT DISTINCT ?reaction ?accession ?equation ?label\nWHERE {\n  ?reaction rdfs:subClassOf rhea:Reaction ;\n            rhea:equation ?equation ;\n            rhea:accession ?accession ;\n            rdfs:label ?label ;\n            rhea:status rhea:Approved .\n  ?equation bif:contains \""'ATP'\"" option (score ?sc) .\n}\nORDER BY DESC(?sc)\nLIMIT 200\nOFFSET 100""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""rhea"", ""sparql_query"": ""PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\nPREFIX rhea: <http://rdf.rhea-db.org/>\n\nSELECT (COUNT(DISTINCT ?reaction) as ?count)\nWHERE {\n  ?reaction rdfs:subClassOf rhea:Reaction ;\n            rhea:equation ?equation ;\n            rhea:status rhea:Approved .\n  ?equation bif:contains \""'ATP'\"" option (score ?sc) .\n}""}}]",Multiple Rhea reaction IDs,Tests comprehensive search capabilities
-10,2025-12-15,Precision,What is the SMILES string for caffeine (PubChem CID 2519)?,True,"The SMILES string for caffeine is:
-
-**CN1C=NC2=C1C(=O)N(C(=O)N2C)C**
-
-This represents caffeine's molecular structure, which is a methylxanthine compound with the molecular formula C8H10N4O2. Caffeine contains a purine ring system with methyl groups attached to specific nitrogen atoms.",,4.0433220863342285,58,91,True,"The SMILES string for caffeine (PubChem CID 2519) is:
-
-**CN1C=NC2=C1C(=O)N(C(=O)N2C)C**
-
-This SMILES notation represents the chemical structure of caffeine, which has the molecular formula C8H10N4O2 and is systematically named 1,3,7-trimethylpurine-2,6-dione. The compound has a molecular weight of 194.19 g/mol.",,10.141084909439087,mcp__togomcp__get_compound_attributes_from_pubchem,"[{""name"": ""mcp__togomcp__get_compound_attributes_from_pubchem"", ""input"": {""pubchem_compound_id"": ""2519""}}]",CN1C=NC2=C1C(=O)N(C(=O)N2C)C,Tests retrieval of molecular structure data
+This makes biological sense as macroautophagy is a specific type of autophagy. Macroautophagy is the major form of autophagy where cellular components are sequestered in double-membrane vesicles called autophagosomes and then delivered to lysosomes for degradation. It's a subclass of the broader autophagy process.",,11.616564273834229,9,371,456,32532,mcp__togomcp__run_sparql,"[{""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""go"", ""sparql_query"": ""PREFIX go: <http://purl.obolibrary.org/obo/>\nPREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n\nSELECT ?parent ?parentLabel\nWHERE {\n  go:GO_0016236 rdfs:subClassOf ?parent .\n  ?parent rdfs:label ?parentLabel .\n  FILTER(?parent != go:GO_0016236)\n}\nORDER BY ?parentLabel""}}]",CRITICAL,GO:0006914 (autophagy),Tests ability to navigate ontology relationships using structured queries. Verified using OLS4 getDescendants which showed macroautophagy (GO:0016236) has directParent: autophagy (GO:0006914). This requires understanding hierarchical ontology structure. Database: GO.

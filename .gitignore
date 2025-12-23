@@ -208,4 +208,7 @@ __marimo__/
 
 # Others
 .DS_Store
-evaluation/scripts/_archive*
+evaluation/scripts/evaluation_dashboard.html
+evaluation/scripts/evaluation_results_intermediate.csv
+# evaluation/results/
+# evaluation/questions/

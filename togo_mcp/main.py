@@ -7,7 +7,7 @@ import asyncio
 
 async def setup():
     await mcp.import_server(togoid_mcp, prefix="togoid")
-    await mcp.import_server(ncbi_mcp, prefix="ncbi")
+    await mcp.import_server(ncbi_mcp)
 
 def run():
     asyncio.run(setup())

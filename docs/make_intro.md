@@ -11,10 +11,14 @@ Create an HTML page for researchers in biology and medicine who are not necessar
 - Setup guide
 - List of available databases
 - List of available tools
+- Other MCP Servers
+- Related Resources
 
 ## Style
+- Use https://togomcp.rdfportal.org/ as a template.
 - Follow the style of DBCLS's default CSS at https://dbcls.rois.ac.jp/style/default.css.
 - However, make it readable both on PC and smartphone.
+- Put the DBCLS Logo with the link at the page top.
 - Mind the contrast! 
 - The hero section should show the MCP endpoint URL.
 
@@ -45,7 +49,9 @@ Key Results:
 ## Setup guide
 Read the following webpages carefully and write a concise, accurate setup guide for each.
 - [Claude Desktop](https://support.claude.com/en/articles/11175166-getting-started-with-custom-connectors-using-remote-mcp#h_3d1a65aded)
-- [ChatGPT](https://help.openai.com/ja-jp/articles/12584461-developer-mode-apps-and-full-mcp-connectors-in-chatgpt-beta)
+  * Method 1 (for paid plans). Settings -> Connectors -> "Add custom connectors"
+  * Method 2. (alternative). Settings -> Developer -> Edit Config (JSON config file)
+- [ChatGPT](https://help.openai.com/ja-jp/articles/12584461-developer-mode-apps-and-full-mcp-connectors-in-chatgpt-beta) (Paid plans only)
 - [Gemini CLI](https://geminicli.com/docs/tools/mcp-server/#how-to-set-up-your-mcp-server) Note that TogoMCP is provided via **Streamable-HTTP, not SSE**.
 For Gemini CLI, the settings.json should be 
 ```
@@ -72,7 +78,6 @@ These MCP servers are strongly recommended to be used with TogoMCP.
 
 ## Related resources
 List the following resources with summaries. Search the Web if necessary.
-- [TogoMCP server](https://togomcp.rdfportal.org/mcp)
 - [RDF Portal](https://rdfportal.org)
 - [TogoID](https://togoid.dbcls.jp)
 - [DBCLS](https://dbcls.rois.jp)
@@ -87,6 +92,9 @@ The footer should include the following
         <p class="footer__organism-sub">Research Organization of Information and Systems</p>
     </div>
 ```
+- Also add the link to each item.
+- Make sure all the links are alive and correct.
+
 **IMPORTANT!**
 - Make sure to follow the style of DBCLS's default CSS at https://dbcls.rois.ac.jp/style/default.css in the footer.
 - The footer should be center-aligned.
@@ -94,7 +102,15 @@ The footer should include the following
 ## Menu tab
 - Add a menu tab near the top of the page.
 - The menu tab should be sticky so the user can always see it when scrolling.
-- In the menu tab, include [Contact](https://dbcls.rois.ac.jp/contact-en.html) as a link.
+- The menu tab should include the pointers to all the sections.
+  * Summary
+  * Examples
+  * Setup
+  * Databases
+  * Tools
+  * Other MCP Servers
+  * Resources
+  * [Contact](https://dbcls.rois.ac.jp/contact-en.html)
 
 ## Back-to-top button
 - 🔵 Circular button in DBCLS blue (#004098)

@@ -1,0 +1,86 @@
+[
+  {
+    "id": 49,
+    "category": "Precision",
+    "question": "What is the PDB entry with the tied world record for highest resolution?",
+    "expected_answer": "5D8V or 3NIR (both at 0.48 Å)",
+    "notes": "Database: PDB. Tests ultra-high resolution structure identification. Verified in pdb_exploration.md Query 2 which found two structures tied at 0.48 Å: 5D8V (R-work 0.072) and 3NIR (R-work 0.127)."
+  },
+  {
+    "id": 50,
+    "category": "Precision",
+    "question": "What is the charge of ATP according to Rhea database?",
+    "expected_answer": "-4",
+    "notes": "Database: Rhea. Tests compound charge property retrieval. Verified in rhea_exploration.md Query 7 which showed ATP compound has molecular formula C10H12N5O13P3 with charge -4 and ChEBI:30616."
+  },
+  {
+    "id": 51,
+    "category": "Completeness",
+    "question": "How many PDB entries were determined using electron microscopy?",
+    "expected_answer": "15,032 (approximately 7% of all structures)",
+    "notes": "Database: PDB. Tests experimental method counting via pdbx:exptl.method. Verified in pdb_exploration.md Query 1 which showed 15,032 EM entries out of 204,594 total (7.3%)."
+  },
+  {
+    "id": 52,
+    "category": "Completeness",
+    "question": "How many transport reactions are in the Rhea database?",
+    "expected_answer": "5,984 (35% of total reactions)",
+    "notes": "Database: Rhea. Tests reaction type counting with rhea:isTransport filter. Verified in rhea_exploration.md which states 5,984 transport reactions out of 17,078 master reactions."
+  },
+  {
+    "id": 53,
+    "category": "Integration",
+    "question": "What is the EMDB entry associated with PDB structure 8A2Z?",
+    "expected_answer": "EMD-15109",
+    "notes": "Database: PDB, EMDB. Tests cryo-EM structure linkage via pdbx:database_2. About 7% of PDB entries have EMDB cross-references. Example from pdb_exploration.md integration opportunities."
+  },
+  {
+    "id": 54,
+    "category": "Integration",
+    "question": "What NCBI Gene ID for insulin is co-mentioned with diabetes in PubTator?",
+    "expected_answer": "3630 (INS gene)",
+    "notes": "Database: PubTator, NCBI Gene. Tests gene-disease co-occurrence from literature mining. Verified in pubtator_exploration.md Query 3 which found insulin gene (3630) co-mentioned with diabetes (MeSH:D003920) in multiple PubMed articles demonstrating text-mining integration."
+  },
+  {
+    "id": 55,
+    "category": "Currency",
+    "question": "How many hemoglobin structures are currently available in PDB?",
+    "expected_answer": "1,299",
+    "notes": "Database: PDB. Tests current structural coverage using search_pdb_entity. Verified in pdb_exploration.md Query 4 which found 1,299 hemoglobin structures including variants and ligand-bound states."
+  },
+  {
+    "id": 56,
+    "category": "Currency",
+    "question": "What pathways in Reactome are related to DNA repair?",
+    "expected_answer": "Multiple pathways including 'DNA Repair' (Pathway13), 'DNA Double-Strand Break Repair' (Pathway40), and TP53-regulated pathways",
+    "notes": "Database: Reactome. Tests current pathway coverage using bif:contains. Verified in reactome_exploration.md Query 5 which found 10 DNA repair pathways with hierarchical organization."
+  },
+  {
+    "id": 57,
+    "category": "Specificity",
+    "question": "What is the BacDive strain number for Thermotoga maritima?",
+    "expected_answer": "DSM 3109",
+    "notes": "Database: BacDive. Tests thermophilic bacterium identification. Thermotoga maritima is a well-studied hyperthermophile. Example from QUESTION_DESIGN_GUIDE.md."
+  },
+  {
+    "id": 58,
+    "category": "Specificity",
+    "question": "How many times is Alzheimer Disease (MeSH:D000544) mentioned in PMID:10514107 according to PubTator?",
+    "expected_answer": "4",
+    "notes": "Database: PubTator. Tests annotation frequency retrieval via pubtator:annotation_count property. Verified in pubtator_exploration.md Query 2 which showed Alzheimer Disease mentioned exactly 4 times in PMID:10514107, demonstrating literature mining precision."
+  },
+  {
+    "id": 59,
+    "category": "Structured Query",
+    "question": "Find all Rhea reactions that involve glucose and phosphate",
+    "expected_answer": "Multiple reactions including glucose phosphorylation, phosphorolysis, and polymer reactions",
+    "notes": "Database: Rhea. Tests Boolean search with bif:contains using 'glucose' AND 'phosphate'. Verified in rhea_exploration.md Query 2 which found 10 glucose-phosphate reactions."
+  },
+  {
+    "id": 60,
+    "category": "Structured Query",
+    "question": "Find all PDB structures with resolution better than 1.0 Å determined after 2010",
+    "expected_answer": "Multiple ultra-high resolution structures including 5D8V, 3NIR, 1EJG",
+    "notes": "Database: PDB. Tests combined numeric filtering (resolution) with temporal filtering. Pattern verified in pdb_exploration.md Query 2 which demonstrated resolution filtering with xsd:decimal comparison."
+  }
+]
