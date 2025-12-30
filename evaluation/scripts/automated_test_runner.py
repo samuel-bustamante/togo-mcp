@@ -169,48 +169,76 @@ class CorrectnessEvaluator:
                 return True
         return False
     
-    def check_expected_answer(self, text: str, expected: str) -> Tuple[bool, float]:
+    def check_expected_answer(self, text: str, expected: str) -> Dict[str, Any]:
         """
         Check if response contains expected answer.
         
-        Uses either token-based partial matching or semantic similarity
-        based on the use_semantic setting.
+        Computes both token-based partial matching and semantic similarity
+        (if enabled) simultaneously.
         
         Returns:
-            (found, confidence) where confidence is 0.0-1.0
+            Dict with:
+                - exact_match: bool (exact string match)
+                - token_found: bool (token-based match found)
+                - token_confidence: float (0.0-1.0)
+                - semantic_found: bool (semantic match found, if enabled)
+                - semantic_similarity: float (0.0-1.0, if enabled)
+                - combined_found: bool (either method found match)
+                - combined_confidence: float (max of both confidences)
         """
+        result = {
+            "exact_match": False,
+            "token_found": False,
+            "token_confidence": 0.0,
+            "semantic_found": False,
+            "semantic_similarity": 0.0,
+            "combined_found": False,
+            "combined_confidence": 0.0
+        }
+        
         if not expected or not text:
-            return (False, 0.0)
+            return result
         
         text_lower = text.lower()
         expected_lower = expected.lower()
         
         # 1. Quick exact match (always try first)
         if expected_lower in text_lower:
-            return (True, 1.0)
+            result["exact_match"] = True
+            result["token_found"] = True
+            result["token_confidence"] = 1.0
+            result["semantic_found"] = True
+            result["semantic_similarity"] = 1.0
+            result["combined_found"] = True
+            result["combined_confidence"] = 1.0
+            return result
         
-        # 2. Semantic similarity matching (if enabled)
-        if self.use_semantic:
-            found, similarity = self._semantic_similarity(text, expected)
-            if found or similarity > 0.0:
-                return (found, similarity)
-            # Fall through to token matching if semantic fails
-        
-        # 3. Token-based partial match (split on punctuation/whitespace)
+        # 2. Token-based partial match (split on punctuation/whitespace)
         expected_parts = [
             p.strip() 
             for p in re.split(r'[,;\s]+', expected_lower) 
             if len(p.strip()) > 3
         ]
         
-        if not expected_parts:
-            return (False, 0.0)
+        if expected_parts:
+            matches = sum(1 for part in expected_parts if part in text_lower)
+            result["token_confidence"] = matches / len(expected_parts)
+            result["token_found"] = result["token_confidence"] >= 0.5
         
-        matches = sum(1 for part in expected_parts if part in text_lower)
-        confidence = matches / len(expected_parts)
-        found = confidence >= 0.5
+        # 3. Semantic similarity matching (if enabled)
+        if self.use_semantic:
+            found, similarity = self._semantic_similarity(text, expected)
+            result["semantic_found"] = found
+            result["semantic_similarity"] = similarity
         
-        return (found, confidence)
+        # 4. Combined result (either method succeeds)
+        result["combined_found"] = result["token_found"] or result["semantic_found"]
+        result["combined_confidence"] = max(
+            result["token_confidence"], 
+            result["semantic_similarity"]
+        )
+        
+        return result
     
     def evaluate_response(
         self, 
@@ -223,16 +251,26 @@ class CorrectnessEvaluator:
         
         Returns dict with:
             - actually_answered: bool
-            - has_expected: bool
-            - confidence: float
+            - has_expected: bool (combined result)
+            - confidence: float (combined confidence)
+            - exact_match: bool
+            - token_found: bool
+            - token_confidence: float
+            - semantic_found: bool
+            - semantic_similarity: float
         """
         actually_answered = not self.check_inability(text)
-        has_expected, confidence = self.check_expected_answer(text, expected)
+        match_result = self.check_expected_answer(text, expected)
         
         return {
             "actually_answered": actually_answered,
-            "has_expected": has_expected,
-            "confidence": confidence
+            "has_expected": match_result["combined_found"],
+            "confidence": match_result["combined_confidence"],
+            "exact_match": match_result["exact_match"],
+            "token_found": match_result["token_found"],
+            "token_confidence": match_result["token_confidence"],
+            "semantic_found": match_result["semantic_found"],
+            "semantic_similarity": match_result["semantic_similarity"]
         }
     
     def assess_value_add(
@@ -584,12 +622,22 @@ class EvaluationRunner:
             "baseline_actually_answered": baseline_eval["actually_answered"],
             "baseline_has_expected": baseline_eval["has_expected"],
             "baseline_confidence": baseline_eval["confidence"],
+            "baseline_exact_match": baseline_eval["exact_match"],
+            "baseline_token_found": baseline_eval["token_found"],
+            "baseline_token_confidence": baseline_eval["token_confidence"],
+            "baseline_semantic_found": baseline_eval["semantic_found"],
+            "baseline_semantic_similarity": baseline_eval["semantic_similarity"],
             "baseline_text": baseline_result.get("text", ""),
             "baseline_error": baseline_result.get("error", ""),
             "baseline_time": baseline_result["elapsed_time"],
             "togomcp_success": togomcp_result["success"],
             "togomcp_has_expected": togomcp_eval["has_expected"],
             "togomcp_confidence": togomcp_eval["confidence"],
+            "togomcp_exact_match": togomcp_eval["exact_match"],
+            "togomcp_token_found": togomcp_eval["token_found"],
+            "togomcp_token_confidence": togomcp_eval["token_confidence"],
+            "togomcp_semantic_found": togomcp_eval["semantic_found"],
+            "togomcp_semantic_similarity": togomcp_eval["semantic_similarity"],
             "togomcp_text": togomcp_result.get("text", ""),
             "togomcp_error": togomcp_result.get("error", ""),
             "togomcp_time": togomcp_result["elapsed_time"],
@@ -703,9 +751,15 @@ class EvaluationRunner:
         fieldnames = [
             "question_id", "date", "category", "question_text",
             "baseline_success", "baseline_actually_answered", "baseline_has_expected", 
-            "baseline_confidence", "baseline_text", "baseline_error", "baseline_time",
+            "baseline_confidence", "baseline_exact_match",
+            "baseline_token_found", "baseline_token_confidence",
+            "baseline_semantic_found", "baseline_semantic_similarity",
+            "baseline_text", "baseline_error", "baseline_time",
             "baseline_input_tokens", "baseline_output_tokens",
             "togomcp_success", "togomcp_has_expected", "togomcp_confidence",
+            "togomcp_exact_match",
+            "togomcp_token_found", "togomcp_token_confidence",
+            "togomcp_semantic_found", "togomcp_semantic_similarity",
             "togomcp_text", "togomcp_error", "togomcp_time",
             "togomcp_input_tokens", "togomcp_output_tokens",
             "togomcp_cache_creation_input_tokens", "togomcp_cache_read_input_tokens",
