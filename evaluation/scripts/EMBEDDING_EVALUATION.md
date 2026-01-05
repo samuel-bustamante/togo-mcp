@@ -159,47 +159,4 @@ Improvement Analysis:
 
 ✓ Processing complete!
 ```
-
-## Troubleshooting
-
-### "Failed to connect to Ollama"
-
-Ensure Ollama is running:
-```bash
-ollama serve
-```
-
-Or on Windows, check if Ollama is in your PATH:
-```powershell
-$env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
-ollama --version
-```
-
-### Model Not Found
-
-Pull the required model:
-```bash
-ollama pull nomic-embed-text
-```
-
-### Low Semantic Similarity Scores
-
-- The default threshold (0.75) may be too high for short expected answers
-- Try lowering with `-t 0.6` or `-t 0.5`
-- Short answers like IDs (e.g., "Q99ZW2") may not benefit from semantic matching
-
-## Alternative Models
-
-Other embedding models available in Ollama:
-
-| Model | Size | Notes |
-|-------|------|-------|
-| `nomic-embed-text` | 274MB | Default, good balance of quality/speed |
-| `mxbai-embed-large` | 670MB | Higher quality, slower |
-| `all-minilm` | 46MB | Lightweight, faster |
-| `snowflake-arctic-embed` | 335MB | Good for retrieval tasks |
-
-List available models:
-```bash
-ollama list
-```
+---

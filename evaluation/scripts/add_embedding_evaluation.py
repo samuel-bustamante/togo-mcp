@@ -40,7 +40,19 @@ except ImportError:
 
 
 class EmbeddingEvaluator:
-    """Evaluates semantic similarity using embeddings."""
+    """Evaluates semantic similarity using embeddings.
+    
+    NOTE: Currently using chunking for long texts because available embedding models
+    (nomic-embed-text, mxbai-embed-large) have a context limit of ~8K tokens.
+    
+    TODO: Consider using a long-context embedding model when available:
+    - OpenAI text-embedding-3-large (8K tokens, API)
+    - Voyage AI embeddings (16K-32K tokens, API)  
+    - Future Ollama models with larger context windows
+    
+    Chunking works but may lose semantic coherence for very long responses.
+    A model with 32K+ token context would be preferable for full-text embeddings.
+    """
     
     def __init__(self, model: str = "nomic-embed-text", threshold: float = 0.75):
         """
@@ -53,36 +65,95 @@ class EmbeddingEvaluator:
         self.model = model
         self.threshold = threshold
         self._cache: Dict[str, np.ndarray] = {}
+        self._max_chars = 6000  # Safe limit for nomic-embed-text (~8K tokens)
+        self._chunk_size = 4000  # Chunk size for long texts
+        
+    def _get_embedding_single(self, text: str) -> Optional[np.ndarray]:
+        """Get embedding for a single text chunk."""
+        try:
+            response = ollama.embed(model=self.model, input=text)
+            if hasattr(response, 'embeddings'):
+                return np.array(response.embeddings[0])
+            elif isinstance(response, dict) and 'embeddings' in response:
+                return np.array(response['embeddings'][0])
+            elif isinstance(response, dict) and 'embedding' in response:
+                return np.array(response['embedding'])
+            return None
+        except Exception as e:
+            print(f"  Warning: Embedding failed: {e}")
+            return None
+    
+    def _chunk_text(self, text: str) -> List[str]:
+        """Split text into overlapping chunks for long text embedding.
+        
+        Strategy: Extract beginning, middle, and end of text to capture
+        key information. First chunk is weighted more heavily since
+        LLM responses typically put the main answer at the beginning.
+        
+        TODO: A long-context embedding model (32K+ tokens) would eliminate
+        the need for chunking and provide more accurate semantic similarity.
+        """
+        chunks = []
+        # First chunk: beginning (usually has the main answer)
+        chunks.append(text[:self._chunk_size])
+        
+        # Middle chunks if text is very long
+        if len(text) > self._chunk_size * 2:
+            mid_start = len(text) // 2 - self._chunk_size // 2
+            chunks.append(text[mid_start:mid_start + self._chunk_size])
+        
+        # Last chunk: end (may have conclusions)
+        if len(text) > self._chunk_size:
+            chunks.append(text[-self._chunk_size:])
+        
+        return chunks
         
     def _get_embedding(self, text: str) -> Optional[np.ndarray]:
-        """Get embedding vector for text using Ollama with caching."""
+        """Get embedding vector for text using Ollama with caching.
+        
+        For short texts (<6000 chars): embeds directly.
+        For long texts: uses chunking and weighted average of embeddings.
+        
+        NOTE: Chunking is a workaround for the 8K token limit of current models.
+        Consider switching to a long-context embedding model when available.
+        """
         if not text or not text.strip():
             return None
             
         # Check cache
-        cache_key = text.lower().strip()
+        cache_key = text.lower().strip()[:500]  # Use first 500 chars as cache key
         if cache_key in self._cache:
             return self._cache[cache_key]
         
-        try:
-            response = ollama.embed(model=self.model, input=text)
-            # Handle both old and new ollama API response formats
-            if hasattr(response, 'embeddings'):
-                embedding = np.array(response.embeddings[0])
-            elif isinstance(response, dict) and 'embeddings' in response:
-                embedding = np.array(response['embeddings'][0])
-            elif isinstance(response, dict) and 'embedding' in response:
-                embedding = np.array(response['embedding'])
-            else:
-                return None
-            
-            # Cache the result
-            self._cache[cache_key] = embedding
+        # Short text: embed directly
+        if len(text) <= self._max_chars:
+            embedding = self._get_embedding_single(text)
+            if embedding is not None:
+                self._cache[cache_key] = embedding
             return embedding
-            
-        except Exception as e:
-            print(f"  Warning: Embedding failed: {e}")
+        
+        # Long text: chunk and average embeddings
+        # TODO: Replace with long-context embedding model (32K+ tokens) when available
+        print(f"(long text: {len(text)} chars, using chunking)", end=" ")
+        chunks = self._chunk_text(text)
+        embeddings = []
+        
+        for chunk in chunks:
+            emb = self._get_embedding_single(chunk)
+            if emb is not None:
+                embeddings.append(emb)
+        
+        if not embeddings:
             return None
+        
+        # Average all chunk embeddings (weighted: first chunk gets more weight)
+        # First chunk weighted 2x because LLM responses typically start with the answer
+        weights = [2.0] + [1.0] * (len(embeddings) - 1)
+        weighted_sum = sum(w * e for w, e in zip(weights, embeddings))
+        avg_embedding = weighted_sum / sum(weights)
+        
+        self._cache[cache_key] = avg_embedding
+        return avg_embedding
     
     def compute_similarity(self, response_text: str, expected_answer: str) -> Dict[str, Any]:
         """
