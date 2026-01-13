@@ -143,13 +143,13 @@ class UnifiedDashboardGenerator:
         baseline_confidences = Counter(
             r.get('baseline_llm_confidence', 'low')
             for r in self.results
-            if self._parse_bool(r.get('baseline_llm_match', 'False'))
+            if r.get('baseline_llm_confidence', '')  # Count all non-empty values
         )
         
         togomcp_confidences = Counter(
             r.get('togomcp_llm_confidence', 'low')
             for r in self.results
-            if self._parse_bool(r.get('togomcp_llm_match', 'False'))
+            if r.get('togomcp_llm_confidence', '')  # Count all non-empty values
         )
         
         return {
