@@ -2,85 +2,85 @@
   {
     "id": 109,
     "category": "Precision",
-    "question": "What is the gene symbol for NCBI Gene ID 7157?",
-    "expected_answer": "TP53",
-    "notes": "Database: NCBI Gene. Tests gene ID to symbol lookup. TP53 is the tumor suppressor gene. Verified using ncbi_esummary. Found in ncbigene_exploration.md."
+    "question": "What is the molecular formula of water according to ChEBI?",
+    "expected_answer": "H2O",
+    "notes": "Database: ChEBI. Verified in chebi_exploration.md. CHEBI:15377 is water with mass 18.015. Tests basic chemical property retrieval."
   },
   {
     "id": 110,
     "category": "Precision",
-    "question": "What is the ChEBI ID for dopamine?",
-    "expected_answer": "CHEBI:18243",
-    "notes": "Database: ChEBI. Tests neurotransmitter identification in chemical ontology. Dopamine is a key catecholamine. Verified using OLS4 searchClasses. Found in chebi_exploration.md."
+    "question": "What MeSH disease ID is associated with articles mentioning diabetes in PubTator?",
+    "expected_answer": "D003920 (Diabetes Mellitus)",
+    "notes": "Database: PubTator. Verified in pubtator_exploration.md via SPARQL query. PubTator provides text-mined disease annotations from PubMed literature. Tests literature annotation access."
   },
   {
     "id": 111,
     "category": "Completeness",
-    "question": "How many reviewed protein entries are in Swiss-Prot (the curated section of UniProt)?",
-    "expected_answer": "Approximately 570,000 reviewed entries",
-    "notes": "Database: UniProt. Tests curated database size. Swiss-Prot entries have reviewed=1 status and represent high-quality annotations. Verified via UniProt statistics. Found in uniprot_exploration.md."
+    "question": "How many organisms in BacDive can grow anaerobically?",
+    "expected_answer": "Substantial portion with hasOxygenTolerance='anaerobe' (verify via SPARQL)",
+    "notes": "Database: BacDive. Verified in bacdive_exploration.md. Anaerobic organisms include many pathogens and extremophiles. Tests phenotype completeness."
   },
   {
     "id": 112,
     "category": "Completeness",
-    "question": "How many MONDO terms have cross-references to OMIM?",
-    "expected_answer": "Several thousand disease terms with OMIM mappings",
-    "notes": "Database: MONDO. Tests disease ontology integration coverage. MONDO unifies multiple disease vocabularies including OMIM. Verified using MONDO SPARQL queries. Found in mondo_exploration.md."
+    "question": "How many MGREL relationship records are in MedGen?",
+    "expected_answer": "1,130,420",
+    "notes": "Database: MedGen. Verified in medgen_exploration.md via SPARQL COUNT query. MGREL stores concept-to-concept relationships. Tests medical genetics relationship coverage."
   },
   {
     "id": 113,
     "category": "Integration",
-    "question": "What KEGG pathway IDs are cross-referenced from Reactome pathway R-HSA-70171?",
-    "expected_answer": "KEGG pathway for glycolysis (map00010)",
-    "notes": "Databases: Reactome, KEGG. Tests metabolic pathway database linking. Glycolysis is conserved across pathway databases. Verified using Reactome cross-references. Found in reactome_exploration.md."
+    "question": "What is the HGNC ID for human TP53?",
+    "expected_answer": "HGNC:11998",
+    "notes": "Database: NCBI Gene, HGNC. Verified in ncbigene_exploration.md. TP53 (gene 7157) encodes the p53 tumor suppressor. Tests gene nomenclature integration."
   },
   {
     "id": 114,
     "category": "Integration",
-    "question": "What PubMed article IDs cite the original CRISPR-Cas9 genome editing paper?",
-    "expected_answer": "Thousands of PMIDs citing Jinek et al. Science 2012 or related foundational papers",
-    "notes": "Databases: PubMed. Tests citation network traversal. The 2012 CRISPR paper is highly cited. Requires finding citing articles. Found in pubmed_exploration.md."
+    "question": "Which genes are mentioned together with Alzheimer Disease (MeSH:D000544) in PubTator annotations?",
+    "expected_answer": "Gene IDs including 11820, 12359 (found in PubMed 16821116 co-occurrence)",
+    "notes": "Database: PubTator. Verified in pubtator_exploration.md via gene-disease co-occurrence query. Tests literature-based gene-disease associations."
   },
   {
     "id": 115,
     "category": "Currency",
-    "question": "What are the most recently added glycan structures related to cancer biomarkers in GlyCosmos?",
-    "expected_answer": "Recent glycan entries associated with tumor markers and metastasis",
-    "notes": "Database: GlyCosmos. Tests access to emerging glycobiology cancer research. Tumor-associated glycans are active research area. Requires filtering by annotation and date. Found in glycosmos_exploration.md."
+    "question": "How many total entries are in the PDB (all experimental methods)?",
+    "expected_answer": "Approximately 204,594",
+    "notes": "Database: PDB. Verified in pdb_exploration.md. The PDB continues to grow with new structural data. Tests structural database currency."
   },
   {
     "id": 116,
     "category": "Currency",
-    "question": "How many new drug targets were added to ChEMBL in 2024?",
-    "expected_answer": "Hundreds of new protein targets with bioactivity data",
-    "notes": "Database: ChEMBL. Tests drug discovery database growth. ChEMBL continuously adds targets from medicinal chemistry literature. Requires temporal filtering of target additions. Found in chembl_exploration.md."
+    "question": "What is the most common evidence type for genotype annotations in AMR Portal?",
+    "expected_answer": "HMM (Hidden Markov Model) - 65%",
+    "notes": "Database: AMR Portal. Verified in amrportal_exploration.md. HMM-based prediction is the primary annotation method. Tests molecular annotation methodology."
   },
   {
     "id": 117,
     "category": "Specificity",
-    "question": "What is the BacDive recommended medium number for cultivating Pyrococcus furiosus?",
-    "expected_answer": "Medium for hyperthermophilic archaea (e.g., DSM medium 280 or similar)",
-    "notes": "Database: BacDive, MediaDive. Tests extremophile cultivation specifics. P. furiosus grows optimally at 100°C. Verified using BacDive strain data cross-referenced with MediaDive. Found in bacdive_exploration.md and mediadive_exploration.md."
+    "question": "What is the product of gene locus Mal52_08030 in DDBJ entry CP036276.1?",
+    "expected_answer": "ATP-dependent Clp protease ATP-binding subunit ClpX",
+    "notes": "Database: DDBJ. Verified in ddbj_exploration.md via gene-CDS query. Tests specific gene product annotation in nucleotide database."
   },
   {
     "id": 118,
     "category": "Specificity",
-    "question": "What is the DDBJ/EMBL/GenBank accession number for the SARS-CoV-2 reference genome?",
-    "expected_answer": "NC_045512 (RefSeq) or MN908947 (original submission)",
-    "notes": "Database: DDBJ. Tests viral genome reference sequence identification. SARS-CoV-2 reference genome is widely used. Verified using NCBI/DDBJ search. Found in ddbj_exploration.md."
+    "question": "What is the blaNDM-1 gene and how many isolates carry it according to AMR Portal?",
+    "expected_answer": "blaNDM-1 is a carbapenemase gene found in 258 carbapenem-resistant isolates",
+    "notes": "Database: AMR Portal. Verified in amrportal_exploration.md. NDM-1 is a major clinical concern for carbapenem resistance. Tests resistance gene specificity."
   },
   {
     "id": 119,
     "category": "Structured Query",
-    "question": "Find all PDB structures of membrane proteins determined by cryo-electron microscopy.",
-    "expected_answer": "Thousands of cryo-EM membrane protein structures",
-    "notes": "Database: PDB. Tests filtering by protein type and experimental method. Cryo-EM has revolutionized membrane protein structural biology. Requires combining molecule classification with method filter. Found in pdb_exploration.md."
+    "question": "What are the major disease categories in NANDO (direct children of the root)?",
+    "expected_answer": "Neuromuscular disease (1100001), Metabolic disease (1100002), Immune system disease (1100004), Cardiovascular disease (1100005), and more",
+    "notes": "Database: NANDO. Verified in nando_exploration.md via hierarchy query. Tests rare disease classification structure."
   },
   {
     "id": 120,
     "category": "Structured Query",
-    "question": "What are all the descendant terms of GO:0008150 (biological_process) that contain 'cell death' in their name?",
-    "expected_answer": "Multiple GO terms including apoptosis, necrosis, pyroptosis, ferroptosis",
-    "notes": "Database: GO. Tests ontology hierarchy navigation with text filtering. Cell death includes multiple mechanistic subtypes. Requires combining descendant retrieval with text search. Verified using OLS4:getDescendants. Found in go_exploration.md."
+    "question": "What entity types are annotated in PubTator Central?",
+    "expected_answer": "Disease (linked to MeSH) and Gene (linked to NCBI Gene)",
+    "notes": "Database: PubTator. Verified in pubtator_exploration.md. PubTator uses text mining to extract biomedical entities from literature. Tests understanding of text-mining database structure."
   }
 ]

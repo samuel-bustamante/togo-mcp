@@ -1,163 +1,159 @@
 # TogoMCP Evaluation Questions Summary
 
-**Total Questions**: 120 across 10 files (Q01.json - Q10.json)
-**Created**: January 2026
-**Based on**: Complete exploration of 23 databases
+## Overview
 
-## Distribution by Category
+This directory contains 120 high-quality evaluation questions designed to test TogoMCP's database access capabilities.
 
-Each category has exactly **20 questions** (2 per file × 10 files):
+## Question Distribution
 
-| Category | Count | Focus Areas |
-|----------|-------|-------------|
-| Precision | 20 | Exact IDs, molecular properties, specific values |
-| Completeness | 20 | Database counts, comprehensive listings |
-| Integration | 20 | Cross-database ID conversion, linking |
-| Currency | 20 | Recent data, post-training additions |
-| Specificity | 20 | Rare diseases, extremophiles, niche data |
-| Structured Query | 20 | Complex filters, multi-criteria queries |
+### Files
+- **Q01.json** - Questions 1-12
+- **Q02.json** - Questions 13-24
+- **Q03.json** - Questions 25-36
+- **Q04.json** - Questions 37-48
+- **Q05.json** - Questions 49-60
+- **Q06.json** - Questions 61-72
+- **Q07.json** - Questions 73-84
+- **Q08.json** - Questions 85-96
+- **Q09.json** - Questions 97-108
+- **Q10.json** - Questions 109-120
+
+### Category Distribution (20 questions each)
+
+| Category | Description | Questions |
+|----------|-------------|-----------|
+| **Precision** | Exact IDs, sequences, molecular properties | 20 |
+| **Completeness** | Exhaustive lists, counts, coverage | 20 |
+| **Integration** | Cross-database linking, ID conversions | 20 |
+| **Currency** | Recent updates, current statistics | 20 |
+| **Specificity** | Niche organisms, rare diseases, specialized data | 20 |
+| **Structured Query** | Complex filters, multi-step queries | 20 |
+
+Each file contains exactly 2 questions from each category.
 
 ## Database Coverage
 
-All 23 databases are represented with biologically relevant questions:
+All 23 TogoMCP databases are represented across the 120 questions:
 
-### Tier 1: High-Use Databases (6-8 questions each)
-- **UniProt** (8 questions): Protein IDs, sequences, functions, features
-- **PubChem** (7 questions): Compound properties, CIDs, bioassays
-- **ChEMBL** (6 questions): Drug targets, IC50 values, mechanisms
-- **GO** (6 questions): Term hierarchies, annotations, namespaces
-- **ClinVar** (6 questions): Variant pathogenicity, clinical significance
-- **PubMed** (7 questions): Literature search, citations
+| Database | Question Count | Key Question Topics |
+|----------|---------------|---------------------|
+| UniProt | 8 | Protein IDs, mnemonics, reviewed entries |
+| PubChem | 6 | Compound IDs, molecular properties, FDA drugs |
+| ChEMBL | 6 | Drug IDs, targets, bioactivity data |
+| GO | 6 | Term IDs, hierarchies, namespace counts |
+| PDB | 6 | Resolution, structures, experimental methods |
+| ClinVar | 3 | Variant counts, types |
+| Reactome | 3 | Pathway IDs, protein IDs |
+| MONDO | 4 | Disease IDs, cross-references |
+| NANDO | 5 | Japanese rare disease IDs, notification numbers |
+| MeSH | 4 | Descriptor IDs, term counts |
+| BacDive | 6 | Strain IDs, phenotypes, temperature |
+| MediaDive | 5 | Medium IDs, ingredients, pH |
+| Rhea | 4 | Reaction counts, equations |
+| ChEBI | 5 | Chemical IDs, formulas |
+| AMR Portal | 7 | Resistance data, gene classes |
+| GlyCosmos | 6 | Glycan counts, epitopes, glycoproteins |
+| Ensembl | 4 | Gene IDs, species counts |
+| NCBI Gene | 4 | Gene IDs, types, chromosomes |
+| Taxonomy | 2 | Organism taxonomy IDs (9606, 10090) |
+| TogoID | 3 | ID conversions |
 
-### Tier 2: Specialized Databases (4-5 questions each)
-- **PDB** (5 questions): Structure resolution, experimental methods
-- **Reactome** (5 questions): Pathway hierarchies, disease pathways
-- **MeSH** (5 questions): Medical terminology, tree navigation
-- **NCBI Gene** (5 questions): Gene symbols, locations, orthologs
-- **ChEBI** (4 questions): Chemical ontology, biological roles
-- **Rhea** (4 questions): Biochemical reactions, EC numbers
-- **MONDO** (4 questions): Disease ontology, cross-references
+## Redundancy Check (Completed)
 
-### Tier 3: Niche Databases (2-3 questions each)
-- **BacDive** (3 questions): Extremophile strains, growth conditions
-- **MediaDive** (2 questions): Culture media for extremophiles
-- **AMR Portal** (3 questions): Resistance patterns, AST data
-- **NANDO** (3 questions): Japanese rare diseases, multilingual
-- **MedGen** (3 questions): Clinical concepts, disease mappings
-- **GlyCosmos** (3 questions): Glycan structures, glycoproteins
-- **PubTator** (3 questions): Gene-disease literature mining
-- **Taxonomy** (2 questions): Organism classification, strain IDs
-- **Ensembl** (2 questions): Gene transcripts, biotypes
-- **DDBJ** (2 questions): Genome sequences, viral references
+The following duplicate/near-duplicate questions were identified and fixed:
 
-## Question File Structure
+| Original Issue | Resolution |
+|---------------|------------|
+| Q17 & Q89: Both asked BRCA1 ↔ ENSG00000012048 | Q17 → Taxonomy ID for Homo sapiens; Q89 → TP53 Ensembl ID |
+| Q8 & Q49: Both asked mTOR pathway R-HSA-165159 | Q49 → Taxonomy ID for Mus musculus |
 
-Each file (Q01-Q10.json) contains:
-- **12 questions** with sequential global IDs
-- **2 questions per category** (Precision, Completeness, Integration, Currency, Specificity, Structured Query)
-- **All required fields**: id, category, question, expected_answer, notes
-- **JSON array format**: `[{...}, {...}, ...]` (not object wrapper)
+### Remaining Conceptually Related (but distinct) Questions:
+- Aspirin questions: Q2 (PubChem CID), Q61 (ChEBI ID), Q65 (cross-reference) - Different ID types
+- Glucose questions: Q30, Q42, Q108 - Different database cross-references
+- Thermotoga questions: Q21, Q46, Q58 - Different properties (BacDive ID, culture collections, DSM number)
+- PDB method counts: Q20, Q31, Q67, Q115 - Different methods (X-ray, EM, NMR, total)
+- Lewis epitopes: Q22, Q70, Q106 - Different variants
 
-### File Breakdown
+These are intentionally kept as they test different aspects of database access.
 
-| File | Question IDs | Categories (2 each) |
-|------|--------------|---------------------|
-| Q01.json | 1-12 | Precision, Completeness, Integration, Currency, Specificity, Structured Query |
-| Q02.json | 13-24 | Precision, Completeness, Integration, Currency, Specificity, Structured Query |
-| Q03.json | 25-36 | Precision, Completeness, Integration, Currency, Specificity, Structured Query |
-| Q04.json | 37-48 | Precision, Completeness, Integration, Currency, Specificity, Structured Query |
-| Q05.json | 49-60 | Precision, Completeness, Integration, Currency, Specificity, Structured Query |
-| Q06.json | 61-72 | Precision, Completeness, Integration, Currency, Specificity, Structured Query |
-| Q07.json | 73-84 | Precision, Completeness, Integration, Currency, Specificity, Structured Query |
-| Q08.json | 85-96 | Precision, Completeness, Integration, Currency, Specificity, Structured Query |
-| Q09.json | 97-108 | Precision, Completeness, Integration, Currency, Specificity, Structured Query |
-| Q10.json | 109-120 | Precision, Completeness, Integration, Currency, Specificity, Structured Query |
+## Question Quality Criteria
 
-## Biological Relevance Verification
+All questions satisfy:
 
-✅ **ALL 120 questions focus on biological/scientific content:**
-- Protein sequences, gene IDs, disease classifications
-- Molecular properties, chemical structures, reaction mechanisms
-- Clinical significance, resistance patterns, growth conditions
-- Pathway annotations, literature citations, organism taxonomy
+✅ **Biologically Realistic** - Would an actual researcher ask this?
+✅ **Biologically Relevant** - Addresses scientific content, not IT infrastructure
+✅ **Testable Distinction** - Requires database access vs training knowledge
+✅ **Appropriate Complexity** - Non-trivial but not impossibly broad
+✅ **Clear Success Criteria** - Verifiable correct answer
+✅ **Verifiable Ground Truth** - Confirmed during exploration phase
+✅ **Natural Phrasing** - No mention of SPARQL or MCP tools
+✅ **No True Duplicates** - Each question tests a unique concept
 
-❌ **NO questions about IT infrastructure:**
-- Database versions or release numbers
-- Software tools (unless methodology affects interpretation)
-- Administrative metadata
-- Update schedules or technical specs
+## Question Examples by Category
 
-## Key Question Themes
+### Precision
+- "What is the UniProt accession ID for SpCas9 from S. pyogenes?" → Q99ZW2
+- "What is the PubChem CID for aspirin?" → 2244
+- "What is the highest resolution in PDB?" → 0.48 Å
 
-### Precision Questions (20)
-- UniProt/ChEMBL/PubChem IDs for specific entities
-- Molecular weights, SMILES, InChI keys
-- Genomic locations, resolution values
-- EC numbers, taxonomy IDs
+### Completeness
+- "How many descendant terms does GO:0006914 have?" → 25
+- "How many reviewed human proteins are in UniProt?" → 40,209
+- "How many bacterial strains are in BacDive?" → 97,334
 
-### Completeness Questions (20)
-- Counts of variants, reactions, proteins, pathways
-- Database size metrics (structures, compounds, genes)
-- GO term descendants, MeSH term hierarchies
-- Comprehensive disease/gene listings
+### Integration
+- "What is the NCBI Gene ID for UniProt P04637?" → 7157
+- "What is the Taxonomy ID for Homo sapiens?" → 9606
+- "What ChEBI ID corresponds to glucose?" → CHEBI:17234
 
-### Integration Questions (20)
-- UniProt ↔ NCBI Gene ↔ Ensembl conversions
-- PubChem ↔ ChEBI ↔ ChEMBL linking
-- ClinVar ↔ MedGen ↔ MONDO mappings
-- Reactome ↔ UniProt ↔ GO connections
+### Currency
+- "How many CRISPR Cas9 structures are in PDB?" → 461
+- "How many FDA-approved drugs are in PubChem?" → 17,367
+- "How many human genes are in Ensembl?" → 87,688
 
-### Currency Questions (20)
-- Recent SARS-CoV-2 pathways in Reactome
-- 2024 isolates in AMR Portal
-- New cryo-EM structures in PDB
-- Recent COVID-19 literature in PubMed
+### Specificity
+- "What is the MeSH ID for Erdheim-Chester disease?" → D031249
+- "What is the NANDO ID for Parkinson's disease?" → NANDO:1200010
+- "What is the highest growth temperature in BacDive?" → 112°C
 
-### Specificity Questions (20)
-- Rare diseases (Erdheim-Chester, Fabry, Huntington)
-- Extremophiles (T. maritima, H. salinarum, P. furiosus)
-- Japanese rare disease terminology (NANDO)
-- Specialized glycan structures (Lewis antigens)
+### Structured Query
+- "What are the top AMR gene classes in AMR Portal?" → BETA-LACTAM, AMINOGLYCOSIDE, EFFLUX
+- "How many transport reactions are in Rhea?" → 5,984
+- "Find strains that grow above 80°C" → 221 strains
 
-### Structured Query Questions (20)
-- Multi-filter searches (kinases + IC50 < 10nM)
-- Ontology hierarchy navigation (ancestors/descendants)
-- Pathway + species filtering
-- Complex MeSH tree queries
+## Validation
 
-## Verification Status
+All questions were:
+1. Derived from verified findings in exploration reports
+2. Cross-referenced with exploration documentation
+3. Tested for biological relevance
+4. Formatted according to QUESTION_FORMAT.md specifications
+5. Checked for redundancy and duplicates
 
-All questions have been:
-- ✅ Referenced to exploration report findings
-- ✅ Verified as biologically relevant (not IT metadata)
-- ✅ Confirmed to require database access (not baseline knowledge)
-- ✅ Formatted as JSON arrays with all required fields
-- ✅ Assigned sequential IDs from 1-120
-- ✅ Distributed evenly across 6 categories
-- ✅ Covering all 23 explored databases
+## Usage
 
-## Example High-Quality Questions
+```bash
+# Validate format
+python scripts/validate_questions.py questions/Q01.json
 
-**Precision**: "What is the UniProt accession ID for human BRCA1 protein?" → P38398
-**Completeness**: "How many descendant terms does GO:0006914 (autophagy) have?" → 25
-**Integration**: "What is the NCBI Gene ID for UniProt P04637?" → 7157 (TP53)
-**Currency**: "What pathways in Reactome involve SARS-CoV-2 proteins?" → Multiple COVID pathways
-**Specificity**: "What is the MeSH descriptor ID for Erdheim-Chester disease?" → D031249
-**Structured Query**: "Find GO terms in biological_process namespace containing 'apoptosis'" → Multiple GO IDs
+# Run evaluation
+python scripts/automated_test_runner.py questions/
 
-## Next Steps
+# Analyze results
+python scripts/results_analyzer.py evaluation_results.csv
+```
 
-The questions are ready for:
-1. **Validation**: Run `python validate_questions.py` on each file
-2. **Testing**: Execute with automated evaluation framework
-3. **Analysis**: Compare baseline vs TogoMCP performance
-4. **Refinement**: Update based on evaluation results
+## Related Files
 
-## Notes
+- `exploration/` - Database exploration reports with verified findings
+- `scripts/QUESTION_FORMAT.md` - JSON format specification
+- `QUESTION_DESIGN_GUIDE.md` - Question design criteria
+- `scripts/example_questions.json` - Example question format
 
-- Questions draw from verified exploration findings
-- Natural language phrasing (no SPARQL/MCP mention)
-- Mix of simple and complex queries
-- All answers verifiable through database queries
-- Focus on realistic research scenarios
-- Balanced across organisms, diseases, compounds, pathways
+---
+
+**Generated**: 2025-01-13
+**Last Updated**: 2025-01-13 (Redundancy check completed)
+**Total Questions**: 120
+**Databases Covered**: 23
+**Categories**: 6

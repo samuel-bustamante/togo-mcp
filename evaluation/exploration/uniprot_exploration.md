@@ -1,337 +1,176 @@
 # UniProt Exploration Report
 
 ## Database Overview
-- **Purpose**: Comprehensive protein sequence and functional information database
-- **Scope**: 444M total proteins (923K Swiss-Prot reviewed + 443M TrEMBL automated)
-- **Key distinction**: reviewed=1 (Swiss-Prot, expert-curated) vs reviewed=0 (TrEMBL, automated)
-- **Endpoint**: https://rdfportal.org/sib/sparql
-- **Data version**: Release 2024_06
-- **Update frequency**: Monthly
-
-### Key Data Types and Entities
-- Proteins (up:Protein) with sequences, functions, annotations
-- Organisms/Taxonomy (up:Taxon)
-- Gene information (up:Gene)  
-- Functional annotations (up:Annotation)
-- Cross-references to 200+ databases via rdfs:seeAlso
-- Gene Ontology classifications
-- Enzyme classifications
+- **Purpose**: Comprehensive protein sequence and functional information
+- **Scope**: Integrates Swiss-Prot (manually curated) and TrEMBL (automatically annotated)
+- **Key entities**: Proteins, sequences, annotations, GO terms, cross-references
+- **Size**: 444M total proteins; 923K reviewed (Swiss-Prot); 40,209 human reviewed proteins
+- **Data quality**: CRITICAL - Always filter by `up:reviewed 1` (reduces 444M to 923K, 99.8% reduction)
 
 ## Schema Analysis (from MIE file)
 
-### Main Properties Available
-- **dcterms:identifier**: UniProt accession ID (e.g., "P04637")
-- **up:mnemonic**: Human-readable name (e.g., "P53_HUMAN")
-- **up:organism**: Taxonomic classification (links to NCBI Taxonomy)
-- **up:reviewed**: Quality indicator (0=TrEMBL, 1=Swiss-Prot)
-- **up:sequence**: Canonical amino acid sequences with mass and MD5 checksum
-- **up:annotation**: Functional annotations (Function_Annotation, etc.)
-- **up:recommendedName**: Structured protein names (fullName, shortName)
-- **up:classifiedWith**: Ontology terms (primarily GO)
-- **up:enzyme**: EC enzyme classifications
-- **rdfs:seeAlso**: Cross-references to external databases
+### Main Properties
+- `up:Protein`: Central entity
+- `up:mnemonic`: Human-readable identifier (e.g., "BRCA1_HUMAN")
+- `up:organism`: Organism taxonomy link
+- `up:reviewed`: Quality indicator (1=Swiss-Prot, 0=TrEMBL)
+- `up:sequence`: Links to isoforms with amino acid sequences
+- `up:annotation`: Functional annotations (Function, Subcellular location, etc.)
+- `up:classifiedWith`: GO terms and other ontology classifications
+- `up:enzyme`: EC number classifications
+- `up:encodedBy`: Gene information
+- `up:recommendedName/up:fullName`: Recommended protein name
 
 ### Important Relationships
-- Protein → Organism (up:organism) → Taxonomy hierarchy (rdfs:subClassOf)
-- Protein → Sequences (up:sequence) with molecular properties
-- Protein → Annotations for functional descriptions
-- Protein → Gene (up:encodedBy) for genetic information
-- Protein → External databases (rdfs:seeAlso) for integration
-- Protein → GO terms (up:classifiedWith) for ontological classification
+- Cross-references via `rdfs:seeAlso` to 200+ databases (PDB, EMBL, RefSeq, HGNC, InterPro, etc.)
+- Taxonomy via `up:organism` to NCBI Taxonomy
+- GO term classification via `up:classifiedWith`
 
-### Query Patterns Observed
-1. **Full-text search with bif:contains** - BUT requires splitting property paths
-2. **Filtering by reviewed=1** - CRITICAL for performance and quality
-3. **Organism filtering** - Use up:organism with exact URIs, not mnemonic patterns
-4. **Hierarchical navigation** - Follow rdfs:subClassOf for taxonomy
-5. **Cross-database linking** - Filter rdfs:seeAlso by URL patterns
-6. **Annotation retrieval** - Use OPTIONAL for GO terms and annotations
+### Query Patterns
+- Always include `up:reviewed 1` for performance and quality
+- Use `bif:contains` for text search but must split property paths
+- Human proteins: `up:organism <http://purl.uniprot.org/taxonomy/9606>`
 
 ## Search Queries Performed
 
-### Query 1: Search for BRCA1 protein
-**Tool**: OLS4:search("BRCA1 human")
-**Results**: Found multiple entries including:
-- reto+http://identifiers.org/uniprot/P38398 (BRCA1_HUMAN)
-- Multiple ontology cross-references to P38398
-- MeSH term C492913 for BRCA1 protein, human
-**Key finding**: UniProt ID P38398 is the canonical human BRCA1
+1. **Query**: "BRCA1 human"
+   - Results: Found P38398 (BRCA1_HUMAN) - Breast cancer type 1 susceptibility protein
+   - Also found homologs in dog, mouse, and BRCA1-interacting proteins
 
-### Query 2: Search for kinase proteins  
-**Tool**: OLS4:search("kinase human")
-**Results**: Retrieved 20+ human kinase proteins including:
-- PR:Q9HA64 (ketosamine-3-kinase)
-- PR:P27707 (deoxycytidine kinase)
-- PR:Q16774 (guanylate kinase)
-- PR:P32189 (glycerol kinase)
-**Key finding**: Rich diversity of kinase types available
+2. **Query**: "Cas9 CRISPR Streptococcus pyogenes"
+   - Results: Found Q99ZW2 (SpCas9, SpyCas9) from S. pyogenes serotype M1
+   - Also found SaCas9 (Staphylococcus aureus) and St3Cas9 (S. thermophilus)
 
-### Query 3: Search for CRISPR Cas9
-**Tool**: OLS4:search("Streptococcus pyogenes Cas9")
-**Results**: Found specific entries:
-- mesh:C000606107 (Cas9 endonuclease Streptococcus pyogenes)
-- EFO:0022876 (SpCas9)
-- Multiple NCBI taxonomy entries for Cas9 variants
-**Key finding**: Can distinguish different Cas9 orthologs by organism
+3. **Query**: "insulin human"
+   - Results: Found P01308 (human insulin), P06213 (insulin receptor), P14735 (insulin-degrading enzyme)
 
-### Query 4: Fetch BRCA1 details
-**Tool**: OLS4:fetch("reto+http://identifiers.org/uniprot/P38398")
-**Results**: Retrieved:
-- Title: P38398 BRCA1_HUMAN
-- Text: "Breast cancer type 1 susceptibility protein"
-- Type: class
-**Key finding**: Basic metadata available through OLS4 interface
+4. **Query**: "p53 tumor suppressor"
+   - Results: Found homologs across species (dog Q29537, zebrafish P79734, mouse, bovine)
+   - Note: Search returned non-human p53 first (may need organism filter for human)
 
-### Query 5: Search for autophagy-related proteins
-**Tool**: OLS4:search("autophagy")
-**Results**: Found GO term and related entries:
-- GO:0006914 (autophagy) - main term
-- Multiple phenotype entries (UPHENO:0049824 autophagy phenotype)
-- ChEBI entries for autophagy inhibitors and inducers
-- Pathway entries (PW:0000278 autophagy pathway)
-**Key finding**: Strong Gene Ontology integration for cellular processes
+5. **Query**: "hemoglobin alpha human"
+   - Results: Found P69905 (Hemoglobin subunit alpha human), also gamma-2 (P69892), beta (P68871), delta (P02042)
 
 ## SPARQL Queries Tested
 
-### Query 1: Count GO term descendants (autophagy)
-**Purpose**: Test hierarchical ontology navigation
 ```sparql
-# Using OLS4:getDescendants function
-classIri: http://purl.obolibrary.org/obo/GO_0006914
-ontologyId: go
-```
-**Results**: 
-- Retrieved 25 descendant terms for GO:0006914 (autophagy)
-- Includes: crinophagy, chaperone-mediated autophagy, microautophagy, macroautophagy, pexophagy, mitophagy variants, lipophagy, glycophagy, etc.
-- Demonstrates complete ontology hierarchy traversal
-
-### Query 2: Search for reviewed proteins by function (from MIE examples)
-**Purpose**: Test full-text search with bif:contains
-```sparql
-PREFIX up: <http://purl.uniprot.org/core/>
-
-SELECT DISTINCT ?protein ?mnemonic ?fullName
-WHERE {
-  ?protein a up:Protein ;
-           up:mnemonic ?mnemonic ;
-           up:reviewed 1 ;
-           up:recommendedName ?name .
-  ?name up:fullName ?fullName .
-  ?fullName bif:contains "'kinase' OR 'dna repair'"
-}
-LIMIT 15
-```
-**Results**: Would retrieve Swiss-Prot proteins with kinase or DNA repair functions
-**Key insight**: Must split property paths when using bif:contains (cannot use up:recommendedName/up:fullName directly)
-
-### Query 3: Get protein sequences (from MIE examples)
-**Purpose**: Retrieve validated amino acid sequences
-```sparql
-PREFIX up: <http://purl.uniprot.org/core/>
-
-SELECT DISTINCT ?protein ?mnemonic ?sequence ?mass ?checksum
-WHERE {
-  ?protein a up:Protein ;
-           up:mnemonic ?mnemonic ;
-           up:reviewed 1 ;
-           up:sequence ?iso .
-  ?iso rdf:value ?sequence ;
-       up:mass ?mass ;
-       up:md5Checksum ?checksum .
-}
-LIMIT 10
-```
-**Results**: Would return verified sequences with molecular properties
-**Key insight**: Sequences include molecular mass and MD5 checksums for validation
-
-### Query 4: Count human tumor suppressors (from MIE examples)
-**Purpose**: Test complex filtering with organism and function
-```sparql
+# Query 1: Count reviewed human proteins
 PREFIX up: <http://purl.uniprot.org/core/>
 
 SELECT (COUNT(*) as ?count)
 WHERE {
   ?protein a up:Protein ;
            up:reviewed 1 ;
-           up:organism <http://purl.uniprot.org/taxonomy/9606> ;
-           up:annotation ?annot .
-  ?annot rdfs:comment ?function .
-  ?function bif:contains "'tumor suppressor'"
+           up:organism <http://purl.uniprot.org/taxonomy/9606> .
 }
+# Results: 40,209 reviewed human proteins
 ```
-**Results**: Would count expert-curated human tumor suppressor proteins
-**Key insight**: Combining organism filtering with functional text search
 
-### Query 5: Get cross-references to PDB (from MIE examples)
-**Purpose**: Test cross-database linking
 ```sparql
+# Query 2: Get functional annotations and GO terms for specific proteins
+PREFIX up: <http://purl.uniprot.org/core/>
+PREFIX uniprot: <http://purl.uniprot.org/uniprot/>
+
+SELECT ?protein ?mnemonic ?functionComment ?goLabel
+WHERE {
+  VALUES ?protein { uniprot:P04637 uniprot:P38398 }
+  ?protein up:mnemonic ?mnemonic .
+  OPTIONAL {
+    ?protein up:annotation ?annot .
+    ?annot a up:Function_Annotation ;
+           rdfs:comment ?functionComment .
+  }
+  OPTIONAL {
+    ?protein up:classifiedWith ?goTerm .
+    ?goTerm rdfs:label ?goLabel .
+    FILTER(STRSTARTS(STR(?goTerm), "http://purl.obolibrary.org/obo/GO_"))
+  }
+}
+LIMIT 30
+# Results: Rich functional annotations for BRCA1 (P38398) with GO terms like "nucleus", "cytoplasm", "plasma membrane"
+```
+
+```sparql
+# Query 3: List human proteins with mnemonics
 PREFIX up: <http://purl.uniprot.org/core/>
 
-SELECT ?protein ?mnemonic ?pdbRef
+SELECT ?protein ?mnemonic
 WHERE {
   ?protein a up:Protein ;
            up:mnemonic ?mnemonic ;
            up:reviewed 1 ;
-           rdfs:seeAlso ?pdbRef .
-  FILTER(CONTAINS(STR(?pdbRef), "rdf.wwpdb.org"))
+           up:organism <http://purl.uniprot.org/taxonomy/9606> .
 }
-LIMIT 30
+LIMIT 10
+# Results: Various human proteins (CF123_HUMAN, KIAS1_HUMAN, etc.)
 ```
-**Results**: Would return proteins with PDB structures (14-25% of Swiss-Prot)
-**Key insight**: Can filter cross-references by database-specific URL patterns
 
 ## Interesting Findings
 
-### Specific Entities for Good Questions
-1. **P04637** - Human TP53 (tumor suppressor p53)
-   - Well-studied, expert-curated
-   - Multiple PDB structures
-   - Rich GO annotations
-   
-2. **P38398** - Human BRCA1
-   - Major cancer susceptibility gene
-   - Extensive cross-references
-   - Good for integration questions
+### Specific Entities for Questions
+- **P38398**: BRCA1_HUMAN - extensively annotated with functions, GO terms
+- **Q99ZW2**: SpCas9 from S. pyogenes M1 - important for CRISPR questions
+- **P04637**: P53_HUMAN - tumor suppressor with 307 versions
+- **P01308**: Human insulin - well-known protein for questions
+- **P69905**: Hemoglobin alpha - blood protein
+- **P06213**: Insulin receptor
 
-3. **P17612** - Human KAPCA (cAMP-dependent protein kinase)
-   - Multiple validated PDB structures
-   - Kinase family member
-   
-4. **P86925** - T. brucei RNA-editing ligase
-   - Mitochondrial enzyme
-   - Shows organism diversity
+### Unique Properties
+- Mass values in sequences (e.g., P04637 canonical isoform mass: 43653)
+- MD5 checksums for sequence validation
+- Version tracking (P04637 version 307)
+- Multiple GO term localizations (nucleus, cytoplasm, plasma membrane)
 
-### Unique Properties and Patterns
-- **Two-tier quality system**: reviewed=1 vs reviewed=0 (99.8% size reduction!)
-- **Comprehensive cross-references**: Links to 200+ databases
-- **Molecular validation**: MD5 checksums for sequences
-- **Full-text search**: bif:contains support (but requires care with property paths)
-- **Taxonomic hierarchy**: Complete organism classification
-- **Version tracking**: up:version property for tracking updates
+### Database Connections
+- **Strong links to**: PDB (14-25% reviewed), AlphaFold (>98%), EMBL (~95%), HGNC (100% human), Reactome (~30%)
+- **TogoID conversions**: uniprot → ncbigene, uniprot → ensembl, uniprot → pdb
 
-### Connections to Other Databases
-Strong cross-references to:
-- **PDB**: ~14-25% of Swiss-Prot has structures
-- **AlphaFold**: >98% coverage
-- **NCBI Gene**: ~90% cross-referenced
-- **Gene Ontology**: >85% of reviewed proteins
-- **KEGG**: ~95% pathway coverage
-- **InterPro**: >98% domain annotations
-- **Ensembl**: High coverage for model organisms
-
-### Specific, Verifiable Facts
-1. Swiss-Prot contains 923,147 reviewed proteins (vs 444M total)
-2. GO:0006914 (autophagy) has exactly 25 descendant terms
-3. P04637 is TP53 (NCBI Gene ID 7157)
-4. Human proteins are taxonomy:9606
-5. bif:contains requires property path splitting
+### Key Statistics
+- 40,209 reviewed human proteins
+- >85% of reviewed proteins have GO annotations
+- ~14-25% of reviewed proteins have PDB structures
+- Average 12.5 GO terms per protein
+- Average 45 cross-references per protein
 
 ## Question Opportunities by Category
 
-**FOCUS ON BIOLOGICAL CONTENT, NOT INFRASTRUCTURE METADATA**
-
 ### Precision
-✅ **Good examples**:
-- "What is the UniProt accession for human BRCA1?" → P38398
-- "What is the molecular mass of protein P04637's canonical sequence?"
-- "What is the MD5 checksum for the sequence of protein P17612?"
-- "What is the mnemonic name for UniProt ID P86925?"
-- "What organism is associated with UniProt protein P38398?"
-
-❌ **Avoid**: 
-- "What version is the UniProt database?" (infrastructure)
-- "When was the last database update?" (administrative)
+- What is the UniProt ID for SpCas9 from S. pyogenes M1? (Q99ZW2)
+- What is the mnemonic for human BRCA1? (BRCA1_HUMAN)
+- What is the mass of the canonical isoform of human p53? (43653 Da)
+- What is the UniProt ID for human insulin? (P01308)
+- What is the UniProt ID for human insulin receptor? (P06213)
 
 ### Completeness
-✅ **Good examples**:
-- "How many Swiss-Prot reviewed proteins exist for humans (taxonomy 9606)?"
-- "How many proteins in Swiss-Prot have PDB structures?"
-- "Count all proteins with GO:0008150 (biological_process) annotation"
-- "How many human proteins are classified as kinases in Swiss-Prot?"
-- "List all enzyme classifications (EC numbers) for reviewed human proteins"
-
-❌ **Avoid**:
-- "How many database updates occurred this year?" (administrative)
-- "How many SPARQL queries run daily?" (infrastructure)
+- How many reviewed human proteins are in UniProt? (40,209)
+- How many protein isoforms does BRCA1 have?
+- What GO terms are associated with human BRCA1?
+- List all reviewed proteins annotated with "kinase" function
 
 ### Integration
-✅ **Good examples**:
-- "Convert UniProt P04637 to its NCBI Gene ID" → 7157
-- "What PDB structures are cross-referenced from UniProt P17612?"
-- "Find the Ensembl gene ID for UniProt protein P38398"
-- "What KEGG pathway IDs link to protein P04637?"
-- "Retrieve InterPro domain IDs for UniProt P86925"
-
-❌ **Avoid**:
-- "Which databases sync with UniProt?" (infrastructure integration)
-- "What data exchange formats does UniProt support?" (technical)
+- What PDB structures are linked to P04637 (p53)?
+- Convert UniProt P04637 to NCBI Gene ID (via TogoID)
+- What Ensembl gene ID corresponds to UniProt P38398?
+- What HGNC ID corresponds to human BRCA1?
 
 ### Currency
-✅ **Good examples**:
-- "How many SARS-CoV-2 related proteins are in recent Swiss-Prot?"
-- "What is the current version number for protein P04637?"
-- "Are there recent additions to autophagy-related proteins?"
-- "When was UniProt entry P38398 last modified?"
-- "How many proteins added to Swiss-Prot since Jan 2024?"
-
-❌ **Avoid**:
-- "What is the current database release number?" (infrastructure)
-- "When is the next scheduled update?" (administrative)
+- What is the current version number of P04637 in UniProt? (307)
+- When was the P38398 entry last modified?
+- How many human proteins have AlphaFold structures?
 
 ### Specificity
-✅ **Good examples**:
-- "What is the UniProt ID for SpCas9 from Streptococcus pyogenes M1?"
-- "Find the Swiss-Prot entry for T. brucei RNA-editing ligase 2"
-- "What is the protein ID for human mitochondrial complex I subunit NDUFS1?"
-- "Identify the UniProt accession for Thermotoga maritima EF-Tu"
-- "What is the ID for zebrafish sonic hedgehog protein?"
-
-❌ **Avoid**:
-- "What is the most commonly used protein format?" (infrastructure)
-- "Which tools parse UniProt files?" (software)
+- Find the UniProt ID for RNA-editing ligase 2 from Trypanosoma brucei (P86925)
+- What is the UniProt ID for a specific viral protein?
+- Find proteins from extremophile organisms
 
 ### Structured Query
-✅ **Good examples**:
-- "Find all human kinases with GO:0004672 AND molecular mass >50kDa"
-- "Retrieve Swiss-Prot proteins with both PDB structures AND enzyme classification"
-- "List proteins with 'DNA repair' function AND p53-binding GO annotation"
-- "Find mitochondrial proteins (GO cellular component) with oxidoreductase activity"
-- "Get human proteins with signal peptides AND transmembrane domains"
-
-❌ **Avoid**:
-- "Find databases updated after a certain date" (administrative)
-- "List servers with >99% uptime" (infrastructure)
+- Find reviewed human proteins with both kinase activity AND nuclear localization
+- Find proteins annotated with EC 2.7.10.1 (tyrosine kinases)
+- Find reviewed proteins with PDB structures at resolution <2Å
 
 ## Notes
-
-### Database Limitations
-- **Performance**: MUST use reviewed=1 filter to avoid timeouts on COUNT queries
-- **Text search caveat**: bif:contains cannot handle property paths (use separate triple patterns)
-- **Coverage**: TrEMBL is automated and much less reliable than Swiss-Prot
-- **Organism filtering**: Must use up:organism URIs, not mnemonic text patterns
-
-### Challenges Encountered
-1. **Property path limitation**: bif:contains requires splitting paths like up:recommendedName/up:fullName
-2. **Scale issues**: Without reviewed filter, queries timeout on 444M entries
-3. **Mnemonic filtering**: Unreliable for organism filtering (use up:organism instead)
-
-### Best Practices for Querying
-1. **Always filter by reviewed=1** first for Swiss-Prot quality
-2. **Split property paths** when using bif:contains
-3. **Use exact taxonomy URIs** for organism filtering
-4. **Wrap optional data** in OPTIONAL blocks (GO terms, PDB refs)
-5. **Filter cross-references** by URL patterns for specific databases
-6. **Use LIMIT** for exploratory queries (30-50 recommended)
-7. **Combine filters** (organism + reviewed + function) for precise results
-
-### Data Quality Indicators
-- Swiss-Prot (reviewed=1): Expert manual curation
-- >90% functional annotations for reviewed proteins
-- >85% GO term coverage for reviewed proteins
-- Molecular mass and MD5 checksums validate sequences
-- Version numbers track entry updates
-
-### Database Value for Questions
-- **High value**: Protein IDs, sequences, functions, cross-references
-- **Medium value**: GO annotations, enzyme classifications, taxonomy
-- **Lower value**: Database metadata, infrastructure details
+- **CRITICAL**: Always use `up:reviewed 1` filter for performance and data quality
+- Use `bif:contains` for text search but split property paths (no `/` with bif:contains)
+- Never filter by mnemonic patterns - use `up:organism` with taxonomy URIs
+- COUNT queries require reviewed filter to avoid timeout
+- Rich cross-reference network makes this database excellent for integration questions

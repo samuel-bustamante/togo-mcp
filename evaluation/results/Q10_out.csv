@@ -1,545 +1,337 @@
 question_id,date,category,question_text,baseline_success,baseline_actually_answered,baseline_has_expected,baseline_confidence,baseline_text,baseline_error,baseline_time,baseline_input_tokens,baseline_output_tokens,togomcp_success,togomcp_has_expected,togomcp_confidence,togomcp_text,togomcp_error,togomcp_time,togomcp_input_tokens,togomcp_output_tokens,togomcp_cache_creation_input_tokens,togomcp_cache_read_input_tokens,tools_used,tool_details,value_add,expected_answer,notes
-109,2026-01-09,Precision,What is the notification number system in NANDO used for?,True,True,False,0.0,"In NANDO (New Approach Notified and Designated Organisations), the notification number system is used to **uniquely identify notified bodies** that have been authorized to perform conformity assessment activities under EU legislation.
+109,2026-01-13,Precision,What is the molecular formula of water according to ChEBI?,True,True,False,0.0,"According to ChEBI (Chemical Entities of Biological Interest), the molecular formula of water is **H₂O**.
 
-Key aspects of the notification number system:
+This represents two hydrogen atoms bonded to one oxygen atom, which is the universally recognized chemical formula for water.",,2.641353130340576,50,53,True,True,1.0,"Perfect! According to ChEBI, the molecular formula of water is **H₂O**.
 
-1. **Unique Identifier**: Each notified body receives a unique four-digit identification number when it is notified by an EU member state or country participating in the relevant EU legislation.
+This is the entry for ""water"" (ChEBI:15377), which shows the chemical formula as H2O - indicating 2 hydrogen atoms bonded to 1 oxygen atom.",,27.470513105392456,21,654,7345,112480,"mcp__togomcp__run_sparql, mcp__togomcp__get_MIE_file, mcp__togomcp__run_sparql","[{""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""chebi"", ""sparql_query"": ""\nPREFIX chebi: <http://purl.obolibrary.org/obo/chebi/>\nPREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\nPREFIX cheminf: <http://semanticscience.org/resource/>\n\nSELECT ?formula ?label\nWHERE {\n  ?entity rdfs:label ?label .\n  FILTER(regex(?label, \""^water$\"", \""i\""))\n  ?entity cheminf:CHEMINF_000042 ?formula .\n}\nLIMIT 10\n""}}, {""name"": ""mcp__togomcp__get_MIE_file"", ""input"": {""dbname"": ""chebi""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""chebi"", ""sparql_query"": ""\nPREFIX owl: <http://www.w3.org/2002/07/owl#>\nPREFIX chebi: <http://purl.obolibrary.org/obo/chebi/>\nPREFIX obo: <http://purl.obolibrary.org/obo/>\n\nSELECT ?label ?formula\nFROM <http://rdf.ebi.ac.uk/dataset/chebi>\nWHERE {\n  ?entity a owl:Class ;\n          rdfs:label ?label .\n  ?label bif:contains \""'water'\"" option (score ?sc) .\n  OPTIONAL { ?entity chebi:formula ?formula }\n}\nORDER BY DESC(?sc)\nLIMIT 10\n""}}]",CRITICAL,H2O,Database: ChEBI. Verified in chebi_exploration.md. CHEBI:15377 is water with mass 18.015. Tests basic chemical property retrieval.
+110,2026-01-13,Precision,What MeSH disease ID is associated with articles mentioning diabetes in PubTator?,True,False,True,1.0,"I don't have access to real-time PubTator database queries or specific MeSH disease IDs from PubTator's current contents.
 
-2. **Traceability**: The number allows for clear identification and traceability of which notified body has assessed and certified a product's conformity with applicable EU directives or regulations.
+However, I can tell you that in the MeSH (Medical Subject Headings) system, the most common MeSH terms for diabetes include:
 
-3. **CE Marking**: When a notified body is involved in the conformity assessment process, its notification number must be affixed to the product alongside the CE marking, indicating third-party certification was required and performed.
+- **Diabetes Mellitus** - MeSH ID: **D003920**
+- **Diabetes Mellitus, Type 1** - MeSH ID: **D003922**
+- **Diabetes Mellitus, Type 2** - MeSH ID: **D003924**
 
-4. **Public Database**: The NANDO database uses these numbers to maintain publicly accessible information about each notified body, including their scope of authorization, applicable legislation, and current status.
+PubTator uses MeSH IDs to annotate diseases in biomedical literature. When articles mention ""diabetes,"" they would typically be annotated with D003920 (Diabetes Mellitus) or its more specific subtypes depending on the context.
 
-5. **Official Recognition**: The notification number represents official recognition by the notifying authority that the body meets the requirements to perform specific conformity assessment procedures.
+To get the exact MeSH disease IDs currently associated with diabetes-mentioning articles in PubTator, you would need to query the PubTator database directly through their API or web interface.",,6.653411149978638,56,236,True,True,1.0,"Based on the information I found in the PubTator MIE (Metadata Interoperability Exchange) file, the **MeSH disease ID associated with diabetes in PubTator is D003920**, which represents ""Diabetes Mellitus.""
 
-This numbering system provides transparency and allows manufacturers, authorities, and market surveillance bodies to verify the legitimacy and scope of notified bodies involved in product certification.",,9.624486923217773,50,290,True,True,0.8571428571428571,"Based on the NANDO (Nanbyo Data) database documentation, the **notification number system** is used to identify **designated intractable diseases that are eligible for Japanese government support**.
+This is clearly documented in the example SPARQL queries provided in the PubTator Central RDF schema, specifically in the query titled ""Find all annotations for a specific disease"" which uses:
 
-Here are the key details:
+```sparql
+oa:hasBody <http://identifiers.org/mesh/D003920>
+```
 
-## Purpose of Notification Numbers
+The MIE file explains that this query ""Retrieves all PubMed articles that mention a specific disease by MeSH ID (D003920 = Diabetes Mellitus).""
 
-1. **Government Designation**: Notification numbers (accessed via the property `nando:hasNotificationNumber`) are assigned to diseases officially designated by the Japanese government as intractable diseases requiring special support.
+So the answer is: **MeSH:D003920** (Diabetes Mellitus)
 
-2. **Coverage**: Approximately **88% of diseases in NANDO** (about 2,454 out of 2,777 total diseases) have notification numbers, indicating they are designated for government assistance.
+This MeSH ID is used in PubTator Central to annotate articles that mention diabetes, and you can query for all articles mentioning diabetes by searching for annotations with this identifier.",,34.96858501434326,24,769,8955,121940,"mcp__togomcp__get_MIE_file, mcp__togomcp__search_mesh_entity, mcp__pubdictionaries__find_ids, mcp__togomcp__run_sparql","[{""name"": ""mcp__togomcp__get_MIE_file"", ""input"": {""dbname"": ""pubtator""}}, {""name"": ""mcp__togomcp__search_mesh_entity"", ""input"": {""query"": ""diabetes"", ""limit"": 10}}, {""name"": ""mcp__pubdictionaries__find_ids"", ""input"": {""labels"": ""Diabetes Mellitus"", ""dictionary"": ""MeSH""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""pubtator"", ""sparql_query"": ""PREFIX oa: <http://www.w3.org/ns/oa#>\nPREFIX dcterms: <http://purl.org/dc/terms/>\n\nSELECT DISTINCT ?diseaseId\nFROM <http://rdfportal.org/dataset/pubtator_central>\nWHERE {\n  ?ann a oa:Annotation ;\n       dcterms:subject \""Disease\"" ;\n       oa:hasBody ?diseaseId .\n  FILTER(CONTAINS(STR(?diseaseId), \""diabetes\"") || CONTAINS(STR(?diseaseId), \""D003920\""))\n}\nLIMIT 10""}}]",CRITICAL,D003920 (Diabetes Mellitus),Database: PubTator. Verified in pubtator_exploration.md via SPARQL query. PubTator provides text-mined disease annotations from PubMed literature. Tests literature annotation access.
+111,2026-01-13,Completeness,How many organisms in BacDive can grow anaerobically?,True,False,False,0.16666666666666666,"I don't have access to real-time BacDive database statistics or the ability to query the database directly. BacDive (the Bacterial Diversity Metadatabase) contains information about bacterial and archaeal strains, including their growth conditions.
 
-3. **Administrative Function**: These numbers serve as official identifiers in Japan's healthcare policy and patient information systems for:
-   - Tracking diseases eligible for government subsidies
-   - Coordinating research efforts
-   - Managing patient support programs
-   - Administrative documentation
+To find out how many organisms in BacDive can grow anaerobically, you would need to:
 
-## Example
+1. Access the BacDive database directly at https://bacdive.dsmz.de/
+2. Use their search/filter functions to query for strains with anaerobic growth capabilities
+3. Look for entries where oxygen tolerance is listed as ""anaerobe,"" ""facultative anaerobe,"" or similar terms
 
-For instance, **Spinal and bulbar muscular atrophy** (Kennedy disease) has notification number **""1""**, while **Parkinson's disease** has notification number **""6""**. These numbers are used in official government documentation and healthcare systems to reference these conditions.
+The number of such organisms would depend on:
+- When you query the database (as it's regularly updated)
+- How anaerobic growth is defined (strict anaerobes only, or including facultative anaerobes)
+- The completeness of metadata for different strains
 
-The notification number system is a unique feature of NANDO that reflects its role as a Japanese government-maintained resource for managing intractable (rare) disease policy and patient care programs.",,25.421098947525024,9,394,10232,52643,mcp__togomcp__get_MIE_file,"[{""name"": ""mcp__togomcp__get_MIE_file"", ""input"": {""dbname"": ""nando""}}]",CRITICAL,Japanese government designation for intractable disease support eligibility,Database: NANDO. Tests understanding of Japan-specific disease classification. 88% of NANDO diseases have notification numbers. Baseline has no knowledge of Japanese healthcare policy integration. Verified in nando_exploration.md via hasNotificationNumber property.
-110,2026-01-09,Precision,How many ChEMBL molecules are classified as kinase inhibitors with IC50 < 100 nM?,True,False,False,0.4,"I don't have access to real-time ChEMBL database statistics to give you an exact current number of kinase inhibitors with IC50 < 100 nM.
+If you need this specific number, I recommend visiting the BacDive website directly or contacting the DSMZ (German Collection of Microorganisms and Cell Cultures) team that maintains the database.",,7.615447998046875,52,256,True,False,0.3333333333333333,"Based on the BacDive database query, **8,993 organisms** can grow anaerobically.
 
-However, I can provide some context:
+This total includes:
+- **5,801** strains classified as ""anaerobe""
+- **224** strains classified as ""obligate anaerobe"" 
+- **4,485** strains classified as ""facultative anaerobe""
 
-**General scale:** ChEMBL contains hundreds of thousands of bioactivity data points for kinase inhibitors. The number of distinct molecules classified as kinase inhibitors with IC50 < 100 nM is likely in the **tens of thousands**, but this number:
+Note that some strains may have multiple oxygen tolerance entries, which is why I used `COUNT(DISTINCT ?strain)` to avoid counting the same organism multiple times.
 
-1. **Varies by definition** - depends on whether you count:
-   - Unique molecules vs. multiple measurements
-   - All kinases vs. specific kinase families
-   - Only direct binding assays vs. all functional assays
-
-2. **Changes over time** - ChEMBL is regularly updated with new releases adding more compounds and bioactivity data
-
-3. **Depends on data quality filters** - researchers typically filter for:
-   - Assay confidence scores
-   - Standardized activity types
-   - Removal of duplicates
-
-**To get an accurate answer**, you would need to:
-- Query the current ChEMBL database (version 33 as of late 2023)
-- Filter for target class = ""kinase""
-- Filter for IC50 standard_value < 100 nM
-- Apply appropriate data quality filters
-
-Would you like guidance on how to query this information from ChEMBL directly?",,10.0974440574646,63,321,True,False,0.2,"Based on the SPARQL query of the ChEMBL database, there are **66,929 distinct ChEMBL molecules** classified as kinase inhibitors with IC50 < 100 nM.
-
-This count represents unique molecules that have:
-- At least one bioactivity measurement with IC50 as the standard type
-- IC50 values less than 100 nanomolar (nM)
-- Been tested against targets whose labels contain the term ""kinase""
-
-These are considered potent kinase inhibitors based on the IC50 threshold of 100 nM, which is a common benchmark for identifying compounds with significant inhibitory activity against kinase targets.",,28.853945016860962,15,571,7795,86292,"mcp__togomcp__get_MIE_file, mcp__togomcp__run_sparql","[{""name"": ""mcp__togomcp__get_MIE_file"", ""input"": {""dbname"": ""chembl""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""chembl"", ""sparql_query"": ""PREFIX cco: <http://rdf.ebi.ac.uk/terms/chembl#>\n\nSELECT (COUNT(DISTINCT ?molecule) AS ?count)\nFROM <http://rdf.ebi.ac.uk/dataset/chembl>\nWHERE {\n  ?activity a cco:Activity ;\n            cco:standardType \""IC50\"" ;\n            cco:standardValue ?value ;\n            cco:standardUnits \""nM\"" ;\n            cco:hasMolecule ?molecule ;\n            cco:hasAssay/cco:hasTarget ?target .\n  ?target rdfs:label ?targetLabel .\n  ?targetLabel bif:contains \""'kinase'\""\n  FILTER(xsd:decimal(?value) < 100)\n}""}}]",CRITICAL,Multiple compounds meeting potency criteria,"Database: ChEMBL. Tests drug potency filtering. Sub-100nM IC50 indicates high potency. Requires standardType, standardValue, and target filtering. Baseline cannot access ChEMBL bioactivity data. Verified in chembl_exploration.md example query for potent kinase inhibitors."
-111,2026-01-09,Completeness,How many proteins are documented in Reactome across all species?,True,False,False,0.0,"I don't have access to the exact current number of proteins documented in Reactome across all species. The Reactome database is continuously updated with new annotations and pathways, so this number changes regularly.
-
-However, I can tell you that Reactome is a comprehensive, manually curated database that documents:
-- Proteins from multiple species (primarily human, but also model organisms like mouse, rat, and others)
-- Tens of thousands of protein entries
-- Proteins involved in various biological pathways and reactions
-
-To get the most accurate and current count, you would need to:
-1. Visit the Reactome website (reactome.org) directly
-2. Check their latest statistics page
-3. Or query their database using their API or download their latest data release
-
-The exact number would depend on whether you're counting:
-- Unique protein entries
-- Protein isoforms
-- Proteins across all species combined or per species
-
-I apologize I cannot provide you with the specific current number without access to their live database.",,7.542446136474609,50,222,True,False,0.0,"Based on the Reactome database query, there are **233,200 proteins** documented across all species in Reactome.
-
-This count represents distinct protein entities in the Reactome knowledgebase, which includes proteins from various species that participate in biological pathways and reactions. Reactome is a comprehensive pathway database that covers multiple organisms, with human pathways being the most extensively curated, and many pathways also documented for other model organisms and species.",,14.895934104919434,9,267,525,52643,mcp__togomcp__run_sparql,"[{""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""reactome"", ""sparql_query"": ""\nSELECT (COUNT(DISTINCT ?protein) AS ?proteinCount)\nWHERE {\n  ?protein a <http://www.biopax.org/release/biopax-level3.owl#Protein> .\n}\n""}}]",CRITICAL,"226,000",Database: Reactome. Tests protein entity counting. Reactome covers 30+ species with extensive protein documentation. Baseline cannot access Reactome statistics. Verified in reactome_exploration.md overview section showing comprehensive protein coverage.
-112,2026-01-09,Completeness,"What isolation sources are represented in the AMR Portal, ranked by frequency?",True,False,False,0.45454545454545453,"I don't have access to specific current data from the AMR (Antimicrobial Resistance) Portal database, so I cannot provide you with the actual ranked frequency of isolation sources represented there.
+These organisms represent a significant portion of the bacterial and archaeal diversity in BacDive, which contains approximately 97,000 total strain records with oxygen tolerance data available for about 29,050 strains (based on the values shown).",,38.14803194999695,26,1084,9440,157140,"mcp__togomcp__get_MIE_file, mcp__togomcp__run_sparql, mcp__togomcp__run_sparql, mcp__togomcp__run_sparql","[{""name"": ""mcp__togomcp__get_MIE_file"", ""input"": {""dbname"": ""bacdive""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""bacdive"", ""sparql_query"": ""PREFIX schema: <https://purl.dsmz.de/schema/>\n\nSELECT (COUNT(DISTINCT ?strain) as ?count)\nFROM <http://rdfportal.org/dataset/bacdive>\nWHERE {\n  ?strain a schema:Strain .\n  ?ot a schema:OxygenTolerance ;\n      schema:describesStrain ?strain ;\n      schema:hasOxygenTolerance ?oxygenTolerance .\n  FILTER(CONTAINS(LCASE(?oxygenTolerance), \""anaerobic\""))\n}""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""bacdive"", ""sparql_query"": ""PREFIX schema: <https://purl.dsmz.de/schema/>\n\nSELECT DISTINCT ?oxygenTolerance (COUNT(?strain) as ?count)\nFROM <http://rdfportal.org/dataset/bacdive>\nWHERE {\n  ?strain a schema:Strain .\n  ?ot a schema:OxygenTolerance ;\n      schema:describesStrain ?strain ;\n      schema:hasOxygenTolerance ?oxygenTolerance .\n}\nGROUP BY ?oxygenTolerance\nORDER BY DESC(?count)\nLIMIT 20""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""bacdive"", ""sparql_query"": ""PREFIX schema: <https://purl.dsmz.de/schema/>\n\nSELECT (COUNT(DISTINCT ?strain) as ?total_anaerobic_strains)\nFROM <http://rdfportal.org/dataset/bacdive>\nWHERE {\n  ?strain a schema:Strain .\n  ?ot a schema:OxygenTolerance ;\n      schema:describesStrain ?strain ;\n      schema:hasOxygenTolerance ?oxygenTolerance .\n  FILTER(?oxygenTolerance IN (\""anaerobe\"", \""obligate anaerobe\"", \""facultative anaerobe\""))\n}""}}]",CRITICAL,Substantial portion with hasOxygenTolerance='anaerobe' (verify via SPARQL),Database: BacDive. Verified in bacdive_exploration.md. Anaerobic organisms include many pathogens and extremophiles. Tests phenotype completeness.
+112,2026-01-13,Completeness,How many MGREL relationship records are in MedGen?,True,False,False,0.0,"I don't have access to the current count of MGREL relationship records in MedGen. The number of MGREL records would vary depending on the version and release date of the MedGen database, as it is regularly updated.
 
-However, based on general knowledge of antimicrobial resistance surveillance systems, common isolation sources typically include:
-
-**Most frequently represented sources often include:**
-1. **Urine** - urinary tract infections
-2. **Blood** - bloodstream infections/bacteremia
-3. **Respiratory specimens** - sputum, bronchoalveolar lavage
-4. **Wound/skin and soft tissue** samples
-5. **Stool/fecal** samples
-6. **Genital specimens** - cervical, urethral swabs
-7. **Other body fluids** - cerebrospinal fluid, peritoneal fluid, etc.
-
-The actual ranking in the AMR Portal would depend on:
-- Which countries/regions contribute data
-- The surveillance networks included
-- Healthcare settings represented (hospital vs. community)
-- Time period covered
-- The specific pathogens being monitored
-
-To get the accurate, current ranked list of isolation sources by frequency, you would need to query the AMR Portal directly or access their latest surveillance reports and data summaries.",,8.169548749923706,52,278,True,True,0.9090909090909091,"Based on the AMR Portal database query, here are the **isolation sources represented in the AMR Portal, ranked by frequency**:
-
-## Top 50 Isolation Sources
-
-| Rank | Isolation Source | Count |
-|------|------------------|-------|
-| 1 | Stool | 189,939 |
-| 2 | urine | 123,939 |
-| 3 | blood | 81,333 |
-| 4 | sputum | 55,428 |
-| 5 | Blood (capitalized) | 38,508 |
-| 6 | ground turkey | 36,892 |
-| 7 | Urine (capitalized) | 20,705 |
-| 8 | chicken breast | 17,759 |
-| 9 | stool (lowercase) | 16,620 |
-| 10 | venous blood | 13,159 |
-| 11 | chicken wings | 12,173 |
-| 12 | urine from catheter | 12,058 |
-| 13 | chicken thighs | 10,148 |
-| 14 | Chicken Breast (capitalized) | 9,840 |
-| 15 | feces | 9,735 |
-| 16 | chicken breasts | 9,498 |
-| 17 | nasopharynx | 9,184 |
-| 18 | ground beef | 9,039 |
-| 19 | urethral swab | 8,870 |
-| 20 | respiratory | 8,723 |
-| 21 | chicken | 8,091 |
-| 22 | chicken legs | 7,414 |
-| 23 | Ground Turkey (capitalized) | 7,359 |
-| 24 | wound | 7,327 |
-| 25 | csf (cerebrospinal fluid) | 7,024 |
-| 26 | urethra | 6,709 |
-| 27 | pork chop | 5,177 |
-| 28 | Bodily fluid | 4,622 |
-| 29 | bile | 3,942 |
-| 30 | Faeces | 3,778 |
-| 31 | feces from patient with diarrhea | 3,640 |
-| 32 | rectal swab | 3,630 |
-| 33 | urine (canis lupus familiaris) | 3,548 |
-| 34 | faeces | 3,474 |
-| 35 | Urine(second portion) | 3,359 |
-| 36 | chicken liver | 3,300 |
-| 37 | urine from indwelling catheter | 3,237 |
-| 38 | WOUND (all caps) | 3,181 |
-| 39 | Chicken, Gallus gallus | 3,172 |
-| 40 | infection | 2,850 |
-| 41 | chicken gizzard | 2,794 |
-| 42 | URINE (all caps) | 2,694 |
-| 43 | blood culture | 2,664 |
-| 44 | animal-swine-sow | 2,571 |
-| 45 | Rectal | 2,511 |
-| 46 | chicken heart | 2,491 |
-| 47 | arterial blood | 2,434 |
-| 48 | Animal-Cattle-Dairy Cow | 2,304 |
-| 49 | swab | 2,272 |
-| 50 | skin | 2,208 |
-
-## Key Observations:
-
-1. **Clinical specimens dominate**: The most common sources are human clinical samples including stool (189,939), urine (123,939), blood (81,333), and sputum (55,428).
-
-2. **Food sources are well-represented**: There's substantial representation of food animal products, particularly poultry (chicken, turkey) and meat (beef, pork), reflecting food safety surveillance.
-
-3. **Data quality issues**: There are inconsistencies in capitalization (e.g., ""Stool"" vs ""stool"", ""Blood"" vs ""blood""), which affects the counts. If normalized, the numbers would be even higher for the major categories.
-
-4. **Veterinary samples**: Many samples are from domestic animals, particularly dogs (Canis lupus familiaris) and farm animals (swine, cattle).
-
-5. **Diverse sample types**: The database contains over 1,000 different isolation source entries, ranging from clinical specimens to food products, environmental samples, and veterinary sources.
-
-The total includes specimens from over 1.7 million phenotypic AMR measurements, making this a comprehensive antimicrobial resistance surveillance database spanning clinical, veterinary, and food safety domains.",,55.99620604515076,26,1870,43253,155245,"mcp__togomcp__run_sparql, mcp__togomcp__get_MIE_file, mcp__togomcp__run_sparql, mcp__togomcp__run_sparql","[{""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""amrportal"", ""sparql_query"": ""\nSELECT ?isolation_source (COUNT(?sample) AS ?count)\nWHERE {\n  ?sample a <http://purl.jp/bio/11/amrportal/AMRSample> ;\n          <http://purl.jp/bio/11/amrportal/isolation_source> ?isolation_source .\n}\nGROUP BY ?isolation_source\nORDER BY DESC(?count)\n""}}, {""name"": ""mcp__togomcp__get_MIE_file"", ""input"": {""dbname"": ""amrportal""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""amrportal"", ""sparql_query"": ""PREFIX amr: <http://example.org/ebiamr#>\n\nSELECT ?isolationSource (COUNT(*) as ?count)\nFROM <http://rdfportal.org/dataset/amrportal>\nWHERE {\n  ?s a amr:PhenotypeMeasurement .\n  ?s amr:isolationSource ?isolationSource .\n}\nGROUP BY ?isolationSource\nORDER BY DESC(?count)\nLIMIT 100""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""amrportal"", ""sparql_query"": ""PREFIX amr: <http://example.org/ebiamr#>\n\nSELECT ?isolationSource (COUNT(*) as ?count)\nFROM <http://rdfportal.org/dataset/amrportal>\nWHERE {\n  ?s a amr:PhenotypeMeasurement .\n  ?s amr:isolationSource ?isolationSource .\n}\nGROUP BY ?isolationSource\nORDER BY DESC(?count)""}}]",CRITICAL,"Stool (189,939), urine (123,939), blood (81,333), sputum (55,428), etc.",Database: AMR Portal. Tests clinical sample type distribution. Different sources indicate different infection types. Requires GROUP BY isolationSource with ORDER BY. Baseline cannot access AMR sample metadata. Verified in amrportal_exploration.md.
-113,2026-01-09,Integration,Convert the mouse gene NCBI ID 11461 to its UniProt protein accession.,True,True,False,0.0,"I need to convert mouse gene NCBI ID 11461 to its UniProt protein accession.
-
-NCBI Gene ID 11461 corresponds to the mouse gene **Actb** (Actin beta).
-
-The UniProt protein accession for mouse Actb is **P60710**.
-
-This is the accession for beta-actin in Mus musculus (mouse), which is one of the most abundant and highly conserved cytoskeletal proteins.",,4.874226093292236,58,108,True,False,0.0,"The mouse gene NCBI ID **11461** (which corresponds to the *Slc2a4* gene, also known as GLUT4 - Glucose Transporter 4) converts to the following UniProt protein accessions:
-
-- **P60710** (primary/canonical)
-- **B2RRX1** (alternative isoform)
-
-The primary UniProt accession is **P60710**, which represents the main isoform of the GLUT4 protein in mouse.",,16.391133785247803,8,237,26641,26496,mcp__togomcp__togoid_convertId,"[{""name"": ""mcp__togomcp__togoid_convertId"", ""input"": {""ids"": ""11461"", ""route"": ""ncbigene,uniprot""}}]",VALUABLE,P10107 (Anxa1),"Database: NCBI Gene, UniProt. Tests cross-species gene-to-protein conversion. Uses TogoID or gene cross-references. Baseline has limited mouse gene ID knowledge. Verified as example in exploration summary showing integration opportunities."
-114,2026-01-09,Integration,Find PDB structures that have both cryo-EM density maps in EMDB and publication in PubMed.,True,True,True,0.8,"I can provide guidance on finding PDB structures that meet your criteria, though I cannot query databases directly.
-
-## Approach to Find These Structures:
-
-### 1. **Using PDB Website (rcsb.org)**
-You can use the advanced search with these criteria:
-- **Experimental Method**: Electron Microscopy (EM)
-- **Has EMDB ID**: Yes (this ensures an EMDB entry exists)
-- **Has PubMed ID**: Yes (this ensures a publication exists)
-
-### 2. **General Information**
-
-Most cryo-EM structures deposited in the PDB will have:
-- An associated EMDB entry (with the density map)
-- A primary citation with a PubMed ID
-
-This represents the majority of cryo-EM structures, as publication is typically required or expected for deposition.
-
-### 3. **Key Fields to Check**
-When viewing a PDB entry, look for:
-- **EMDB ID**: Usually formatted as EMD-XXXXX
-- **Primary Citation**: With DOI and PubMed ID (PMID)
-
-### 4. **Approximate Numbers**
-As of my training data, there are tens of thousands of cryo-EM structures in the PDB, and the vast majority have both EMDB maps and publications. The exact current number would require a database query.
-
-### 5. **Example Structures** (that I know meet these criteria):
-- **7BV2** - SARS-CoV-2 spike protein
-- **6VSB** - SARS-CoV-2 spike protein  
-- **3J9I** - Ribosome structures
-
-Would you like help with a more specific subset of these structures?",,12.363340854644775,63,394,True,True,1.0,"Perfect! I've found many PDB structures with both cryo-EM density maps in EMDB and publications in PubMed. Here's a comprehensive summary:
-
-## PDB Structures with Both EMDB Entries and PubMed Publications
-
-I successfully identified **50 PDB structures** that have both:
-1. **Cryo-EM density maps deposited in EMDB** (Electron Microscopy Data Bank)
-2. **Publications indexed in PubMed**
-
-### Sample Structures:
-
-| PDB ID | EMDB ID | PubMed ID | Title |
-|--------|---------|-----------|-------|
-| **8A2Z** | EMD-15109 | 36289337 | Cryo-EM structure of F-actin in the Ca2+-ADP nucleotide state |
-| **7A98** | EMD-11688 | 32942285 | SARS-CoV-2 Spike Glycoprotein with 3 ACE2 Bound |
-| **8AA5** | EMD-15294 | 36184667 | Cryo-EM structure of the strand transfer complex of the TnsB transposase (type V-K CRISPR-associated transposon) |
-| **6AJ7** | EMD-9633 | 30397341 | The structure of Enterovirus D68 mature virion in complex with Fab 15C5 |
-| **7CCQ** | EMD-30339 | 33051594 | Structure of the 1:1 cGAS-nucleosome complex |
-| **7CFM** | EMD-30344 | 32698187 | Cryo-EM structure of the P395-bound GPBAR-Gs complex |
-| **8AVB** | EMD-15677 | 36959263 | Cryo-EM structure for mouse leptin in complex with the mouse LEP-R ectodomain |
-| **7CYQ** | EMD-30504 | 33232691 | Cryo-EM structure of an extended SARS-CoV-2 replication and transcription complex |
-
-### Key Findings:
-
-- **All structures used ELECTRON MICROSCOPY** as their experimental method
-- These represent diverse biological systems including:
-  - **Viral structures** (SARS-CoV-2, Enterovirus, Coxsackievirus)
-  - **Membrane proteins** (receptors, ion channels, transporters)
-  - **Enzyme complexes** (transcription machinery, metabolic enzymes)
-  - **Structural proteins** (actin, cytoskeleton components)
-
-### Database Cross-references:
-- Each structure has a **PDB ID** (protein structure)
-- An **EMDB ID** (electron density map)
-- A **PubMed ID** (associated publication)
-
-This integration allows researchers to access the atomic model (PDB), the experimental density map (EMDB), and the scientific publication (PubMed) for comprehensive structural biology studies.",,57.76163196563721,31,2457,18189,187994,"mcp__togomcp__search_pdb_entity, mcp__togomcp__run_sparql, mcp__togomcp__get_MIE_file, mcp__togomcp__run_sparql, mcp__togomcp__run_sparql","[{""name"": ""mcp__togomcp__search_pdb_entity"", ""input"": {""db"": ""pdb"", ""query"": ""cryo-EM EMDB"", ""limit"": 20}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""pdb"", ""sparql_query"": ""PREFIX pdbx: <http://pdbj.org/schema/pdbx-v50.owl#>\nPREFIX pdbo: <http://rdf.wwpdb.org/schema/pdbx-v50.owl#>\nPREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\nPREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n\nSELECT DISTINCT ?pdb_id ?emdb_id ?pubmed_id ?title\nWHERE {\n  ?entry a pdbo:datablock ;\n         pdbo:datablockName ?pdb_id ;\n         pdbo:has_em_3d_reconstructionCategory ?em_cat .\n  \n  ?em_cat pdbo:has_em_3d_reconstruction ?em_recon .\n  ?em_recon pdbo:em_3d_reconstruction.emdb_id ?emdb_id .\n  \n  ?entry pdbo:has_struct_keywordsCategory ?kw_cat .\n  ?kw_cat pdbo:has_struct_keywords ?kw .\n  ?kw pdbo:struct_keywords.pdbx_keywords ?title .\n  \n  ?entry pdbo:has_citationCategory ?cit_cat .\n  ?cit_cat pdbo:has_citation ?citation .\n  ?citation pdbo:citation.pdbx_database_id_PubMed ?pubmed_id .\n  \n  FILTER(BOUND(?emdb_id))\n  FILTER(BOUND(?pubmed_id))\n}\nLIMIT 20""}}, {""name"": ""mcp__togomcp__get_MIE_file"", ""input"": {""dbname"": ""pdb""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""pdb"", ""sparql_query"": ""PREFIX pdbx: <http://rdf.wwpdb.org/schema/pdbx-v50.owl#>\n\nSELECT DISTINCT ?entry_id ?emdb_code ?pubmed_id ?title\nFROM <http://rdfportal.org/dataset/pdbj>\nWHERE {\n  ?entry a pdbx:datablock .\n  BIND(STRAFTER(str(?entry), \""http://rdf.wwpdb.org/pdb/\"") AS ?entry_id)\n  \n  # Get EMDB reference\n  ?entry pdbx:has_database_2Category/pdbx:has_database_2 ?emdb_db .\n  ?emdb_db pdbx:database_2.database_id \""EMDB\"" ;\n           pdbx:database_2.database_code ?emdb_code .\n  \n  # Get PubMed reference\n  ?entry pdbx:has_citationCategory/pdbx:has_citation ?citation .\n  ?citation pdbx:citation.pdbx_database_id_PubMed ?pubmed_id .\n  \n  # Get structure title\n  ?entry pdbx:has_structCategory/pdbx:has_struct ?struct .\n  ?struct pdbx:struct.title ?title .\n  \n  FILTER(BOUND(?emdb_code))\n  FILTER(BOUND(?pubmed_id))\n}\nLIMIT 30""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""pdb"", ""sparql_query"": ""PREFIX pdbx: <http://rdf.wwpdb.org/schema/pdbx-v50.owl#>\n\nSELECT DISTINCT ?entry_id ?emdb_code ?pubmed_id ?title ?method\nFROM <http://rdfportal.org/dataset/pdbj>\nWHERE {\n  ?entry a pdbx:datablock .\n  BIND(STRAFTER(str(?entry), \""http://rdf.wwpdb.org/pdb/\"") AS ?entry_id)\n  \n  # Get EMDB reference\n  ?entry pdbx:has_database_2Category/pdbx:has_database_2 ?emdb_db .\n  ?emdb_db pdbx:database_2.database_id \""EMDB\"" ;\n           pdbx:database_2.database_code ?emdb_code .\n  \n  # Get PubMed reference\n  ?entry pdbx:has_citationCategory/pdbx:has_citation ?citation .\n  ?citation pdbx:citation.pdbx_database_id_PubMed ?pubmed_id .\n  \n  # Get structure title\n  ?entry pdbx:has_structCategory/pdbx:has_struct ?struct .\n  ?struct pdbx:struct.title ?title .\n  \n  # Get experimental method\n  ?entry pdbx:has_exptlCategory/pdbx:has_exptl ?exptl .\n  ?exptl pdbx:exptl.method ?method .\n  \n  FILTER(BOUND(?emdb_code))\n  FILTER(BOUND(?pubmed_id))\n}\nLIMIT 50""}}]",VALUABLE,PDB IDs with both EMDB and PubMed cross-references,"Database: PDB, EMDB, PubMed. Tests multi-database structure annotation. ~7% PDB entries have EMDB links, ~73% have PubMed. Requires checking both database_2 references. Baseline cannot perform this cross-database query. Verified in pdb_exploration.md."
-115,2026-01-09,Currency,What are the most frequently cited publications in the AMR Portal from 2024 onwards?,True,False,False,0.3333333333333333,"I don't have access to current data from the AMR Portal or information about citation frequencies for publications from 2024 onwards. My training data has a cutoff date, and I cannot access real-time databases, citation metrics, or the AMR Portal itself.
-
-To find the most frequently cited publications in the AMR Portal from 2024 onwards, you would need to:
-
-1. **Visit the AMR Portal directly** (if you're referring to the WHO's Global Antimicrobial Resistance and Use Surveillance System portal or another AMR database)
-
-2. **Check citation databases** like:
-   - Web of Science
-   - Scopus
-   - Google Scholar
-   - PubMed
-
-3. **Look for AMR Portal reports** that may include bibliometric analyses or lists of highly cited works
-
-If you're looking for generally important recent AMR publications, I'd recommend checking:
-- WHO AMR reports
-- The Lancet's series on antimicrobial resistance
-- Nature and Science publications on AMR
-- CDC and ECDC surveillance reports
-
-Is there a specific aspect of AMR research you're interested in? I may be able to provide general information about key topics or research areas in antimicrobial resistance.",,8.182312965393066,56,272,True,True,0.8333333333333334,"Based on my analysis of the AMR Portal database and PubMed metadata, I can now provide you with a comprehensive answer about the most frequently cited publications from 2024 onwards.
-
-## Most Frequently Cited Publications in the AMR Portal from 2024 Onwards
-
-Unfortunately, **there are no publications from 2024 onwards** among the most frequently cited papers in the AMR Portal database. The database primarily references publications from earlier years (2018-2023), which reflects the typical lag time between research publication, data collection, and database integration.
-
-However, I can identify the **most recently published highly-cited papers** (from 2023) in the AMR Portal:
-
-### Top Publication from 2023:
-
-1. **PMID: 38052776** - **108,358 citations in AMR Portal**
-   - **Title:** ""National genomic surveillance integrating standardized quantitative susceptibility testing clarifies antimicrobial resistance in Enterobacterales""
-   - **Journal:** Nature Communications
-   - **Published:** December 5, 2023
-   - **Focus:** Genome sequencing and antimicrobial susceptibility testing of 4,195 isolates of *Escherichia coli* and *Klebsiella pneumoniae* resistant to third-generation cephalosporins and carbapenems in Japan. The study provides a blueprint for national genomic surveillance integrating standardized antimicrobial susceptibility testing.
-
-### Other Notable Highly-Cited Publications from 2022-2023:
-
-2. **PMID: 35944069** - **157,331 citations** (August 2022)
-   - A data compendium of 12,289 *Mycobacterium tuberculosis* isolates with resistance phenotypes to 13 antibiotics
-
-3. **PMID: 35780211** - **99,144 citations** (July 2022)
-   - Convolutional neural network for predicting antimicrobial resistance in *M. tuberculosis*
-
-4. **PMID: 37823632** - **28,377 citations** (October 2023)
-   - Comparison of invasive and non-invasive *Streptococcus pneumoniae* isolates for AMR determinants
-
-### Key Insights:
-
-- The AMR Portal database shows a temporal lag, with the most recent highly-cited publications being from late 2023
-- The database version noted is ""Current as of 2025"" with ""Irregular updates from source databases""
-- Most citations reference landmark studies on tuberculosis, *E. coli*, *Klebsiella pneumoniae*, *Salmonella*, and *Neisseria gonorrhoeae* resistance
-- The 2023 publications are beginning to accumulate citations but haven't yet reached the citation levels of earlier landmark papers from 2020-2022
-
-**Attribution:** According to PubMed and the AMR Portal RDF Database.
-
-**DOIs:**
-- 10.1038/s41467-023-43516-4 (PMID: 38052776)
-- 10.1371/journal.pbio.3001721 (PMID: 35944069)
-
-Would you like me to provide more details about any of these publications or explore specific aspects of antimicrobial resistance surveillance?",,78.42347192764282,33,1881,100671,305693,"mcp__togomcp__list_databases, mcp__togomcp__get_MIE_file, mcp__togomcp__run_sparql, mcp__pubmed__get_article_metadata, mcp__pubmed__get_article_metadata, mcp__togomcp__run_sparql","[{""name"": ""mcp__togomcp__list_databases"", ""input"": {}}, {""name"": ""mcp__togomcp__get_MIE_file"", ""input"": {""dbname"": ""amrportal""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""amrportal"", ""sparql_query"": ""PREFIX amr: <http://example.org/ebiamr#>\nPREFIX dct: <http://purl.org/dc/terms/>\n\nSELECT ?pubmed (COUNT(*) as ?citationCount)\nFROM <http://rdfportal.org/dataset/amrportal>\nWHERE {\n  ?s a amr:PhenotypeMeasurement .\n  ?s dct:references ?pubmed .\n}\nGROUP BY ?pubmed\nORDER BY DESC(?citationCount)\nLIMIT 50""}}, {""name"": ""mcp__pubmed__get_article_metadata"", ""input"": {""pmids"": [""35944069"", ""38052776"", ""35780211"", ""34461978"", ""33659219"", ""33075053"", ""30333126"", ""34414415"", ""31003929"", ""34907895"", ""29323230"", ""37823632"", ""31736907"", ""26686880"", ""31086182"", ""26116186"", ""28720578"", ""33347430"", ""30550564"", ""31488838""]}}, {""name"": ""mcp__pubmed__get_article_metadata"", ""input"": {""pmids"": [""32091356"", ""29358649"", ""31307955"", ""35659907"", ""27381390"", ""34485958"", ""24501024"", ""32163580"", ""35756053"", ""32163577"", ""32602459"", ""35907429"", ""32025709"", ""32213251"", ""24464101"", ""25373147"", ""36916881"", ""30510172"", ""36450777""]}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""amrportal"", ""sparql_query"": ""PREFIX amr: <http://example.org/ebiamr#>\nPREFIX dct: <http://purl.org/dc/terms/>\n\nSELECT DISTINCT ?pubmed\nFROM <http://rdfportal.org/dataset/amrportal>\nWHERE {\n  ?s a amr:PhenotypeMeasurement .\n  ?s dct:references ?pubmed .\n}\nLIMIT 100 OFFSET 50""}}]",CRITICAL,Recent PMID citations with high frequency,"Database: AMR Portal, PubMed. Tests current research impact in surveillance. Requires dct:references aggregation with temporal filter. Baseline cannot access current AMR literature citations. Pattern verified in amrportal_exploration.md showing PMID citation counts."
-116,2026-01-09,Currency,How many antibody structures have been deposited in PDB since 2020?,True,False,True,0.5,"I don't have access to real-time PDB database statistics or the ability to query the current contents of the Protein Data Bank. 
+MGREL (MedGen Relationships) contains relationships between MedGen concepts, but I cannot provide you with a specific current number without access to the actual database or recent release notes.
 
 To find this information, you would need to:
+1. Check the latest MedGen release notes on NCBI's website
+2. Query the MedGen database directly
+3. Download and examine the MGREL data files from the MedGen FTP site
+
+If you need the current count, I'd recommend checking the official NCBI MedGen documentation or data files.",,5.289769887924194,50,175,True,True,1.0,"Based on the query results, **MedGen contains 1,130,420 MGREL relationship records**.
+
+MGREL entities in MedGen represent relationships between clinical concepts, such as:
+- Hierarchical relationships (isa, inverse_isa)
+- Disease-phenotype associations (has_manifestation, manifestation_of)
+- Gene-disease associations
+- Other medical concept relationships
+
+Each MGREL record connects two clinical concepts (ConceptID entities) with a specific relationship type (mo:rela), along with source attribution and other metadata.",,22.031130075454712,15,390,9309,87913,"mcp__togomcp__get_MIE_file, mcp__togomcp__run_sparql","[{""name"": ""mcp__togomcp__get_MIE_file"", ""input"": {""dbname"": ""medgen""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""medgen"", ""sparql_query"": ""PREFIX mo: <http://med2rdf/ontology/medgen#>\n\nSELECT (COUNT(?rel) as ?count)\nFROM <http://rdfportal.org/dataset/medgen>\nWHERE {\n  ?rel a mo:MGREL .\n}\nLIMIT 1""}}]",CRITICAL,"1,130,420",Database: MedGen. Verified in medgen_exploration.md via SPARQL COUNT query. MGREL stores concept-to-concept relationships. Tests medical genetics relationship coverage.
+113,2026-01-13,Integration,What is the HGNC ID for human TP53?,True,True,True,1.0,"The HGNC ID for human TP53 is **HGNC:11998**.
+
+TP53 (tumor protein p53) is one of the most well-studied human genes, and this is its official identifier in the HUGO Gene Nomenclature Committee (HGNC) database.",,3.160382032394409,51,71,True,True,1.0,"Perfect! The **HGNC ID for human TP53 is HGNC:11998**.
+
+To summarize:
+- **Gene Symbol**: TP53
+- **HGNC ID**: HGNC:11998
+- **NCBI Gene ID**: 7157
+- **Full Name**: tumor protein p53
+- **Location**: Chromosome 17p13.1
+- **Function**: This is the famous tumor suppressor gene that encodes the p53 protein, often called ""the guardian of the genome"" due to its critical role in preventing cancer through regulation of cell cycle arrest, apoptosis, DNA repair, and metabolism.",,25.812695741653442,19,573,3337,109046,"mcp__togomcp__search_uniprot_entity, mcp__togomcp__ncbi_esearch, mcp__togomcp__ncbi_esummary, mcp__togomcp__togoid_convertId","[{""name"": ""mcp__togomcp__search_uniprot_entity"", ""input"": {""query"": ""TP53 human"", ""limit"": 5}}, {""name"": ""mcp__togomcp__ncbi_esearch"", ""input"": {""database"": ""gene"", ""query"": ""TP53 AND human[organism]"", ""max_results"": 5}}, {""name"": ""mcp__togomcp__ncbi_esummary"", ""input"": {""database"": ""gene"", ""ids"": [""7157""]}}, {""name"": ""mcp__togomcp__togoid_convertId"", ""input"": {""ids"": ""7157"", ""route"": ""ncbigene,hgnc""}}]",VALUABLE,HGNC:11998,"Database: NCBI Gene, HGNC. Verified in ncbigene_exploration.md. TP53 (gene 7157) encodes the p53 tumor suppressor. Tests gene nomenclature integration."
+114,2026-01-13,Integration,Which genes are mentioned together with Alzheimer Disease (MeSH:D000544) in PubTator annotations?,True,False,False,0.125,"I don't have access to the PubTator database or its annotations in my training data. PubTator is a web-based tool developed by the National Center for Biotechnology Information (NCBI) that provides automatic annotations of biomedical literature with concepts like genes, diseases, mutations, chemicals, and species.
+
+To find which genes are mentioned together with Alzheimer Disease (MeSH:D000544) in PubTatar annotations, you would need to:
+
+1. Access PubTator directly at https://www.ncbi.nlm.nih.gov/research/pubtator/
+2. Search for ""Alzheimer Disease"" or use the MeSH ID D000544
+3. Review the gene annotations that appear in the same articles
+
+Some genes that are commonly associated with Alzheimer's disease in the scientific literature (though I cannot confirm their specific co-occurrence in PubTator) include:
+- APP (Amyloid Precursor Protein)
+- PSEN1 and PSEN2 (Presenilin 1 and 2)
+- APOE (Apolipoprotein E)
+- MAPT (Microtubule Associated Protein Tau)
+- TREM2
+- CLU (Clusterin)
+- CR1 (Complement Receptor 1)
+
+However, for the specific PubTator annotation data you're asking about, you would need to query that database directly.",,7.199548959732056,63,329,True,False,0.375,"Based on the PubTator annotations, here are the **top 50 genes most frequently mentioned together with Alzheimer Disease (MeSH:D000544)** in scientific literature:
+
+## Top Human Genes Associated with Alzheimer Disease
 
-1. Visit the RCSB PDB website (rcsb.org)
-2. Use their advanced search function to filter for:
-   - Structures containing antibodies (immunoglobulins)
-   - Deposition date from 2020 onwards
+| Rank | Gene Symbol | Gene Name | Co-occurrences | Key Role |
+|------|-------------|-----------|----------------|----------|
+| 1 | **APP** | Amyloid beta precursor protein | 80,147 | Central to AD pathology; mutations cause familial AD |
+| 2 | **MAPT** | Microtubule associated protein tau | 54,061 | Forms neurofibrillary tangles; mutations linked to AD |
+| 3 | **APOE** | Apolipoprotein E | 34,825 | APOE4 variant is major genetic risk factor for AD |
+| 4 | **TNF** | Tumor necrosis factor | 30,944 | Pro-inflammatory cytokine; neuroinflammation in AD |
+| 5 | **IL6** | Interleukin 6 | 24,448 | Inflammatory cytokine elevated in AD |
+| 6 | **INS** | Insulin | 21,604 | Metabolic dysfunction linked to AD |
+| 7 | **SNCA** | Synuclein alpha | 19,437 | Component of amyloid plaques in AD |
+| 8 | **IL1B** | Interleukin 1 beta | 19,419 | Inflammatory mediator in AD pathogenesis |
+| 9 | **NFKB1** | Nuclear factor kappa B subunit 1 | 18,287 | Inflammation and immune response regulator |
+| 10 | **AKT1** | AKT serine/threonine kinase 1 | 17,024 | Cell survival and metabolism pathways |
+| 11 | **BDNF** | Brain derived neurotrophic factor | 14,187 | Reduced in AD; supports neuronal survival |
+| 12 | **PSEN1** | Presenilin 1 | 13,449 | Mutations cause familial AD; gamma-secretase component |
+| 13 | **TP53** | Tumor protein p53 | 12,330 | Apoptosis and cell cycle regulation |
+| 14 | **TGFB1** | Transforming growth factor beta 1 | 11,597 | Growth factor; inflammation regulation |
+| 15 | **VEGFA** | Vascular endothelial growth factor A | 11,046 | Angiogenesis; vascular dysfunction in AD |
+| 16 | **CRP** | C-reactive protein | 11,035 | Inflammation biomarker |
+| 17 | **IFNG** | Interferon gamma | 10,997 | Immune response cytokine |
+| 18 | **MTOR** | Mechanistic target of rapamycin kinase | 10,858 | Autophagy and metabolism regulation |
+| 19 | **ACHE** | Acetylcholinesterase | 10,402 | Target of AD drugs; cholinergic dysfunction |
+| 20 | **SOD1** | Superoxide dismutase 1 | 10,061 | Oxidative stress defense |
 
-Alternatively, you could search for terms like ""antibody,"" ""immunoglobulin,"" ""Fab,"" ""scFv,"" or ""nanobody"" with the appropriate date filters.
+## Notable Model Organism Genes
 
-The number of antibody structures being deposited has been increasing significantly in recent years due to advances in cryo-EM and the pharmaceutical industry's focus on antibody therapeutics, but I cannot provide you with the exact current count without access to the database.",,6.98113489151001,54,198,True,True,1.0,"Good! This shows there are at least 118 publications about antibody structures with PDB depositions from 2020-2024, but this is counting papers, not individual PDB entries. A single paper might report multiple structures, and not all structures get published immediately. 
+Several mouse and rat genes also appear frequently:
+- **App** (mouse, gene:11820) - 32,142 co-occurrences
+- **Tnf** (mouse, gene:21926) - 21,692 co-occurrences  
+- **Psen1** (mouse, gene:19164) - 14,181 co-occurrences
+- **Il1b** (mouse, gene:16176) - 14,181 co-occurrences
+- **Il6** (mouse, gene:16193) - 15,985 co-occurrences
 
-Let me provide the user with the information I've gathered, explaining the limitations of the data sources:
+## Key Pathways Represented
 
-Based on my search of the PDB database, I can provide you with the following information about antibody structures deposited since 2020:
+These genes highlight several major mechanisms in Alzheimer's disease:
 
-## Summary
+1. **Amyloid Processing**: APP, PSEN1, BACE1 - directly involved in amyloid-beta production
+2. **Tau Pathology**: MAPT - forms neurofibrillary tangles
+3. **Genetic Risk**: APOE - strongest genetic risk factor for late-onset AD
+4. **Neuroinflammation**: TNF, IL6, IL1B, IFNG - cytokine-mediated inflammation
+5. **Oxidative Stress**: SOD1 - antioxidant defense
+6. **Metabolic Dysfunction**: INS, MTOR - insulin signaling and metabolism
+7. **Neurotrophic Support**: BDNF - reduced in AD, affects neuronal survival
+8. **Cholinergic System**: ACHE - therapeutic target in AD
 
-Unfortunately, I encountered limitations in getting an exact count from the available data sources:
+This analysis is based on PubTator Central annotations, which uses text mining to identify gene mentions in PubMed literature, reflecting the research community's focus on these genes in Alzheimer's disease studies.",,63.884336948394775,31,2520,104683,221916,"mcp__togomcp__run_sparql, mcp__togomcp__get_sparql_example, mcp__togomcp__get_MIE_file, mcp__togomcp__run_sparql, mcp__togomcp__ncbi_esummary, mcp__togomcp__ncbi_esummary","[{""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""pubtator"", ""sparql_query"": ""\nPREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\nPREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\nPREFIX pubtator: <http://pubtator.org/ontology/>\nPREFIX mesh: <http://id.nlm.nih.gov/mesh/>\n\nSELECT DISTINCT ?gene ?geneLabel (COUNT(DISTINCT ?article) AS ?articleCount)\nWHERE {\n  # Articles annotated with Alzheimer Disease (MeSH:D000544)\n  ?article pubtator:hasAnnotation ?diseaseAnnotation .\n  ?diseaseAnnotation pubtator:hasConceptID mesh:D000544 .\n  \n  # Same articles annotated with genes\n  ?article pubtator:hasAnnotation ?geneAnnotation .\n  ?geneAnnotation pubtator:hasConceptType \""Gene\"" .\n  ?geneAnnotation pubtator:hasConceptID ?gene .\n  ?geneAnnotation pubtator:hasConceptName ?geneLabel .\n}\nGROUP BY ?gene ?geneLabel\nORDER BY DESC(?articleCount)\nLIMIT 100\n""}}, {""name"": ""mcp__togomcp__get_sparql_example"", ""input"": {""dbname"": ""pubtator""}}, {""name"": ""mcp__togomcp__get_MIE_file"", ""input"": {""dbname"": ""pubtator""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""pubtator"", ""sparql_query"": ""PREFIX oa: <http://www.w3.org/ns/oa#>\nPREFIX dcterms: <http://purl.org/dc/terms/>\nPREFIX mesh: <http://identifiers.org/mesh/>\n\nSELECT ?geneId (COUNT(DISTINCT ?article) AS ?cooccurrence)\nFROM <http://rdfportal.org/dataset/pubtator_central>\nWHERE {\n  ?geneAnn a oa:Annotation ;\n           dcterms:subject \""Gene\"" ;\n           oa:hasBody ?geneId ;\n           oa:hasTarget ?article .\n  ?diseaseAnn a oa:Annotation ;\n              dcterms:subject \""Disease\"" ;\n              oa:hasBody mesh:D000544 ;\n              oa:hasTarget ?article .\n}\nGROUP BY ?geneId\nORDER BY DESC(?cooccurrence)\nLIMIT 50""}}, {""name"": ""mcp__togomcp__ncbi_esummary"", ""input"": {""database"": ""gene"", ""ids"": [""351"", ""4137"", ""348"", ""11820"", ""7124"", ""3569"", ""21926"", ""3630"", ""6622"", ""3553"", ""4790"", ""207"", ""16176"", ""16193"", ""627"", ""19164"", ""5663"", ""18033"", ""7157"", ""11651""]}}, {""name"": ""mcp__togomcp__ncbi_esummary"", ""input"": {""database"": ""gene"", ""ids"": [""7040"", ""14580"", ""7422"", ""1401"", ""11461"", ""3458"", ""2475"", ""43"", ""6647"", ""54226"", ""12064"", ""14433"", ""920"", ""3586"", ""836"", ""5594"", ""2670"", ""2597"", ""23621"", ""24835""]}}]",CRITICAL,"Gene IDs including 11820, 12359 (found in PubMed 16821116 co-occurrence)",Database: PubTator. Verified in pubtator_exploration.md via gene-disease co-occurrence query. Tests literature-based gene-disease associations.
+115,2026-01-13,Currency,How many total entries are in the PDB (all experimental methods)?,True,False,True,1.0,"As of my last training data (April 2024), the Protein Data Bank (PDB) contained approximately **215,000-220,000** total structure entries across all experimental methods.
 
-1. **Total antibody structures in PDB**: The keyword search tool found **11,475 total antibody structures** across all years in the PDB database.
+This total includes structures determined by:
+- X-ray crystallography (~85-90% of entries)
+- NMR spectroscopy (~7-8%)
+- Electron microscopy (cryo-EM) (rapidly growing, ~5-7%)
+- Other methods including neutron diffraction, hybrid methods, and electron crystallography (<1%)
 
-2. **SPARQL endpoint limitations**: The RDF/SPARQL endpoint I queried appears to contain only a small subset of the full PDB data (only 64 antibody structures with proper metadata), which makes it difficult to get an accurate count filtered by deposition date.
+**Important note**: The PDB has been growing steadily, with particularly rapid growth in cryo-EM structures in recent years. The exact current number would be higher than what I've stated, as thousands of new structures are deposited each year. For the most up-to-date count, you would need to check the PDB website directly at rcsb.org or wwpdb.org.",,6.116615056991577,51,207,True,False,0.0,"Based on the PDB RDF database, there are **245,833 total entries** in the Protein Data Bank across all experimental methods.
 
-3. **Publication proxy**: Searching PubMed for papers about antibody structures with PDB depositions from 2020-2024 returned **at least 118 publications**, which likely represent several hundred new structure depositions (as each paper may report multiple structures).
+This count includes structures determined by various methods such as X-ray crystallography, NMR spectroscopy, electron microscopy (cryo-EM), and other techniques.",,14.02785873413086,9,296,26738,26489,mcp__togomcp__run_sparql,"[{""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""pdb"", ""sparql_query"": ""\nPREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\nPREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\nPREFIX PDBo: <http://rdf.wwpdb.org/schema/pdbx-v50.owl#>\n\nSELECT (COUNT(DISTINCT ?entry) AS ?total_entries)\nWHERE {\n  ?entry rdf:type PDBo:datablock .\n}\n""}}]",CRITICAL,"Approximately 204,594",Database: PDB. Verified in pdb_exploration.md. The PDB continues to grow with new structural data. Tests structural database currency.
+116,2026-01-13,Currency,What is the most common evidence type for genotype annotations in AMR Portal?,True,False,False,0.0,"I don't have specific information about the AMR Portal's genotype annotation evidence types in my training data. 
 
-## Estimate
+The AMR Portal (likely referring to the NCBI's Antimicrobial Resistance Portal or a similar database) typically uses various evidence types for genotype annotations, which might include:
 
-Based on the available data and PDB growth trends:
-- The PDB has been receiving approximately **15,000-20,000 new structures per year** in recent years
-- Antibody/immunoglobulin structures typically represent about **5-8% of annual depositions**
-- This suggests roughly **3,000-5,000 antibody structures** have likely been deposited since 2020
+- Experimental evidence
+- Sequence similarity
+- Literature references
+- Computational predictions
 
-To get the exact number, you would need to query the official RCSB PDB website directly (https://www.rcsb.org/), which has advanced search capabilities that can filter by:
-- Deposition date range (2020-present)
-- Keywords (antibody, immunoglobulin, Fab, etc.)
-- Molecule type (protein)",,168.92379426956177,53,5312,27178,788126,"mcp__togomcp__search_pdb_entity, mcp__togomcp__get_MIE_file, mcp__togomcp__run_sparql, mcp__togomcp__run_sparql, mcp__togomcp__run_sparql, mcp__togomcp__run_sparql, mcp__togomcp__run_sparql, mcp__togomcp__run_sparql, mcp__togomcp__run_sparql, mcp__togomcp__run_sparql, mcp__togomcp__run_sparql, mcp__togomcp__run_sparql, mcp__pubmed__search_articles, WebFetch, mcp__togomcp__search_pdb_entity, mcp__togomcp__run_sparql, mcp__pubmed__search_articles","[{""name"": ""mcp__togomcp__search_pdb_entity"", ""input"": {""db"": ""pdb"", ""query"": ""antibody"", ""limit"": 100}}, {""name"": ""mcp__togomcp__get_MIE_file"", ""input"": {""dbname"": ""pdb""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""pdb"", ""sparql_query"": ""PREFIX pdbx: <http://rdf.wwpdb.org/schema/pdbx-v50.owl#>\nPREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n\nSELECT (COUNT(DISTINCT ?entry_id) as ?count)\nFROM <http://rdfportal.org/dataset/pdbj>\nWHERE {\n  ?entry a pdbx:datablock .\n  BIND(STRAFTER(str(?entry), \""http://rdf.wwpdb.org/pdb/\"") AS ?entry_id)\n  ?entry pdbx:has_struct_keywordsCategory/pdbx:has_struct_keywords ?kw ;\n         pdbx:has_citationCategory/pdbx:has_citation ?citation .\n  ?kw pdbx:struct_keywords.pdbx_keywords ?keywords .\n  ?citation pdbx:citation.year ?year .\n  FILTER(CONTAINS(LCASE(?keywords), \""antibod\""))\n  FILTER(xsd:integer(?year) >= 2020)\n}""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""pdb"", ""sparql_query"": ""PREFIX pdbx: <http://rdf.wwpdb.org/schema/pdbx-v50.owl#>\nPREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n\nSELECT ?entry_id ?keywords ?year\nFROM <http://rdfportal.org/dataset/pdbj>\nWHERE {\n  ?entry a pdbx:datablock .\n  BIND(STRAFTER(str(?entry), \""http://rdf.wwpdb.org/pdb/\"") AS ?entry_id)\n  ?entry pdbx:has_struct_keywordsCategory/pdbx:has_struct_keywords ?kw .\n  ?kw pdbx:struct_keywords.pdbx_keywords ?keywords .\n  OPTIONAL { \n    ?entry pdbx:has_citationCategory/pdbx:has_citation ?citation .\n    ?citation pdbx:citation.year ?year .\n  }\n  FILTER(CONTAINS(LCASE(?keywords), \""antibod\""))\n  FILTER(!BOUND(?year) || xsd:integer(?year) >= 2020)\n}\nLIMIT 50""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""pdb"", ""sparql_query"": ""PREFIX pdbx: <http://rdf.wwpdb.org/schema/pdbx-v50.owl#>\n\nSELECT ?property (COUNT(?property) as ?count)\nFROM <http://rdfportal.org/dataset/pdbj>\nWHERE {\n  ?entry a pdbx:datablock .\n  ?entry ?property ?value .\n  FILTER(CONTAINS(str(?property), \""date\"") || CONTAINS(str(?property), \""Date\""))\n}\nGROUP BY ?property\nLIMIT 20""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""pdb"", ""sparql_query"": ""PREFIX pdbx: <http://rdf.wwpdb.org/schema/pdbx-v50.owl#>\n\nSELECT DISTINCT ?category\nFROM <http://rdfportal.org/dataset/pdbj>\nWHERE {\n  ?entry a pdbx:datablock .\n  ?entry ?category ?value .\n  FILTER(STRSTARTS(str(?category), \""http://rdf.wwpdb.org/schema/pdbx-v50.owl#has_\""))\n}\nLIMIT 50""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""pdb"", ""sparql_query"": ""PREFIX pdbx: <http://rdf.wwpdb.org/schema/pdbx-v50.owl#>\n\nSELECT ?property (COUNT(?value) as ?count)\nFROM <http://rdfportal.org/dataset/pdbj>\nWHERE {\n  ?entry a pdbx:datablock .\n  ?entry pdbx:has_pdbx_database_statusCategory/pdbx:has_pdbx_database_status ?status .\n  ?status ?property ?value .\n}\nGROUP BY ?property\nLIMIT 30""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""pdb"", ""sparql_query"": ""PREFIX pdbx: <http://rdf.wwpdb.org/schema/pdbx-v50.owl#>\nPREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n\nSELECT ?entry_id ?keywords ?year\nFROM <http://rdfportal.org/dataset/pdbj>\nWHERE {\n  ?entry a pdbx:datablock .\n  BIND(STRAFTER(str(?entry), \""http://rdf.wwpdb.org/pdb/\"") AS ?entry_id)\n  ?entry pdbx:has_struct_keywordsCategory/pdbx:has_struct_keywords ?kw .\n  ?kw pdbx:struct_keywords.pdbx_keywords ?keywords .\n  OPTIONAL {\n    ?entry pdbx:has_citationCategory/pdbx:has_citation ?citation .\n    ?citation pdbx:citation.year ?year .\n  }\n  FILTER(CONTAINS(LCASE(?keywords), \""antibod\""))\n}\nORDER BY DESC(?year)\nLIMIT 100""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""pdb"", ""sparql_query"": ""PREFIX pdbx: <http://rdf.wwpdb.org/schema/pdbx-v50.owl#>\nPREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n\nSELECT (COUNT(DISTINCT ?entry_id) as ?total_antibody_structures)\nFROM <http://rdfportal.org/dataset/pdbj>\nWHERE {\n  ?entry a pdbx:datablock .\n  BIND(STRAFTER(str(?entry), \""http://rdf.wwpdb.org/pdb/\"") AS ?entry_id)\n  ?entry pdbx:has_struct_keywordsCategory/pdbx:has_struct_keywords ?kw .\n  ?kw pdbx:struct_keywords.pdbx_keywords ?keywords .\n  FILTER(CONTAINS(LCASE(?keywords), \""antibod\""))\n}""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""pdb"", ""sparql_query"": ""PREFIX pdbx: <http://rdf.wwpdb.org/schema/pdbx-v50.owl#>\n\nSELECT ?prop (COUNT(?val) as ?count)\nFROM <http://rdfportal.org/dataset/pdbj>\nWHERE {\n  ?entry a pdbx:datablock .\n  ?entry pdbx:has_pdbx_audit_revision_historyCategory/pdbx:has_pdbx_audit_revision_history ?hist .\n  ?hist ?prop ?val .\n}\nGROUP BY ?prop\nLIMIT 30""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""pdb"", ""sparql_query"": ""PREFIX pdbx: <http://rdf.wwpdb.org/schema/pdbx-v50.owl#>\nPREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n\nSELECT DISTINCT ?entry_id ?keywords ?revision_date\nFROM <http://rdfportal.org/dataset/pdbj>\nWHERE {\n  ?entry a pdbx:datablock .\n  BIND(STRAFTER(str(?entry), \""http://rdf.wwpdb.org/pdb/\"") AS ?entry_id)\n  ?entry pdbx:has_struct_keywordsCategory/pdbx:has_struct_keywords ?kw ;\n         pdbx:has_pdbx_audit_revision_historyCategory/pdbx:has_pdbx_audit_revision_history ?hist .\n  ?kw pdbx:struct_keywords.pdbx_keywords ?keywords .\n  ?hist pdbx:pdbx_audit_revision_history.revision_date ?revision_date ;\n        pdbx:pdbx_audit_revision_history.ordinal \""1\"" .\n  FILTER(CONTAINS(LCASE(?keywords), \""antibod\""))\n  FILTER(xsd:date(?revision_date) >= \""2020-01-01\""^^xsd:date)\n}\nORDER BY DESC(?revision_date)\nLIMIT 50""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""pdb"", ""sparql_query"": ""PREFIX pdbx: <http://rdf.wwpdb.org/schema/pdbx-v50.owl#>\nPREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n\nSELECT (COUNT(DISTINCT ?entry_id) as ?count)\nFROM <http://rdfportal.org/dataset/pdbj>\nWHERE {\n  ?entry a pdbx:datablock .\n  BIND(STRAFTER(str(?entry), \""http://rdf.wwpdb.org/pdb/\"") AS ?entry_id)\n  ?entry pdbx:has_struct_keywordsCategory/pdbx:has_struct_keywords ?kw ;\n         pdbx:has_pdbx_audit_revision_historyCategory/pdbx:has_pdbx_audit_revision_history ?hist .\n  ?kw pdbx:struct_keywords.pdbx_keywords ?keywords .\n  ?hist pdbx:pdbx_audit_revision_history.revision_date ?revision_date ;\n        pdbx:pdbx_audit_revision_history.ordinal \""1\"" .\n  FILTER(CONTAINS(LCASE(?keywords), \""antibod\""))\n  FILTER(xsd:date(?revision_date) >= \""2020-01-01\""^^xsd:date)\n}""}}, {""name"": ""mcp__pubmed__search_articles"", ""input"": {""query"": ""antibody structure[Title] AND (crystal OR cryo-EM OR X-ray)"", ""date_from"": ""2020"", ""date_to"": ""2024"", ""max_results"": 100}}, {""name"": ""WebFetch"", ""input"": {""url"": ""https://www.rcsb.org/stats/growth/growth-released-structures"", ""prompt"": ""Extract information about the number of antibody or immunoglobulin structures deposited since 2020. Look for any statistics, charts, or data tables that might show growth trends or categorical breakdowns.""}}, {""name"": ""mcp__togomcp__search_pdb_entity"", ""input"": {""db"": ""pdb"", ""query"": ""antibody 2020 2021 2022 2023 2024"", ""limit"": 100}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""pdb"", ""sparql_query"": ""PREFIX pdbx: <http://rdf.wwpdb.org/schema/pdbx-v50.owl#>\n\nSELECT (COUNT(DISTINCT ?entry_id) as ?count_recent_antibodies)\nFROM <http://rdfportal.org/dataset/pdbj>\nWHERE {\n  ?entry a pdbx:datablock .\n  BIND(STRAFTER(str(?entry), \""http://rdf.wwpdb.org/pdb/\"") AS ?entry_id)\n  ?entry pdbx:has_struct_keywordsCategory/pdbx:has_struct_keywords ?kw .\n  ?kw pdbx:struct_keywords.pdbx_keywords ?keywords .\n  FILTER(CONTAINS(LCASE(?keywords), \""antibod\""))\n  FILTER(REGEX(?entry_id, \""^[6-9]\"", \""i\""))\n}""}}, {""name"": ""mcp__pubmed__search_articles"", ""input"": {""query"": ""(antibody OR antibodies OR immunoglobulin OR Fab OR scFv) AND (crystal structure OR cryo-EM OR cryoEM OR structure determination OR X-ray crystallography) AND PDB"", ""date_from"": ""2020"", ""date_to"": ""2024"", ""max_results"": 100}}]",CRITICAL,"Subset of 11,422 total antibody structures",Database: PDB. Tests recent immunology research activity. Antibody therapeutics are major research focus. Requires temporal filtering on deposition dates. Baseline from Jan 2025 cannot show current deposits. Verified total count in pdb_exploration.md.
-117,2026-01-09,Specificity,What percentage of AMR Portal isolates are from human hosts versus non-clinical sources?,True,False,False,0.0,"I don't have specific percentage data about the distribution of host types in the AMR Portal isolates readily available in my training knowledge.
+However, without access to the actual AMR Portal database or its documentation, I cannot definitively tell you which evidence type is most common for genotype annotations. This would require querying the database directly or reviewing their current statistics/documentation.
 
-The AMR Portal (Antimicrobial Resistance Portal) aggregates data from various sources including clinical and surveillance databases, but the exact breakdown between human hosts versus non-clinical sources (such as environmental samples, animal sources, or food samples) would depend on:
+If you need this specific information, I'd recommend checking the AMR Portal's documentation or using their query tools to examine the distribution of evidence types in their genotype annotations.",,6.144426107406616,53,171,True,True,1.0,"Perfect! Based on the query results from the AMR Portal RDF database, **HMM (Hidden Markov Model)** is the most common evidence type for genotype annotations in the AMR Portal, with **759,625 occurrences**.
 
-1. The specific databases included in the portal
-2. The time period of data collection
-3. Which contributing organizations submit data
-4. The portal's scope and focus
+This makes sense as HMM-based methods are widely used for identifying and annotating antimicrobial resistance genes in bacterial genomes. The evidence links typically point to NCBI Pathogen Detection annotation where HMM profiles are used to detect AMR genes and their variants based on sequence similarity patterns.
 
-Generally, AMR surveillance databases tend to be heavily weighted toward clinical human isolates since clinical infections drive most AMR monitoring efforts. However, One Health approaches to AMR surveillance increasingly include environmental, animal, and food sources.
+According to the AMR Portal documentation, approximately 65% of genotype features have an evidence type specified, and the vast majority of these are HMM-based annotations.",,25.509623050689697,21,576,11344,116521,"mcp__togomcp__get_sparql_example, mcp__togomcp__get_MIE_file, mcp__togomcp__run_sparql","[{""name"": ""mcp__togomcp__get_sparql_example"", ""input"": {""dbname"": ""amrportal""}}, {""name"": ""mcp__togomcp__get_MIE_file"", ""input"": {""dbname"": ""amrportal""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""amrportal"", ""sparql_query"": ""PREFIX amr: <http://example.org/ebiamr#>\n\nSELECT ?evidenceType (COUNT(*) as ?count)\nFROM <http://rdfportal.org/dataset/amrportal>\nWHERE {\n  ?s a amr:GenotypeFeature .\n  ?s amr:evidenceType ?evidenceType .\n}\nGROUP BY ?evidenceType\nORDER BY DESC(?count)""}}]",CRITICAL,HMM (Hidden Markov Model) - 65%,Database: AMR Portal. Verified in amrportal_exploration.md. HMM-based prediction is the primary annotation method. Tests molecular annotation methodology.
+117,2026-01-13,Specificity,What is the product of gene locus Mal52_08030 in DDBJ entry CP036276.1?,True,False,False,0.0,"I don't have specific information about the product of gene locus Mal52_08030 in DDBJ entry CP036276.1 in my training data. To find this information, you would need to:
 
-To get accurate current percentages, you would need to:
-- Query the AMR Portal directly
-- Check their published statistics or annual reports
-- Look at their data summary pages or documentation
+1. Access the DDBJ (DNA Data Bank of Japan) database directly
+2. Search for the accession number CP036276.1
+3. Look up the annotation for locus tag Mal52_08030
 
-Is there a specific AMR database or surveillance system you're interested in, or would you like information about general trends in AMR surveillance source distributions?",,7.862478971481323,55,239,True,True,0.75,"Perfect! Based on the query results from the AMR Portal database, I can now calculate the percentages:
+This type of specific gene annotation data from particular database entries is typically not included in my training knowledge, as it requires querying specialized biological databases.",,4.803126096725464,64,129,True,True,1.0,"Perfect! I found the information about gene locus Mal52_08030 in DDBJ entry CP036276.1.
 
-**AMR Portal Isolate Distribution by Host Source:**
+## Answer:
 
-- **Human (Homo sapiens)**: 94,120 isolates → **79.5%**
-- **Non-clinical sources**: 24,308 isolates → **20.5%**
+The product of gene locus **Mal52_08030** in DDBJ entry **CP036276.1** is:
 
-Out of a total of 118,428 isolates with host information in the AMR Portal:
+**ATP-dependent Clp protease ATP-binding subunit ClpX**
 
-- **Nearly 80% (79.5%) are from human hosts**
-- **About 20% (20.5%) are from non-clinical sources**
+Additional information:
+- **Gene symbol**: clpX
+- **Protein ID**: QDU42347.1 (NCBI Protein)
+- **Organism**: Symmachiella dynata strain Mal52
 
-This shows that the AMR Portal database is heavily weighted toward human clinical isolates, which makes sense given the focus on antimicrobial resistance surveillance in human health. The ""other (non-clinical isolate)"" category likely includes isolates from environmental sources, animals, food products, and other non-human origins.
+This gene encodes ClpX, which is the ATP-binding component of the Clp protease complex involved in protein degradation and quality control in bacterial cells.",,23.10619020462036,15,634,7772,86147,"mcp__togomcp__get_MIE_file, mcp__togomcp__run_sparql","[{""name"": ""mcp__togomcp__get_MIE_file"", ""input"": {""dbname"": ""ddbj""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""ddbj"", ""sparql_query"": ""PREFIX nuc: <http://ddbj.nig.ac.jp/ontologies/nucleotide/>\nPREFIX sio: <http://semanticscience.org/resource/>\n\nSELECT ?locus_tag ?gene_symbol ?product ?protein_id\nFROM <http://rdfportal.org/dataset/ddbj>\nWHERE {\n  ?gene a nuc:Gene ;\n        nuc:locus_tag \""Mal52_08030\"" .\n  OPTIONAL { ?gene nuc:gene ?gene_symbol }\n  OPTIONAL {\n    ?cds sio:SIO_010081 ?gene ;\n         nuc:locus_tag \""Mal52_08030\"" ;\n         nuc:product ?product ;\n         rdfs:seeAlso ?protein_id .\n    FILTER(CONTAINS(STR(?protein_id), \""ncbiprotein\""))\n  }\n  FILTER(CONTAINS(STR(?gene), \""CP036276.1\""))\n}""}}]",CRITICAL,ATP-dependent Clp protease ATP-binding subunit ClpX,Database: DDBJ. Verified in ddbj_exploration.md via gene-CDS query. Tests specific gene product annotation in nucleotide database.
+118,2026-01-13,Specificity,What is the blaNDM-1 gene and how many isolates carry it according to AMR Portal?,True,False,True,0.6666666666666666,"I can provide information about the blaNDM-1 gene from my training knowledge, but I cannot access the AMR Portal database to give you current isolate counts.
 
-It's worth noting that these figures are based on isolates that have host information recorded. There may be additional isolates in the database without host metadata, but among those with recorded host information, the human-to-non-clinical ratio is approximately 4:1.",,32.191006898880005,15,585,11212,89744,"mcp__togomcp__get_MIE_file, mcp__togomcp__run_sparql","[{""name"": ""mcp__togomcp__get_MIE_file"", ""input"": {""dbname"": ""amrportal""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""amrportal"", ""sparql_query"": ""PREFIX amr: <http://example.org/ebiamr#>\n\nSELECT ?host (COUNT(DISTINCT ?bioSample) as ?isolateCount)\nFROM <http://rdfportal.org/dataset/amrportal>\nWHERE {\n  ?s a amr:PhenotypeMeasurement .\n  ?s amr:bioSample ?bioSample .\n  ?s amr:host ?host .\n}\nGROUP BY ?host\nORDER BY DESC(?isolateCount)""}}]",CRITICAL,"73% Homo sapiens, 27% other (non-clinical)","Database: AMR Portal. Tests clinical versus environmental surveillance distribution. Requires GROUP BY host. Baseline has no access to AMR host metadata. Verified in amrportal_exploration.md showing 828,750 human vs 309,699 non-clinical."
-118,2026-01-09,Specificity,What ChEBI role classification is assigned to ATP in PubChem?,True,False,True,0.6666666666666666,"I don't have certain knowledge of the specific ChEBI role classification assigned to ATP in PubChem's database. 
+## About blaNDM-1:
 
-However, I can tell you that ATP (adenosine triphosphate) typically has several ChEBI role classifications, which commonly include:
+**blaNDM-1** (New Delhi Metallo-beta-lactamase-1) is an antibiotic resistance gene that encodes a carbapenemase enzyme. Key characteristics include:
 
-- **Fundamental metabolite role** - as it's essential for energy metabolism
-- **Cofactor role** - as it participates in many enzymatic reactions
-- **Purine ribonucleoside 5'-triphosphate** - based on its chemical structure
+1. **Resistance Profile**: It confers resistance to carbapenem antibiotics, which are considered last-resort drugs for treating serious bacterial infections. It also provides resistance to most other beta-lactam antibiotics except aztreonam.
 
-PubChem integrates data from multiple sources including ChEBI, and the specific role classifications displayed there may include some or all of these categories, but I cannot state with certainty which exact ChEBI role classification(s) appear in PubChem's entry for ATP without access to that specific database record.",,5.972437143325806,53,188,True,True,0.6666666666666666,"Based on my investigation of ATP (PubChem CID 5957, ChEBI ID: CHEBI:15422) in the PubChem RDF database, I found the following:
+2. **Mechanism**: It's a metallo-beta-lactamase (Class B beta-lactamase) that requires zinc ions for its catalytic activity and hydrolyzes carbapenem antibiotics.
 
-## ChEBI Role Classification for ATP in PubChem:
+3. **Mobile Genetic Element**: The gene is typically carried on plasmids, making it easily transferable between different bacterial species through horizontal gene transfer.
 
-The only **ChEBI role** classification explicitly assigned to ATP in PubChem's RDF data is:
-- **FDA Approved Drug** (as indicated by the relationship `obo:RO_0000087`)
+4. **Clinical Significance**: NDM-1 is considered a major public health threat because infections caused by NDM-1-producing bacteria are very difficult to treat.
 
-## Structural Classifications (Not Roles):
+5. **Geographic Distribution**: First identified in 2008 in a patient from New Delhi, India, it has since spread globally.
 
-While ATP is classified structurally in ChEBI as:
-- Adenosine 5'-phosphate
-- Purine ribonucleoside 5'-triphosphate  
-- Adenyl ribonucleotide
-- Nucleotide
-- And many other structural/chemical classifications
+## Regarding AMR Portal Data:
 
-These are **chemical structure classifications**, not **role classifications**. In ChEBI ontology, ""roles"" specifically refer to the functional or application aspects of a compound (like ""drug"", ""metabolite"", ""cofactor"", etc.), which use the `RO_0000087` (""has role"") relationship.
+I cannot access the AMR Portal database or any real-time databases, so I cannot tell you how many isolates currently carry blaNDM-1 in their system. You would need to visit the AMR Portal directly to get current statistics on isolate counts.",,9.206151962280273,61,356,True,True,0.8333333333333334,"Based on the information I've gathered from PubMed and other sources, let me provide you with comprehensive information about blaNDM-1:
 
-The PubChem RDF data for ATP appears to have limited ChEBI role annotations, with only the ""FDA Approved Drug"" designation appearing as an explicit role classification through the standard RO_0000087 predicate.",,137.02431726455688,57,4177,50637,618956,"mcp__togomcp__get_pubchem_compound_id, mcp__togomcp__get_compound_attributes_from_pubchem, mcp__togomcp__run_sparql, mcp__togomcp__run_sparql, mcp__togomcp__run_sparql, mcp__togomcp__run_sparql, mcp__togomcp__run_sparql, mcp__togomcp__run_sparql, mcp__togomcp__run_sparql, mcp__togomcp__run_sparql, mcp__togomcp__run_sparql, mcp__pubdictionaries__find_terms, mcp__togomcp__run_sparql, mcp__togomcp__run_sparql, mcp__togomcp__run_sparql, mcp__togomcp__run_sparql, mcp__ols__getAncestors, mcp__togomcp__run_sparql","[{""name"": ""mcp__togomcp__get_pubchem_compound_id"", ""input"": {""compound_name"": ""ATP""}}, {""name"": ""mcp__togomcp__get_compound_attributes_from_pubchem"", ""input"": {""pubchem_compound_id"": ""5957""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""pubchem"", ""sparql_query"": ""PREFIX compound: <http://rdf.ncbi.nlm.nih.gov/pubchem/compound/>\nPREFIX obo: <http://purl.obolibrary.org/obo/>\nPREFIX dcterms: <http://purl.org/dc/terms/>\nPREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n\nSELECT DISTINCT ?chebiRole ?roleLabel\nWHERE {\n  compound:CID5957 obo:RO_0000087 ?chebiRole .\n  ?chebiRole rdfs:label ?roleLabel .\n  FILTER(STRSTARTS(STR(?chebiRole), \""http://purl.obolibrary.org/obo/CHEBI_\""))\n}\nLIMIT 100""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""pubchem"", ""sparql_query"": ""PREFIX compound: <http://rdf.ncbi.nlm.nih.gov/pubchem/compound/>\nPREFIX obo: <http://purl.obolibrary.org/obo/>\nPREFIX skos: <http://www.w3.org/2004/02/skos/core#>\nPREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n\nSELECT DISTINCT ?role ?label\nWHERE {\n  compound:CID5957 ?p ?role .\n  ?role rdfs:label ?label .\n  FILTER(CONTAINS(LCASE(?label), \""role\"") || CONTAINS(STR(?role), \""CHEBI_\""))\n}\nLIMIT 100""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""pubchem"", ""sparql_query"": ""PREFIX compound: <http://rdf.ncbi.nlm.nih.gov/pubchem/compound/>\nPREFIX obo: <http://purl.obolibrary.org/obo/>\nPREFIX skos: <http://www.w3.org/2004/02/skos/core#>\n\nSELECT DISTINCT ?p ?o\nWHERE {\n  compound:CID5957 ?p ?o .\n  FILTER(CONTAINS(STR(?o), \""CHEBI_\"") && ?p != skos:exactMatch)\n}\nLIMIT 100""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""chebi"", ""sparql_query"": ""PREFIX obo: <http://purl.obolibrary.org/obo/>\nPREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n\nSELECT DISTINCT ?role ?roleLabel\nWHERE {\n  obo:CHEBI_15422 obo:RO_0000087 ?role .\n  ?role rdfs:label ?roleLabel .\n}\nLIMIT 100""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""chebi"", ""sparql_query"": ""PREFIX obo: <http://purl.obolibrary.org/obo/>\nPREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n\nSELECT DISTINCT ?p ?o ?label\nWHERE {\n  obo:CHEBI_15422 ?p ?o .\n  OPTIONAL { ?o rdfs:label ?label }\n  FILTER(CONTAINS(STR(?o), \""role\"") || CONTAINS(STR(?p), \""role\""))\n}\nLIMIT 100""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""chebi"", ""sparql_query"": ""PREFIX obo: <http://purl.obolibrary.org/obo/>\nPREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n\nSELECT ?superclass ?superclassLabel\nWHERE {\n  obo:CHEBI_15422 rdfs:subClassOf ?superclass .\n  ?superclass rdfs:label ?superclassLabel .\n  FILTER(CONTAINS(LCASE(?superclassLabel), \""role\""))\n}\nLIMIT 100""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""chebi"", ""sparql_query"": ""PREFIX obo: <http://purl.obolibrary.org/obo/>\nPREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n\nSELECT ?superclass ?superclassLabel\nWHERE {\n  obo:CHEBI_15422 rdfs:subClassOf+ ?superclass .\n  ?superclass rdfs:label ?superclassLabel .\n}\nLIMIT 50""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""chebi"", ""sparql_query"": ""PREFIX obo: <http://purl.obolibrary.org/obo/>\nPREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n\nSELECT DISTINCT ?superclass ?superclassLabel\nWHERE {\n  obo:CHEBI_15422 rdfs:subClassOf ?superclass .\n  ?superclass rdfs:label ?superclassLabel .\n}\nLIMIT 50""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""chebi"", ""sparql_query"": ""PREFIX obo: <http://purl.obolibrary.org/obo/>\nPREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n\nSELECT DISTINCT ?p ?o ?oLabel\nWHERE {\n  obo:CHEBI_15422 ?p ?o .\n  OPTIONAL { ?o rdfs:label ?oLabel }\n  FILTER(?p != rdfs:subClassOf)\n}\nLIMIT 100""}}, {""name"": ""mcp__pubdictionaries__find_terms"", ""input"": {""dictionary"": ""ChEBI"", ""ids"": ""CHEBI:15422""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""pubchem"", ""sparql_query"": ""PREFIX compound: <http://rdf.ncbi.nlm.nih.gov/pubchem/compound/>\nPREFIX obo: <http://purl.obolibrary.org/obo/>\nPREFIX dcterms: <http://purl.org/dc/terms/>\nPREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n\nSELECT DISTINCT ?chebiTerm ?label\nWHERE {\n  compound:CID5957 ?p ?chebiTerm .\n  ?chebiTerm rdfs:label ?label .\n  FILTER(STRSTARTS(STR(?chebiTerm), \""http://purl.obolibrary.org/obo/CHEBI_\""))\n}\nLIMIT 100""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""pubchem"", ""sparql_query"": ""PREFIX compound: <http://rdf.ncbi.nlm.nih.gov/pubchem/compound/>\nPREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n\nSELECT DISTINCT ?p\nWHERE {\n  compound:CID5957 ?p ?o .\n}\nLIMIT 100""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""pubchem"", ""sparql_query"": ""PREFIX compound: <http://rdf.ncbi.nlm.nih.gov/pubchem/compound/>\nPREFIX obo: <http://purl.obolibrary.org/obo/>\nPREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n\nSELECT DISTINCT ?role ?roleLabel\nWHERE {\n  compound:CID5957 obo:RO_0000087 ?role .\n  OPTIONAL { ?role rdfs:label ?roleLabel }\n}\nLIMIT 100""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""pubchem"", ""sparql_query"": ""PREFIX compound: <http://rdf.ncbi.nlm.nih.gov/pubchem/compound/>\nPREFIX obo: <http://purl.obolibrary.org/obo/>\nPREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n\nSELECT DISTINCT ?role ?roleLabel\nWHERE {\n  {\n    compound:CID5957 obo:RO_0000087 ?role .\n  }\n  UNION\n  {\n    compound:CID5957 a ?type .\n    ?type rdfs:label ?roleLabel .\n    FILTER(STRSTARTS(STR(?type), \""http://purl.obolibrary.org/obo/CHEBI_\""))\n    BIND(?type AS ?role)\n  }\n  OPTIONAL { ?role rdfs:label ?roleLabel }\n}\nLIMIT 100""}}, {""name"": ""mcp__ols__getAncestors"", ""input"": {""ontologyId"": ""chebi"", ""classIri"": ""http://purl.obolibrary.org/obo/CHEBI_15422"", ""pageSize"": 100}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""pubchem"", ""sparql_query"": ""PREFIX compound: <http://rdf.ncbi.nlm.nih.gov/pubchem/compound/>\nPREFIX obo: <http://purl.obolibrary.org/obo/>\nPREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n\nSELECT DISTINCT ?o\nWHERE {\n  compound:CID5957 ?p ?o .\n  FILTER(CONTAINS(STR(?p), \""role\"") || CONTAINS(STR(?o), \""role\""))\n}\nLIMIT 100""}}]",CRITICAL,ChEBI classification via rdf:type,"Database: PubChem, ChEBI. Tests chemical role ontology integration. ~5% of PubChem compounds have ChEBI classifications. Baseline may know ATP function but not specific ontology roles. Pattern verified in pubchem_exploration.md."
-119,2026-01-09,Structured Query,Find all Neisseria gonorrhoeae isolates in the AMR Portal with resistance to fluoroquinolones collected from urogenital sources.,True,False,True,0.6,"I don't have access to the AMR (Antimicrobial Resistance) Portal database or any real-time database tools to query for specific isolates. To find Neisseria gonorrhoeae isolates with the criteria you mentioned, you would need to:
+## What is the blaNDM-1 gene?
 
-1. **Access the AMR Portal directly** - This could be:
-   - The NCBI Pathogen Detection portal
-   - WHO GLASS (Global Antimicrobial Resistance and Use Surveillance System)
-   - CDC's Antibiotic Resistance Laboratory Network portal
-   - Or another regional/national AMR surveillance database
+**blaNDM-1** (New Delhi Metallo-β-lactamase-1) is a gene that encodes a carbapenemase enzyme - a type of β-lactamase that can break down carbapenem antibiotics, which are often considered ""last-resort"" antibiotics for treating multidrug-resistant bacterial infections.
 
-2. **Apply the following filters:**
-   - **Organism**: Neisseria gonorrhoeae
-   - **Antimicrobial resistance**: Fluoroquinolones (such as ciprofloxacin, levofloxacin, or moxifloxacin)
-   - **Isolation source**: Urogenital specimens (including urethral, cervical, vaginal, or urethral swabs)
+### Key Characteristics:
 
-3. **Export or review the results** according to the portal's interface
+1. **Type**: Metallo-β-lactamase (MBL) - requires metal ions (typically zinc) for its activity
+2. **Resistance Profile**: Confers resistance to nearly all β-lactam antibiotics including:
+   - Carbapenems (meropenem, imipenem, ertapenem)
+   - Cephalosporins
+   - Penicillins
+   - Does NOT hydrolyze aztreonam (a monobactam)
 
-If you have access to a specific AMR Portal, I'd be happy to help you understand how to interpret the data or what additional filters might be useful for your analysis. However, I cannot directly query or retrieve this data for you without database access.",,9.381436824798584,69,302,True,False,0.4,"## Summary
+3. **Genetic Mobility**: The gene is typically:
+   - Located on plasmids (mobile genetic elements)
+   - Associated with transposons (Tn125, Tn3)
+   - Can spread between bacteria through horizontal gene transfer
+   - Found on various plasmid types (IncA/C, IncF, IncX3, etc.)
 
-I've successfully identified **1,353 unique Neisseria gonorrhoeae isolates** in the AMR Portal with resistance to fluoroquinolones collected from urogenital sources.
+4. **Clinical Significance**: According to PubMed research:
+   - Found in high-risk bacterial clones (e.g., *Klebsiella pneumoniae* ST307, ST258, ST147)
+   - Often co-occurs with other resistance genes (blaOXA-23, blaVIM)
+   - Contributes to multidrug resistance patterns
+   - Associated with nosocomial (hospital-acquired) infections
 
-### Key Findings:
+5. **Geographic Distribution**: Originally identified in New Delhi, India (2008), but now found worldwide
 
-**Geographic Distribution (by country):**
-- **China**: 394 isolates (29.1%)
-- **Portugal**: 249 isolates (18.4%)
-- **United States**: 198 isolates (14.6%)
-- **Brazil**: 137 isolates (10.1%)
-- **Norway**: 88 isolates (6.5%)
-- **Argentina**: 87 isolates (6.4%)
-- **New Zealand**: 49 isolates (3.6%)
-- **Ireland**: 31 isolates (2.3%)
-- **Israel**: 30 isolates (2.2%)
-- **Canada**: 24 isolates (1.8%)
-- And 6 additional countries with smaller numbers
+## AMR Portal Data
 
-**Fluoroquinolone Tested:**
-- The vast majority of isolates were tested against **ciprofloxacin**
+Unfortunately, I encountered technical difficulties querying the AMR Portal SPARQL endpoint directly to get the exact count of isolates carrying blaNDM-1. The AMR Portal database contains:
+- **1.7 million** phenotypic antimicrobial susceptibility test results
+- **1.1 million** genotypic AMR features from bacterial isolates worldwide
+- Data from ~1.4 million unique BioSamples
 
-**Urogenital Sources Identified:**
-- Urethral swabs
-- Urethra
-- Cervix
-- Vagina/vaginal discharge
-- Penis/Urethra
-- Genitalia
+The database structure indicates that blaNDM-1 would be recorded as part of the **GenotypeFeature** entities with the field `amr:amrElementSymbol` or `amr:geneSymbol`. The database integrates data from NCBI Pathogen Detection, PATRIC, and CABBAGE sources.
 
-**Temporal Coverage:**
-- Data spans from 1996 to 2012, with most isolates from 2007-2012
+### Recent Research Findings (According to PubMed):
 
-**Testing Methods:**
-- E-test (most common)
-- Agar dilution
-- Broth dilution
+A recent 2026 study in Ecuador ([DOI: 10.1093/jambio/lxag008](https://doi.org/10.1093/jambio/lxag008)) found that blaNDM-1 was one of the predominant carbapenemase genes (along with blaKPC-2 and blaOXA-181) in bloodstream infections.
 
-**MIC Values:**
-- Range from 0.063 mg/L to >32 mg/L
-- Many isolates showed high-level resistance (≥16 mg/L or >32 mg/L)
+Another 2026 study in Nepal ([DOI: 10.1186/s12866-025-04692-z](https://doi.org/10.1186/s12866-025-04692-z)) detected blaNDM-1 in **66.7%** of *Acinetobacter baumannii* isolates from cardiac patients, with co-occurrence patterns showing the gene's widespread distribution.
 
-This data demonstrates widespread fluoroquinolone resistance in N. gonorrhoeae from urogenital infections across multiple continents, which is consistent with WHO surveillance data showing fluoroquinolones are no longer recommended for gonorrhea treatment in most regions.",,56.54655909538269,20,2372,49579,164138,"mcp__togomcp__get_MIE_file, mcp__togomcp__run_sparql, mcp__togomcp__run_sparql, mcp__togomcp__run_sparql","[{""name"": ""mcp__togomcp__get_MIE_file"", ""input"": {""dbname"": ""amrportal""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""amrportal"", ""sparql_query"": ""PREFIX amr: <http://example.org/ebiamr#>\n\nSELECT DISTINCT ?bioSample ?isolateId ?antibiotic ?resistancePhenotype \n                ?isolationSource ?country ?collectionYear ?measurementValue \n                ?measurementSign ?measurementUnits ?laboratoryTypingMethod\nFROM <http://rdfportal.org/dataset/amrportal>\nWHERE {\n  ?s a amr:PhenotypeMeasurement .\n  ?s amr:organism \""Neisseria gonorrhoeae\"" .\n  ?s amr:antibioticName ?antibiotic .\n  ?s amr:resistancePhenotype ?resistancePhenotype .\n  ?s amr:bioSample ?bioSample .\n  ?s amr:isolationSource ?isolationSource .\n  \n  # Filter for fluoroquinolone antibiotics\n  FILTER(?antibiotic IN (\""ciprofloxacin\"", \""levofloxacin\"", \""moxifloxacin\"", \""ofloxacin\"", \""norfloxacin\"", \""gatifloxacin\""))\n  \n  # Filter for resistance (including non-susceptible and intermediate)\n  FILTER(?resistancePhenotype IN (\""resistant\"", \""non-susceptible\""))\n  \n  # Filter for urogenital sources\n  FILTER(CONTAINS(LCASE(?isolationSource), \""urogenital\"") || \n         CONTAINS(LCASE(?isolationSource), \""urogen\"") ||\n         CONTAINS(LCASE(?isolationSource), \""genital\"") ||\n         CONTAINS(LCASE(?isolationSource), \""cervix\"") ||\n         CONTAINS(LCASE(?isolationSource), \""urethra\"") ||\n         CONTAINS(LCASE(?isolationSource), \""vagina\"") ||\n         CONTAINS(LCASE(?isolationSource), \""urethral\""))\n  \n  # Optional additional metadata\n  OPTIONAL { ?s amr:isolateId ?isolateId . }\n  OPTIONAL { ?s amr:country ?country . }\n  OPTIONAL { ?s amr:collectionYear ?collectionYear . }\n  OPTIONAL { ?s amr:measurementValue ?measurementValue . }\n  OPTIONAL { ?s amr:measurementSign ?measurementSign . }\n  OPTIONAL { ?s amr:measurementUnits ?measurementUnits . }\n  OPTIONAL { ?s amr:laboratoryTypingMethod ?laboratoryTypingMethod . }\n}\nORDER BY ?collectionYear ?bioSample\nLIMIT 500""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""amrportal"", ""sparql_query"": ""PREFIX amr: <http://example.org/ebiamr#>\n\nSELECT (COUNT(DISTINCT ?bioSample) as ?totalIsolates) \n       (COUNT(DISTINCT ?country) as ?countriesCount)\nFROM <http://rdfportal.org/dataset/amrportal>\nWHERE {\n  ?s a amr:PhenotypeMeasurement .\n  ?s amr:organism \""Neisseria gonorrhoeae\"" .\n  ?s amr:antibioticName ?antibiotic .\n  ?s amr:resistancePhenotype ?resistancePhenotype .\n  ?s amr:bioSample ?bioSample .\n  ?s amr:isolationSource ?isolationSource .\n  \n  # Filter for fluoroquinolone antibiotics\n  FILTER(?antibiotic IN (\""ciprofloxacin\"", \""levofloxacin\"", \""moxifloxacin\"", \""ofloxacin\"", \""norfloxacin\"", \""gatifloxacin\""))\n  \n  # Filter for resistance\n  FILTER(?resistancePhenotype IN (\""resistant\"", \""non-susceptible\""))\n  \n  # Filter for urogenital sources\n  FILTER(CONTAINS(LCASE(?isolationSource), \""urogenital\"") || \n         CONTAINS(LCASE(?isolationSource), \""urogen\"") ||\n         CONTAINS(LCASE(?isolationSource), \""genital\"") ||\n         CONTAINS(LCASE(?isolationSource), \""cervix\"") ||\n         CONTAINS(LCASE(?isolationSource), \""urethra\"") ||\n         CONTAINS(LCASE(?isolationSource), \""vagina\"") ||\n         CONTAINS(LCASE(?isolationSource), \""urethral\""))\n  \n  OPTIONAL { ?s amr:country ?country . }\n}""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""amrportal"", ""sparql_query"": ""PREFIX amr: <http://example.org/ebiamr#>\n\nSELECT ?country (COUNT(DISTINCT ?bioSample) as ?isolateCount)\nFROM <http://rdfportal.org/dataset/amrportal>\nWHERE {\n  ?s a amr:PhenotypeMeasurement .\n  ?s amr:organism \""Neisseria gonorrhoeae\"" .\n  ?s amr:antibioticName ?antibiotic .\n  ?s amr:resistancePhenotype ?resistancePhenotype .\n  ?s amr:bioSample ?bioSample .\n  ?s amr:isolationSource ?isolationSource .\n  ?s amr:country ?country .\n  \n  # Filter for fluoroquinolone antibiotics\n  FILTER(?antibiotic IN (\""ciprofloxacin\"", \""levofloxacin\"", \""moxifloxacin\"", \""ofloxacin\"", \""norfloxacin\"", \""gatifloxacin\""))\n  \n  # Filter for resistance\n  FILTER(?resistancePhenotype IN (\""resistant\"", \""non-susceptible\""))\n  \n  # Filter for urogenital sources\n  FILTER(CONTAINS(LCASE(?isolationSource), \""urogenital\"") || \n         CONTAINS(LCASE(?isolationSource), \""urogen\"") ||\n         CONTAINS(LCASE(?isolationSource), \""genital\"") ||\n         CONTAINS(LCASE(?isolationSource), \""cervix\"") ||\n         CONTAINS(LCASE(?isolationSource), \""urethra\"") ||\n         CONTAINS(LCASE(?isolationSource), \""vagina\"") ||\n         CONTAINS(LCASE(?isolationSource), \""urethral\""))\n}\nGROUP BY ?country\nORDER BY DESC(?isolateCount)""}}]",CRITICAL,N. gonorrhoeae isolates meeting all three criteria,"Database: AMR Portal. Tests sexually transmitted infection surveillance query. Requires organism filter, antibiotic class filter (ciprofloxacin/levofloxacin), and isolation source filter. Baseline cannot perform STI surveillance queries. Organism verified in amrportal_exploration.md."
-120,2026-01-09,Structured Query,"Count GO terms by namespace and calculate the percentage distribution across biological_process, molecular_function, and cellular_component.",True,False,False,0.0,"I can provide you with general information about GO term distribution based on my training knowledge, though I should note that the exact counts change over time as the Gene Ontology is continuously updated.
+---
 
-## Typical GO Term Distribution by Namespace
+If you need the specific isolate count from the AMR Portal, I recommend either accessing their web interface directly at https://rdfportal.org or waiting for the SPARQL endpoint to be more responsive for complex queries.",,153.13869619369507,78,3688,20652,551810,"mcp__togomcp__get_sparql_example, mcp__togomcp__list_databases, mcp__togomcp__run_sparql, mcp__togomcp__run_sparql, mcp__togomcp__run_sparql, mcp__togomcp__run_sparql, mcp__togomcp__get_MIE_file, mcp__togomcp__run_sparql, mcp__togomcp__run_sparql, mcp__togomcp__run_sparql, mcp__togomcp__run_sparql, mcp__togomcp__run_sparql, mcp__togomcp__run_sparql, mcp__pubmed__search_articles, mcp__pubmed__get_article_metadata, mcp__togomcp__ncbi_esearch","[{""name"": ""mcp__togomcp__get_sparql_example"", ""input"": {""dbname"": ""amrportal""}}, {""name"": ""mcp__togomcp__list_databases"", ""input"": {}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""amrportal"", ""sparql_query"": ""PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\nPREFIX obo: <http://purl.obolibrary.org/obo/>\nPREFIX amr: <http://purl.jp/bio/11/amr/>\n\nSELECT (COUNT(DISTINCT ?isolate) AS ?isolate_count)\nWHERE {\n  ?gene a amr:AMR_0000009 ;\n        rdfs:label ?geneName .\n  FILTER(CONTAINS(LCASE(?geneName), \""blandm-1\""))\n  ?isolate amr:BFO_0000051 ?gene .\n}\n""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""amrportal"", ""sparql_query"": ""PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\nPREFIX obo: <http://purl.obolibrary.org/obo/>\nPREFIX amr: <http://purl.jp/bio/11/amr/>\n\nSELECT ?geneName (COUNT(DISTINCT ?isolate) AS ?isolate_count)\nWHERE {\n  ?gene a amr:AMR_0000009 ;\n        rdfs:label ?geneName .\n  FILTER(CONTAINS(LCASE(?geneName), \""ndm\""))\n  ?isolate amr:BFO_0000051 ?gene .\n}\nGROUP BY ?geneName\nORDER BY DESC(?isolate_count)\nLIMIT 20\n""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""amrportal"", ""sparql_query"": ""PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\nPREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n\nSELECT DISTINCT ?type ?label\nWHERE {\n  ?s rdf:type ?type ;\n     rdfs:label ?label .\n  FILTER(CONTAINS(LCASE(?label), \""ndm\""))\n}\nLIMIT 20\n""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""amrportal"", ""sparql_query"": ""PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n\nSELECT ?label\nWHERE {\n  ?s rdfs:label ?label .\n  FILTER(CONTAINS(LCASE(?label), \""ndm-1\""))\n}\nLIMIT 50\n""}}, {""name"": ""mcp__togomcp__get_MIE_file"", ""input"": {""dbname"": ""amrportal""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""amrportal"", ""sparql_query"": ""PREFIX amr: <http://example.org/ebiamr#>\n\nSELECT (COUNT(DISTINCT ?bioSample) as ?isolate_count)\nFROM <http://rdfportal.org/dataset/amrportal>\nWHERE {\n  ?s a amr:GenotypeFeature .\n  ?s amr:geneSymbol ?geneSymbol .\n  ?s amr:bioSample ?bioSample .\n  FILTER(CONTAINS(LCASE(?geneSymbol), \""blandm-1\""))\n}\n""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""amrportal"", ""sparql_query"": ""PREFIX amr: <http://example.org/ebiamr#>\n\nSELECT DISTINCT ?geneSymbol ?amrElementSymbol (COUNT(DISTINCT ?bioSample) as ?isolate_count)\nFROM <http://rdfportal.org/dataset/amrportal>\nWHERE {\n  ?s a amr:GenotypeFeature .\n  ?s amr:geneSymbol ?geneSymbol .\n  ?s amr:amrElementSymbol ?amrElementSymbol .\n  ?s amr:bioSample ?bioSample .\n  FILTER(CONTAINS(LCASE(?geneSymbol), \""ndm-1\"") || CONTAINS(LCASE(?amrElementSymbol), \""ndm-1\""))\n}\nGROUP BY ?geneSymbol ?amrElementSymbol\nORDER BY DESC(?isolate_count)\nLIMIT 20\n""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""amrportal"", ""sparql_query"": ""PREFIX amr: <http://example.org/ebiamr#>\n\nSELECT ?geneSymbol ?amrElementSymbol\nFROM <http://rdfportal.org/dataset/amrportal>\nWHERE {\n  ?s a amr:GenotypeFeature .\n  ?s amr:geneSymbol ?geneSymbol .\n  ?s amr:amrElementSymbol ?amrElementSymbol .\n  ?geneSymbol bif:contains \""'ndm-1'\"" option (score ?sc) .\n}\nORDER BY DESC(?sc)\nLIMIT 10\n""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""amrportal"", ""sparql_query"": ""PREFIX amr: <http://example.org/ebiamr#>\n\nSELECT DISTINCT ?amrElementSymbol\nFROM <http://rdfportal.org/dataset/amrportal>\nWHERE {\n  ?s a amr:GenotypeFeature .\n  ?s amr:amrElementSymbol ?amrElementSymbol .\n  FILTER(CONTAINS(?amrElementSymbol, \""NDM\""))\n}\nLIMIT 20\n""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""amrportal"", ""sparql_query"": ""PREFIX amr: <http://example.org/ebiamr#>\n\nSELECT ?amrElementSymbol\nFROM <http://rdfportal.org/dataset/amrportal>\nWHERE {\n  ?s a amr:GenotypeFeature .\n  ?s amr:amrElementSymbol \""blaNDM-1\"" .\n}\nLIMIT 10\n""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""amrportal"", ""sparql_query"": ""PREFIX amr: <http://example.org/ebiamr#>\nSELECT (COUNT(*) AS ?count)\nFROM <http://rdfportal.org/dataset/amrportal>\nWHERE {\n  ?s a amr:GenotypeFeature ;\n     amr:amrElementSymbol ?symbol .\n  FILTER(regex(?symbol, \""NDM\"", \""i\""))\n}\n""}}, {""name"": ""mcp__pubmed__search_articles"", ""input"": {""query"": ""blaNDM-1 gene carbapenemase"", ""max_results"": 5}}, {""name"": ""mcp__pubmed__get_article_metadata"", ""input"": {""pmids"": [""41518206"", ""41507808""]}}, {""name"": ""mcp__togomcp__ncbi_esearch"", ""input"": {""database"": ""gene"", ""query"": ""NDM-1 carbapenemase"", ""max_results"": 5}}]",CRITICAL,blaNDM-1 is a carbapenemase gene found in 258 carbapenem-resistant isolates,Database: AMR Portal. Verified in amrportal_exploration.md. NDM-1 is a major clinical concern for carbapenem resistance. Tests resistance gene specificity.
+119,2026-01-13,Structured Query,What are the major disease categories in NANDO (direct children of the root)?,True,False,False,0.2857142857142857,"I don't have specific information about NANDO's ontology structure in my training data. NANDO (Nanbyo Data Ontology) is a Japanese rare disease ontology, but I cannot provide you with certainty about what the direct children categories of its root node are.
 
-Based on historical GO statistics, the approximate distribution is:
+To get accurate information about NANDO's major disease categories (direct children of the root), you would need to:
+1. Consult the official NANDO documentation or website
+2. Access the ontology file directly (typically in OWL or OBO format)
+3. Use an ontology browser like OLS (Ontology Lookup Service) or BioPortal if NANDO is indexed there
 
-### **Biological Process (BP)**
-- **Count**: ~29,000-30,000 terms
-- **Percentage**: ~49-51% of all GO terms
-- This is typically the largest namespace, covering processes like metabolism, signaling, development, etc.
+I apologize that I cannot give you the specific answer you're looking for based solely on my training knowledge.",,5.154966115951538,54,176,True,False,0.42857142857142855,"Based on the MIE file documentation I retrieved, I can provide you with information about NANDO's structure. According to the documentation and examples provided:
 
-### **Molecular Function (MF)**
-- **Count**: ~11,000-12,000 terms
-- **Percentage**: ~19-20% of all GO terms
-- Covers activities like catalytic activity, binding, transporter activity
+## Major Disease Categories in NANDO (Direct Children of Root)
 
-### **Cellular Component (CC)**
-- **Count**: ~4,000-4,500 terms
-- **Percentage**: ~7-8% of all GO terms
-- Describes locations like organelles, complexes, membranes
+The NANDO ontology has a hierarchical structure with **NANDO:1000001** serving as the main parent class under the root intractable disease concept (NANDO:0000001). 
 
-### **Obsolete Terms**
-- **Count**: ~12,000-14,000 terms
-- **Percentage**: ~20-23% of all GO terms
-- Terms that have been retired or replaced
+The documentation shows at least these major disease categories that are direct children of NANDO:1000001:
 
-## Total Approximate Distribution
+1. **Neuromuscular disease** (NANDO:1100001)
+   - Japanese: 神経・筋疾患
+   - Mapped to MONDO:0019056
 
-```
-Total GO Terms: ~58,000-60,000 (including obsolete)
-Active Terms: ~44,000-46,000
+2. **Metabolic disease** (NANDO:1100002)
+   - Japanese: 代謝系疾患
+   - Mapped to MONDO:0004955 and MONDO:0005066
 
-Active Term Distribution:
-- Biological Process: ~65-68%
-- Molecular Function: ~25-27%
-- Cellular Component: ~9-10%
-```
+The documentation indicates that:
+- **Disease categories use NANDO:11xxxxx IDs**
+- **Specific diseases use NANDO:12xxxxx IDs**
+- The hierarchy follows: owl:Thing → Intractable disease (NANDO:0000001) → Designated intractable disease (NANDO:1000001) → Disease categories (NANDO:11xxxxx) → Specific diseases (NANDO:12xxxxx)
 
-**Note**: These are approximate figures based on GO statistics from recent years. For exact current counts, you would need to query the live GO database directly.",,10.597429037094116,61,390,True,False,0.0,"Excellent! Now I have complete data. Let me calculate the statistics and present the results.
+According to the statistical data in the documentation, NANDO contains **2,777 total diseases** organized hierarchically, with the major categories at the 1100000-level serving as the primary organizational structure for classifying Japanese intractable (rare) diseases.
 
-## GO Terms Count and Percentage Distribution by Namespace
+The documentation suggests there are multiple top-level categories beyond just the two examples shown, but the SPARQL endpoint appears to be experiencing connectivity issues preventing me from retrieving the complete list at this moment.",,70.17861199378967,37,1603,37863,211555,"mcp__togomcp__get_MIE_file, mcp__togomcp__run_sparql, mcp__togomcp__run_sparql, mcp__ols__searchClasses, mcp__ols__searchClasses, mcp__togomcp__run_sparql","[{""name"": ""mcp__togomcp__get_MIE_file"", ""input"": {""dbname"": ""nando""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""nando"", ""sparql_query"": ""PREFIX owl: <http://www.w3.org/2002/07/owl#>\nPREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\nPREFIX nando: <http://nanbyodata.jp/ontology/NANDO_>\nPREFIX dct: <http://purl.org/dc/terms/>\n\nSELECT ?category ?identifier ?en_label ?ja_label\nFROM <http://nanbyodata.jp/ontology/nando>\nWHERE {\n  ?category a owl:Class ;\n            rdfs:subClassOf nando:1000001 ;\n            dct:identifier ?identifier ;\n            rdfs:label ?en_label ;\n            rdfs:label ?ja_label .\n  FILTER(LANG(?en_label) = \""en\"")\n  FILTER(LANG(?ja_label) = \""ja\"" && !REGEX(STR(?ja_label), \""^[\\u3041-\\u3093]+$\""))\n}\nORDER BY ?identifier""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""nando"", ""sparql_query"": ""PREFIX owl: <http://www.w3.org/2002/07/owl#>\nPREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\nPREFIX nando: <http://nanbyodata.jp/ontology/NANDO_>\n\nSELECT ?category ?label\nWHERE {\n  GRAPH <http://nanbyodata.jp/ontology/nando> {\n    ?category a owl:Class ;\n              rdfs:subClassOf nando:1000001 ;\n              rdfs:label ?label .\n    FILTER(LANG(?label) = \""en\"")\n  }\n}\nORDER BY ?label""}}, {""name"": ""mcp__ols__searchClasses"", ""input"": {""ontologyId"": ""nando"", ""query"": ""NANDO:1000001""}}, {""name"": ""mcp__ols__searchClasses"", ""input"": {""ontologyId"": ""nando"", ""query"": ""disease category"", ""pageSize"": 50}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""nando"", ""sparql_query"": ""PREFIX owl: <http://www.w3.org/2002/07/owl#>\nPREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n\nSELECT ?category ?label\nFROM <http://nanbyodata.jp/ontology/nando>\nWHERE {\n  ?category a owl:Class ;\n            rdfs:subClassOf <http://nanbyodata.jp/ontology/NANDO_1000001> ;\n            rdfs:label ?label .\n  FILTER(LANG(?label) = \""en\"")\n}\nORDER BY ?label\nLIMIT 50""}}]",CRITICAL,"Neuromuscular disease (1100001), Metabolic disease (1100002), Immune system disease (1100004), Cardiovascular disease (1100005), and more",Database: NANDO. Verified in nando_exploration.md via hierarchy query. Tests rare disease classification structure.
+120,2026-01-13,Structured Query,What entity types are annotated in PubTator Central?,True,True,False,0.42857142857142855,"Based on my training knowledge, PubTator Central annotates the following main entity types:
 
-Based on the Gene Ontology (GO) database analysis, here are the counts and percentage distributions across the three namespaces:
+1. **Gene/Protein** - Gene and protein mentions
+2. **Disease** - Disease and condition mentions
+3. **Chemical/Drug** - Chemical compounds and pharmaceutical agents
+4. **Species/Organism** - Taxonomic mentions (often focusing on species)
+5. **Mutation/Variant** - Genetic mutations and variants
+6. **Cell Line** - Cell line mentions
 
-### **Total Counts (Including Obsolete Terms)**
+These annotations are generated using state-of-the-art text mining tools and are normalized to standard identifiers from various databases:
+- Genes are normalized to NCBI Gene IDs
+- Diseases to MESH or OMIM IDs
+- Chemicals to MESH IDs
+- Species to NCBI Taxonomy IDs
+- Mutations using sequence variation nomenclature
 
-| Namespace | Count | Percentage | Obsolete Terms |
-|-----------|-------|------------|----------------|
-| **Biological Process** | 57,951 | 88.71% | 404 |
-| **Cellular Component** | 4,331 | 6.63% | 114 |
-| **Molecular Function** | 3,058 | 4.68% | 24 |
-| **TOTAL** | **65,340** | **100.00%** | **542** |
+PubTator Central provides these annotations for the entire PubMed database and PMC full-text articles, making it a valuable resource for biomedical text mining and literature curation. The annotations are regularly updated and can be accessed through both a web interface and downloadable datasets.",,7.101141929626465,50,251,True,True,0.5714285714285714,"Based on the MIE file information I retrieved, **PubTator Central annotates the following entity types**:
 
-### **Active Terms Only (Excluding Obsolete)**
+## Primary Entity Types
 
-| Namespace | Count | Percentage |
-|-----------|-------|------------|
-| **Biological Process** | 57,547 | 88.74% |
-| **Cellular Component** | 4,217 | 6.50% |
-| **Molecular Function** | 3,034 | 4.68% |
-| **TOTAL** | **64,798** | **100.00%** |
+1. **Disease** - Disease and medical condition annotations using MeSH (Medical Subject Headings) identifiers
+2. **Gene** - Gene annotations using NCBI Gene database identifiers
 
-### **Key Findings**
+## Key Details
 
-1. **Biological Process** dominates the Gene Ontology with nearly **89% of all GO terms**, reflecting the complexity and diversity of biological processes at molecular, cellular, and organismal levels.
+- **Disease annotations**: Link to MeSH terms via `http://identifiers.org/mesh/` URIs (e.g., D056486 for Fecal Incontinence, D003920 for Diabetes Mellitus)
 
-2. **Cellular Component** accounts for approximately **6.6%** of terms, describing the locations where gene products perform their functions.
+- **Gene annotations**: Link to NCBI Gene IDs via `http://identifiers.org/ncbigene/` URIs (e.g., NCBI Gene 11820, 28964)
 
-3. **Molecular Function** represents about **4.7%** of terms, describing the biochemical activities of gene products.
+## Annotation Features
 
-4. Only **542 terms (0.83%)** are marked as obsolete across all namespaces, indicating well-maintained ontology curation.
+Each annotation includes:
+- **Entity type** (Disease or Gene)
+- **External identifier** (MeSH ID or NCBI Gene ID)
+- **Target article** (PubMed article reference)
+- **Annotation count** - indicates how many times the entity appears in that specific article
+- **Source attribution** (optional) - can be PubTator3 (automated), ClinVar (curated), or dbSNP
 
-The overwhelming predominance of biological process terms reflects GO's focus on capturing the rich complexity of how molecular functions are organized into cellular and physiological processes.",,74.54565191268921,30,2433,40958,445613,"mcp__ols__searchClasses, mcp__ols__fetch, mcp__ols__fetch, mcp__ols__fetch, mcp__togomcp__run_sparql, mcp__togomcp__run_sparql, mcp__togomcp__run_sparql, mcp__togomcp__run_sparql, mcp__togomcp__run_sparql","[{""name"": ""mcp__ols__searchClasses"", ""input"": {""query"": ""*"", ""ontologyId"": ""go"", ""pageSize"": 1000, ""pageNum"": 0}}, {""name"": ""mcp__ols__fetch"", ""input"": {""id"": ""go+http://purl.obolibrary.org/obo/GO_0008150""}}, {""name"": ""mcp__ols__fetch"", ""input"": {""id"": ""go+http://purl.obolibrary.org/obo/GO_0003674""}}, {""name"": ""mcp__ols__fetch"", ""input"": {""id"": ""go+http://purl.obolibrary.org/obo/GO_0005575""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""go"", ""sparql_query"": ""PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\nPREFIX oboInOwl: <http://www.geneontology.org/formats/oboInOwl#>\nPREFIX obo: <http://purl.obolibrary.org/obo/>\n\nSELECT ?namespace (COUNT(DISTINCT ?term) as ?count)\nWHERE {\n  ?term oboInOwl:hasOBONamespace ?namespace .\n  ?term a <http://www.w3.org/2002/07/owl#Class> .\n  FILTER(?namespace IN (\""biological_process\"", \""molecular_function\"", \""cellular_component\""))\n}\nGROUP BY ?namespace\nORDER BY ?namespace""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""go"", ""sparql_query"": ""PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\nPREFIX oboInOwl: <http://www.geneontology.org/formats/oboInOwl#>\nPREFIX obo: <http://purl.obolibrary.org/obo/>\nPREFIX owl: <http://www.w3.org/2002/07/owl#>\n\nSELECT ?namespace (COUNT(DISTINCT ?term) as ?count)\nWHERE {\n  ?term a owl:Class .\n  ?term oboInOwl:hasOBONamespace ?namespace .\n  FILTER(?namespace IN (\""biological_process\"", \""molecular_function\"", \""cellular_component\""))\n  FILTER NOT EXISTS { ?term owl:deprecated true }\n}\nGROUP BY ?namespace\nORDER BY ?namespace""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""go"", ""sparql_query"": ""PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\nPREFIX oboInOwl: <http://www.geneontology.org/formats/oboInOwl#>\nPREFIX obo: <http://purl.obolibrary.org/obo/>\nPREFIX owl: <http://www.w3.org/2002/07/owl#>\n\nSELECT ?namespace (COUNT(DISTINCT ?term) as ?total_count) \n       (SUM(IF(?deprecated, 1, 0)) as ?obsolete_count)\n       (SUM(IF(!?deprecated, 1, 0)) as ?active_count)\nWHERE {\n  ?term a owl:Class .\n  ?term oboInOwl:hasOBONamespace ?namespace .\n  FILTER(?namespace IN (\""biological_process\"", \""molecular_function\"", \""cellular_component\""))\n  OPTIONAL { ?term owl:deprecated ?dep }\n  BIND(COALESCE(?dep, false) as ?deprecated)\n}\nGROUP BY ?namespace\nORDER BY ?namespace""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""go"", ""sparql_query"": ""PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\nPREFIX oboInOwl: <http://www.geneontology.org/formats/oboInOwl#>\nPREFIX obo: <http://purl.obolibrary.org/obo/>\nPREFIX owl: <http://www.w3.org/2002/07/owl#>\n\nSELECT ?namespace (COUNT(?term) as ?count)\nWHERE {\n  ?term a owl:Class .\n  ?term oboInOwl:hasOBONamespace ?namespace .\n  FILTER(?namespace IN (\""biological_process\"", \""molecular_function\"", \""cellular_component\""))\n}\nGROUP BY ?namespace\nORDER BY DESC(?count)""}}, {""name"": ""mcp__togomcp__run_sparql"", ""input"": {""dbname"": ""go"", ""sparql_query"": ""PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\nPREFIX oboInOwl: <http://www.geneontology.org/formats/oboInOwl#>\nPREFIX obo: <http://purl.obolibrary.org/obo/>\nPREFIX owl: <http://www.w3.org/2002/07/owl#>\n\nSELECT ?namespace \n       (COUNT(?term) as ?total_count)\n       (SUM(IF(BOUND(?deprecated), 1, 0)) as ?obsolete_count)\nWHERE {\n  ?term a owl:Class .\n  ?term oboInOwl:hasOBONamespace ?namespace .\n  OPTIONAL { ?term owl:deprecated ?deprecated . FILTER(?deprecated = true) }\n  FILTER(?namespace IN (\""biological_process\"", \""molecular_function\"", \""cellular_component\""))\n}\nGROUP BY ?namespace\nORDER BY DESC(?total_count)""}}]",CRITICAL,"biological_process (64%), molecular_function (27%), cellular_component (9%)","Database: GO. Tests ontology domain distribution analysis. Requires GROUP BY hasOBONamespace with percentage calculation. Baseline cannot compute GO statistics. Verified raw counts in go_exploration.md: 30,804 + 12,793 + 4,568 = 48,165 total."
+## Important Notes
+
+According to the database documentation:
+- Disease annotations represent the **majority** of annotations in the database
+- Gene annotations have **substantial coverage**
+- Other entity types like **Chemical, Species, and Mutation may have limited or no coverage** in the RDF version
+
+The database contains over 10 million estimated annotations extracted from PubMed literature using advanced text mining and manual curation, enabling literature-based biomedical discovery and gene-disease association analysis.",,24.638622999191284,15,563,10965,82294,"mcp__togomcp__list_databases, mcp__togomcp__get_MIE_file","[{""name"": ""mcp__togomcp__list_databases"", ""input"": {}}, {""name"": ""mcp__togomcp__get_MIE_file"", ""input"": {""dbname"": ""pubtator""}}]",CRITICAL,Disease (linked to MeSH) and Gene (linked to NCBI Gene),Database: PubTator. Verified in pubtator_exploration.md. PubTator uses text mining to extract biomedical entities from literature. Tests understanding of text-mining database structure.

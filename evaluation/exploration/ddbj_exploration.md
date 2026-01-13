@@ -1,106 +1,73 @@
-# DDBJ Exploration Report
+# DDBJ (DNA Data Bank of Japan) Exploration Report
 
 ## Database Overview
 - **Purpose**: Nucleotide sequence data from the International Nucleotide Sequence Database Collaboration (INSDC)
-- **Scope**: Genomic entries with annotations including genes, CDS, tRNA, rRNA, linked to organism metadata and functional annotations
-- **Key Data Types**:
-  - Sequence entries (accessions like CP036276.1, AP026093.1)
-  - Genomic features (genes, coding sequences, tRNA, rRNA)
-  - Functional annotations (product descriptions, protein translations)
-  - Genomic coordinates (FALDO-based positions)
-  - Taxonomic classifications
-  - Cross-references (BioProject, BioSample, NCBI Protein)
+- **Scope**: Genomic entries with annotations (genes, CDS, tRNA, rRNA) and metadata
+- **Key data types**: Entry metadata, Gene annotations, Coding sequences, RNA features, FALDO coordinates
+- **Focus**: Sequence annotations with cross-references to BioProject, BioSample, NCBI Protein, Taxonomy
 
 ## Schema Analysis (from MIE file)
 
-### Main Entity Types
-1. **nuc:Entry** - Sequence record
-   - rdfs:label (entry description)
-   - dcterms:identifier (accession number)
-   - nuc:definition (full description)
-   - nuc:organism (organism name)
-   - nuc:taxonomy (taxonomic string)
-   - nuc:division (database division)
-   - nuc:sequence_version, nuc:sequence_date
-   - nuc:dblink (BioProject, BioSample links)
-   - nuc:reference (literature references)
-
-2. **nuc:Gene** - Gene features
-   - nuc:locus_tag (>99% coverage - most reliable ID)
-   - nuc:gene (gene symbol, ~60% coverage)
-   - nuc:location (text description)
-   - faldo:location (structured coordinates)
-   - rdfs:subClassOf (Sequence Ontology classification)
-   - bfo:0000050 (part of entry/sequence)
-   - ro:0002162 (in taxon)
-
-3. **nuc:Coding_Sequence** (CDS)
-   - nuc:locus_tag (same as corresponding gene)
-   - nuc:product (protein product description, >95% coverage)
-   - nuc:translation (amino acid sequence, >95% coverage)
-   - nuc:codon_start, nuc:transl_table (translation parameters)
-   - rdfs:seeAlso (NCBI Protein link)
-   - sio:SIO_010081 (encodes gene - **case-sensitive uppercase**)
-   - faldo:location (coordinates)
-
-4. **nuc:Transfer_RNA and nuc:Ribosomal_RNA**
-   - faldo:location (coordinates)
-   - nuc:product (RNA type/amino acid)
-   - bfo:0000050 (part of entry)
-   - ro:0002162 (in taxon)
-
-5. **nuc:Source** - Organism/sample information
-   - nuc:organism (organism name)
-   - nuc:mol_type (molecule type, e.g., "genomic DNA")
-   - rdfs:seeAlso (Taxonomy link)
-   - ro:0002162 (taxonomic classification)
-
-6. **FALDO Regions and Positions**
-   - faldo:Region with faldo:begin and faldo:end
-   - faldo:ExactPosition with faldo:position (integer coordinate)
-   - faldo:reference (reference to sequence)
+### Main Properties Available
+- **Entry**: `nuc:Entry` with `rdfs:label`, `dcterms:identifier`, `nuc:organism`, `nuc:definition`, `nuc:dblink`
+- **Gene**: `nuc:Gene` with `nuc:locus_tag`, `nuc:gene` (symbol), `faldo:location`
+- **CDS**: `nuc:Coding_Sequence` with `nuc:locus_tag`, `nuc:product`, `nuc:translation`, `rdfs:seeAlso` (protein)
+- **RNA**: `nuc:Transfer_RNA`, `nuc:Ribosomal_RNA` with `nuc:product`
+- **Source**: `nuc:Source` with `nuc:organism`, `nuc:mol_type`
+- **Location**: `faldo:Region` with `faldo:begin/faldo:end` positions
 
 ### Important Relationships
-- **Entry-Feature hierarchy**: All features link to entry via bfo:0000050 (part of)
-- **Gene-CDS linkage**: CDS encodes gene via sio:SIO_010081 (**CRITICAL: uppercase**)
-- **Taxonomic classification**: Features use ro:0002162 (in taxon) for NCBI Taxonomy
-- **Protein cross-reference**: CDS links to NCBI Protein via rdfs:seeAlso
-- **Sequence Ontology**: Features classified via rdfs:subClassOf to SO terms
-- **FALDO coordinates**: Structured genomic positions enable range queries
+- Gene-CDS linked via `sio:SIO_010081` (case-sensitive!)
+- BioProject/BioSample via `nuc:dblink`
+- NCBI Protein via `rdfs:seeAlso`
+- Taxonomy via `ro:0002162` (in taxon)
+- Sequence Ontology terms via `rdfs:subClassOf`
+- FALDO for genomic coordinates
 
 ### Query Patterns Observed
-- **CRITICAL**: Always filter by entry ID before any complex queries: `FILTER(CONTAINS(STR(?var), "ENTRY_ID"))`
-- Use `bif:contains` ONLY for organism search at entry level (fast, scored)
-- Use `FILTER CONTAINS` for product searches WITHIN entries (after entry filter)
-- Case-sensitive property: `sio:SIO_010081` (uppercase) for gene-CDS links
-- FROM clause: `FROM <http://rdfportal.org/dataset/ddbj>`
-- Entry URIs: `http://identifiers.org/insdc/ACCESSION`
-- Protein URIs: `http://identifiers.org/ncbiprotein/ACCESSION`
+- Entry-level searches using `bif:contains` on `nuc:organism`
+- Feature-level queries require entry ID filtering
+- Gene-CDS joins via `sio:SIO_010081`
+- FALDO coordinates: `faldo:location/faldo:begin/faldo:position`
 
 ## Search Queries Performed
 
-1. **Query**: Search E. coli entries using bif:contains
-   **Results**: Found 10 E. coli genome entries (AP026093.1, AP026094.1, etc.) all with relevance score 28
+### Query 1: Escherichia coli entries
+- **Search**: `bif:contains "'escherichia' AND 'coli'"`
+- **Results**: 10+ entries including:
+  - AP026093.1, AP026094.1, AP026095.1 (E. coli genomes)
+  - Multiple genome assemblies from DDBJ
 
-2. **Query**: Gene coordinates in CP036276.1
-   **Results**: Retrieved 10 genes with locus tags (Mal52_08030 through Mal52_08120), start positions 1001623-1013845, end positions 1002915-1014603. Shows FALDO coordinates working.
+### Query 2: Bacillus subtilis entries
+- **Search**: `bif:contains "'bacillus' AND 'subtilis'"`
+- **Results**: 10+ entries including:
+  - AB271744.1 - Bacillus subtilis subsp. subtilis
+  - Multiple strains with relevance score 30
 
-3. **Query**: Protease/peptidase genes in CP036276.1
-   **Results**: Found 20 protease/peptidase genes including Clp proteases, leader peptidases, aminopeptidases, signal peptide peptidases, FtsH protease, HtrA protease. Diverse protease families.
+### Query 3: CP036276.1 entry metadata
+- **Search**: Entry-specific query
+- **Results**:
+  - Organism: Symmachiella dynata
+  - BioProject: PRJNA485700
+  - BioSample: SAMN10954015
+  - Label: "Symmachiella dynata strain Mal52 chromosome, complete genome"
 
-4. **Query**: Gene-CDS-Protein integration
-   **Results**: Successfully linked locus tags to products and NCBI Protein IDs. Examples: Mal52_08030 → ClpX → QDU42347.1, Mal52_08040 → N-6 DNA Methylase → QDU42348.1. Many hypothetical proteins.
+### Query 4: Genes with products in CP036276.1
+- **Search**: Gene-CDS join by locus tag
+- **Results**: 20 genes including:
+  - Mal52_08030 (clpX) - ATP-dependent Clp protease ATP-binding subunit ClpX
+  - Mal52_08090 (afsK_1) - Serine/threonine-protein kinase AfsK
+  - Mal52_00720 (stkP_1) - Serine/threonine-protein kinase StkP
 
-5. **Query**: RNA features (tRNA and rRNA)
-   **Results**: Retrieved 20 tRNAs with amino acid specificity (tRNA-Ile, tRNA-Ala, tRNA-Gly, etc.). Standard tRNA set for translation. No rRNA in first 20 results.
-
-6. **Query**: BioProject and BioSample links
-   **Results**: Found 10 entries with both BioProject and BioSample links. Example: CP036276.1 → PRJNA485700 + SAMN10954015. Multiple plasmids from same BioProject.
+### Query 5: RNA features in CP036276.1
+- **Search**: Union of Transfer_RNA and Ribosomal_RNA
+- **Results**: 30 tRNA entries including:
+  - tRNA-Ile, tRNA-Ala, tRNA-Gly, tRNA-Pro, tRNA-Glu, etc.
 
 ## SPARQL Queries Tested
 
 ```sparql
-# Query 1: Search entries by organism (bif:contains at entry level)
+# Query 1: Search entries by organism
 PREFIX nuc: <http://ddbj.nig.ac.jp/ontologies/nucleotide/>
 
 SELECT ?entry ?organism ?relevance
@@ -112,47 +79,11 @@ WHERE {
 }
 ORDER BY DESC(?relevance)
 LIMIT 10
+# Results: E. coli entries with relevance scores
 ```
-**Results**: Successfully retrieved 10 E. coli entries with relevance scoring. Shows bif:contains effective for organism-level search.
 
 ```sparql
-# Query 2: Gene coordinates with FALDO (entry-filtered)
-PREFIX nuc: <http://ddbj.nig.ac.jp/ontologies/nucleotide/>
-PREFIX faldo: <http://biohackathon.org/resource/faldo#>
-
-SELECT ?locus_tag ?start ?end
-FROM <http://rdfportal.org/dataset/ddbj>
-WHERE {
-  ?gene a nuc:Gene ;
-        nuc:locus_tag ?locus_tag ;
-        faldo:location ?region .
-  ?region faldo:begin/faldo:position ?start ;
-          faldo:end/faldo:position ?end .
-  FILTER(CONTAINS(STR(?gene), "CP036276.1"))
-}
-LIMIT 10
-```
-**Results**: Retrieved genes with precise coordinates. FALDO property paths working (begin/position, end/position).
-
-```sparql
-# Query 3: Product search within entry (FILTER CONTAINS)
-PREFIX nuc: <http://ddbj.nig.ac.jp/ontologies/nucleotide/>
-
-SELECT ?locus_tag ?product
-FROM <http://rdfportal.org/dataset/ddbj>
-WHERE {
-  ?cds a nuc:Coding_Sequence ;
-       nuc:locus_tag ?locus_tag ;
-       nuc:product ?product .
-  FILTER(CONTAINS(STR(?cds), "CP036276.1"))
-  FILTER(CONTAINS(LCASE(?product), "protease") || CONTAINS(LCASE(?product), "peptidase"))
-}
-LIMIT 20
-```
-**Results**: Found 20 protease/peptidase genes. Entry filtering + product filtering combination works efficiently.
-
-```sparql
-# Query 4: Gene-CDS-Protein integration (complex join)
+# Query 2: Gene-CDS-Protein integration
 PREFIX nuc: <http://ddbj.nig.ac.jp/ontologies/nucleotide/>
 PREFIX sio: <http://semanticscience.org/resource/>
 
@@ -167,12 +98,31 @@ WHERE {
   FILTER(CONTAINS(STR(?protein_id), "ncbiprotein"))
   FILTER(CONTAINS(STR(?gene), "CP036276.1"))
 }
-LIMIT 10
+LIMIT 20
+# Results: Locus tags with products and NCBI Protein IDs (e.g., QDU42347.1)
 ```
-**Results**: Successfully joined genes, CDS, and proteins. Demonstrates sio:SIO_010081 (uppercase) linkage working.
 
 ```sparql
-# Query 5: RNA features with UNION
+# Query 3: Entry with BioProject/BioSample links
+PREFIX nuc: <http://ddbj.nig.ac.jp/ontologies/nucleotide/>
+
+SELECT ?entry ?label ?organism ?bioproject ?biosample
+FROM <http://rdfportal.org/dataset/ddbj>
+WHERE {
+  ?entry a nuc:Entry ;
+         rdfs:label ?label ;
+         nuc:organism ?organism .
+  OPTIONAL { 
+    ?entry nuc:dblink ?bioproject .
+    FILTER(CONTAINS(STR(?bioproject), "bioproject"))
+  }
+  FILTER(?entry = <http://identifiers.org/insdc/CP036276.1>)
+}
+# Results: Symmachiella dynata with PRJNA485700 and SAMN10954015
+```
+
+```sparql
+# Query 4: RNA features by type
 PREFIX nuc: <http://ddbj.nig.ac.jp/ontologies/nucleotide/>
 
 SELECT ?rna_type ?product
@@ -190,133 +140,85 @@ WHERE {
     FILTER(CONTAINS(STR(?rna), "CP036276.1"))
   }
 }
-LIMIT 20
+LIMIT 30
+# Results: tRNA features for various amino acids
 ```
-**Results**: Retrieved tRNAs with amino acid specificity. UNION pattern working for different RNA types.
-
-```sparql
-# Query 6: BioProject/BioSample cross-references
-PREFIX nuc: <http://ddbj.nig.ac.jp/ontologies/nucleotide/>
-
-SELECT ?entry ?bioproject ?biosample
-FROM <http://rdfportal.org/dataset/ddbj>
-WHERE {
-  ?entry a nuc:Entry ;
-         nuc:dblink ?bioproject ;
-         nuc:dblink ?biosample .
-  FILTER(CONTAINS(STR(?bioproject), "bioproject"))
-  FILTER(CONTAINS(STR(?biosample), "biosample"))
-}
-LIMIT 10
-```
-**Results**: Retrieved entries with both BioProject and BioSample links. Shows external database integration.
 
 ## Interesting Findings
 
-### Biological/Scientific Content
-1. **Protease Diversity**: CP036276.1 genome contains 20+ different protease/peptidase families including ATP-dependent Clp, leader peptidases, signal peptide peptidases, FtsH, HtrA
-2. **tRNA Gene Set**: Standard set of tRNAs for all amino acids (Ile, Ala, Gly, Pro, Glu, Cys, Arg, Ser, Leu, Met, Asp, Lys, Val)
-3. **Hypothetical Proteins**: Many CDS annotated as "hypothetical protein" suggesting unknowns in bacterial genomes
-4. **Gene Density**: CP036276.1 has genes every ~1000-2000 bp showing typical bacterial genome compactness
-5. **Protein Translations**: >95% of CDS have full amino acid translations available
+### Specific Entities for Good Questions
+1. **CP036276.1**: Complete genome of Symmachiella dynata (well-annotated)
+2. **Mal52_08030 (clpX)**: ATP-dependent Clp protease with NCBI Protein QDU42347.1
+3. **E. coli genomes**: Multiple DDBJ entries (AP026093.1, etc.)
+4. **Bacillus subtilis**: Multiple strains in database
 
-### Genomic Annotation Patterns
-- **Locus Tags**: >99% coverage, most reliable identifier (e.g., Mal52_08030)
-- **Gene Symbols**: ~60% coverage, some genes unnamed
-- **Product Descriptions**: >95% coverage for CDS
-- **FALDO Coordinates**: >99% of features have structured positions
-- **Protein Cross-refs**: All CDS link to NCBI Protein database
+### Unique Properties/Patterns
+- FALDO coordinate system for precise genomic positions
+- Gene-CDS linkage via SIO_010081 (case-sensitive)
+- BioProject/BioSample cross-references for experimental context
+- Sequence Ontology classification (SO terms)
+- identifiers.org URIs for standardized cross-references
 
-### Entry Organization
-- **Multiple Accessions**: AP026093-AP026119 series suggests related sequences (chromosomes/plasmids)
-- **CP036276.1**: Complete chromosome of Symmachiella dynata strain Mal52
-- **Prokaryotic Focus**: Mostly bacterial and archaeal genomes
-- **Daily Updates**: Continuous integration from INSDC submissions
+### Connections to Other Databases
+- **BioProject**: Experimental project metadata (e.g., PRJNA485700)
+- **BioSample**: Specimen information (e.g., SAMN10954015)
+- **NCBI Protein**: RefSeq protein sequences (e.g., QDU42347.1)
+- **NCBI Taxonomy**: Classification via ro:0002162 and rdfs:seeAlso
 
-### Data Integration Opportunities
-- **BioProject**: Links to project-level metadata (PRJNA numbers)
-- **BioSample**: Links to sample metadata (SAMN numbers)
-- **NCBI Protein**: Every CDS links to RefSeq protein (QDU prefixes)
-- **NCBI Taxonomy**: All features taxonomically classified via ro:0002162
-- **Sequence Ontology**: Features typed via rdfs:subClassOf to SO terms
-
-### Performance Insights
-- **Entry Filtering CRITICAL**: Must filter by entry ID before ANY complex queries to prevent timeouts
-- **bif:contains**: Fast for organism search at entry level
-- **FILTER CONTAINS**: Use for product/description searches WITHIN entries
-- **Property Case Sensitivity**: sio:SIO_010081 MUST be uppercase
-- **Coordinate Queries**: FALDO efficient when entry-filtered first
+### Verifiable Facts
+- CP036276.1 organism: Symmachiella dynata
+- CP036276.1 BioProject: PRJNA485700
+- Mal52_08030 product: ATP-dependent Clp protease ATP-binding subunit ClpX
+- Mal52_08030 protein: QDU42347.1
 
 ## Question Opportunities by Category
 
-**FOCUS ON BIOLOGICAL CONTENT, NOT INFRASTRUCTURE METADATA**
-
 ### Precision
-- "What is the NCBI Protein ID for the gene with locus tag Mal52_08030?" (QDU42347.1)
-- "What is the start position of the clpX gene in CP036276.1?" (1001623)
-- "What is the product annotation for locus tag Mal52_08430?" (ATP-dependent Clp protease proteolytic subunit)
-- "What amino acid does tRNA-Ile carry in CP036276.1?" (Isoleucine)
-- "What is the BioSample ID for entry CP036276.1?" (SAMN10954015)
+- "What organism does DDBJ entry CP036276.1 belong to?" → Symmachiella dynata
+- "What is the NCBI Protein accession for the clpX gene in CP036276.1?" → QDU42347.1
+- "What is the locus tag for ATP-dependent Clp protease in Symmachiella dynata?" → Mal52_08030
 
 ### Completeness
-- "How many protease/peptidase genes are in CP036276.1?" (20+)
-- "How many different tRNA genes are in a typical bacterial genome?" (Count from query)
-- "What is the full set of tRNA amino acid specificities in CP036276.1?" (Ile, Ala, Gly, Pro, Glu, Cys, Arg, Ser, Leu, Met, Asp, Lys, Val)
-- "How many genes have the prefix Mal52_ in CP036276.1?" (Need count)
-- "List all Clp protease subunits in CP036276.1" (ClpX, proteolytic subunit, precursor)
+- "How many tRNA genes are in DDBJ entry CP036276.1?"
+- "List all genes with 'kinase' in their product description from CP036276.1"
 
 ### Integration
-- "What is the NCBI Protein accession for the ATP-dependent Clp protease in CP036276.1?" (QDU42347.1)
-- "Convert locus tag Mal52_08030 to its corresponding NCBI Protein ID"
-- "What BioProject does entry CP036276.1 belong to?" (PRJNA485700)
-- "Link BioSample SAMN10954015 to its DDBJ entry accession"
-- "What is the NCBI Taxonomy ID for Symmachiella dynata?"
+- "What BioProject is DDBJ entry CP036276.1 associated with?" → PRJNA485700
+- "Link DDBJ entry CP036276.1 to its BioSample record" → SAMN10954015
+- "What NCBI Protein IDs are associated with genes in CP036276.1?"
 
 ### Currency
-- "What are the most recently added E. coli genome entries?" (AP026xxx series from query)
-- "What is the update frequency for DDBJ RDF data?" (Daily)
-- "Which genomes were deposited under BioProject PRJNA485700 recently?"
-- "What new hypothetical proteins have been annotated in recent submissions?"
+- "What new E. coli genome sequences are available in DDBJ?"
+- "When was entry CP036276.1 last updated?"
 
 ### Specificity
-- "What is the function of the HtrA protease in CP036276.1?" (Serine protease)
-- "Find the FtsH protease gene in CP036276.1" (Mal52_13200 - ATP-dependent zinc metalloprotease)
-- "What is the codon start position for translation in a specific CDS?"
-- "Which signal peptide peptidases are present in the Symmachiella dynata genome?"
-- "What is the mol_type annotation for phage sequences?" (genomic DNA)
+- "What is the product of gene Mal52_08030 in CP036276.1?" → ATP-dependent Clp protease ATP-binding subunit ClpX
+- "Find regulatory genes (BlaI, MprA) in Symmachiella dynata genome"
 
 ### Structured Query
-- "Find all genes between positions 1000000-1010000 in CP036276.1"
-- "List all membrane-associated proteases (leader peptidase, signal peptidase) in CP036276.1"
-- "Find all genes with products containing 'ATP-dependent' AND 'protease' in CP036276.1"
-- "Retrieve all tRNA genes with their amino acid specificities AND genomic positions"
-- "Find all CDS with translations longer than 400 amino acids in CP036276.1"
+- "Find all proteases and peptidases in CP036276.1"
+- "List genes with both gene symbol and NCBI Protein cross-reference in CP036276.1"
+- "Find entries for specific organism with BioProject links"
 
 ## Notes
 
-### Critical Limitations
-- **Entry filtering MANDATORY**: All complex queries MUST filter by entry ID first or will timeout
-- **Case sensitivity**: sio:SIO_010081 must be uppercase (sio:010081 won't work)
-- **No aggregation without filtering**: COUNT/GROUP BY without entry filter causes timeout
-- **bif:contains scope**: Only effective for organism search at entry level, not for products
-- **FALDO performance**: Coordinate queries require entry filtering first
+### Limitations
+- Queries timeout without entry ID filtering
+- Mostly prokaryotic data
+- Some organism searches (e.g., "human") may timeout
+- Aggregation queries (COUNT) require sampling instead
 
 ### Best Practices
-1. **Always filter by entry ID**: `FILTER(CONTAINS(STR(?var), "ENTRY_ID"))` before complex queries
-2. **Use bif:contains for organism**: Entry-level organism search only
-3. **Use FILTER CONTAINS for products**: Within-entry product searches
-4. **Uppercase SIO property**: `sio:SIO_010081` not `sio:010081`
-5. **OPTIONAL for gene symbols**: ~40% don't have gene symbols, use locus_tag
-6. **FROM clause required**: `FROM <http://rdfportal.org/dataset/ddbj>`
-7. **Sample instead of aggregate**: Use LIMIT instead of COUNT for exploration
-8. **FALDO property paths**: `faldo:location/faldo:begin/faldo:position`
+- Always include `FROM <http://rdfportal.org/dataset/ddbj>` in SPARQL
+- Use `bif:contains` for organism searches at entry level
+- Always filter by entry ID before complex joins: `FILTER(CONTAINS(STR(?gene), "ENTRY_ID"))`
+- Use uppercase `sio:SIO_010081` (case-sensitive)
+- Use OPTIONAL for gene symbols (~60% coverage)
+- Use LIMIT instead of COUNT for exploratory queries
 
-### Unique Strengths
-- **FALDO genomic coordinates**: Structured position queries enable range-based searches
-- **Complete gene annotations**: Gene → CDS → Protein linkage with functional descriptions
-- **tRNA/rRNA coverage**: RNA genes annotated with specificity
-- **Daily updates**: Continuous integration from INSDC
-- **Protein cross-references**: All CDS link to NCBI Protein RefSeq
-- **BioProject/BioSample links**: Experimental context and metadata
-- **Sequence Ontology**: Semantic feature typing
-- **Translation data**: Amino acid sequences for >95% of CDS
+### Data Quality
+- >99% entries have organism information
+- >99% genes have locus tags
+- ~60% genes have gene symbols
+- >95% CDS have products
+- >99% features have FALDO coordinates

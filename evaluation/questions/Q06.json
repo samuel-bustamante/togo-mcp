@@ -2,85 +2,85 @@
   {
     "id": 61,
     "category": "Precision",
-    "question": "What is the PDB ID for the first cryo-EM structure to break the 2 Angstrom resolution barrier?",
-    "expected_answer": "Specific PDB IDs of high-resolution cryo-EM structures from recent years",
-    "notes": "Database: PDB. Tests knowledge of structural biology milestones. Cryo-EM resolution has dramatically improved. Requires searching high-resolution cryo-EM entries. Found in pdb_exploration.md."
+    "question": "What is the ChEBI ID for acetylsalicylic acid (aspirin)?",
+    "expected_answer": "CHEBI:15365",
+    "notes": "Database: ChEBI. Verified in chebi_exploration.md. Aspirin has formula C9H8O4 and mass 180.157. Tests chemical entity precision in ontology."
   },
   {
     "id": 62,
     "category": "Precision",
-    "question": "What is the canonical SMILES string for penicillin G in PubChem?",
-    "expected_answer": "CC1(C)SC2C(NC(=O)Cc3ccccc3)C(=O)N2C1C(=O)O",
-    "notes": "Database: PubChem. Tests antibiotic chemical structure retrieval. Penicillin G is benzylpenicillin, CID 5904. Verified using get_compound_attributes. Found in pubchem_exploration.md."
+    "question": "What is the UniProt mnemonic for human BRCA1?",
+    "expected_answer": "BRCA1_HUMAN",
+    "notes": "Database: UniProt. Verified in uniprot_exploration.md. P38398 is the accession, BRCA1_HUMAN is the mnemonic. Tests protein naming conventions."
   },
   {
     "id": 63,
     "category": "Completeness",
-    "question": "How many human glycoproteins are annotated in GlyCosmos?",
-    "expected_answer": "Over 16,000 human glycoproteins",
-    "notes": "Database: GlyCosmos. Tests species-specific glycoprotein counting. GlyCosmos integrates glycoproteomics data. Verified via SPARQL count with organism filter. Found in glycosmos_exploration.md."
+    "question": "How many topical descriptors are in MeSH?",
+    "expected_answer": "30,248",
+    "notes": "Database: MeSH. Verified in mesh_exploration.md via SPARQL COUNT of TopicalDescriptor class. MeSH provides controlled vocabulary for biomedicine. Tests terminology completeness."
   },
   {
     "id": 64,
     "category": "Completeness",
-    "question": "How many culture media recipes are documented in MediaDive?",
-    "expected_answer": "3,289 media recipes",
-    "notes": "Database: MediaDive. Tests microbiology culture database size. MediaDive provides standardized media formulations. Verified via database statistics. Found in mediadive_exploration.md."
+    "question": "How many chemical ingredients are catalogued in MediaDive?",
+    "expected_answer": "1,489",
+    "notes": "Database: MediaDive. Verified in mediadive_exploration.md. Ingredients include salts, carbon sources, vitamins, etc. Tests cultivation ingredient coverage."
   },
   {
     "id": 65,
     "category": "Integration",
-    "question": "What is the HGNC gene symbol for Ensembl gene ENSG00000012048?",
-    "expected_answer": "BRCA1",
-    "notes": "Databases: Ensembl, HGNC. Tests gene nomenclature conversion. HGNC provides approved gene symbols. Verified using Ensembl cross-references or togoid. Found in ensembl_exploration.md."
+    "question": "What PubChem CID corresponds to ChEMBL compound CHEMBL25 (aspirin)?",
+    "expected_answer": "2244",
+    "notes": "Database: ChEMBL, PubChem. Verified in chembl_exploration.md and pubchem_exploration.md. Tests compound identifier cross-referencing."
   },
   {
     "id": 66,
     "category": "Integration",
-    "question": "What PubMed articles are annotated with both the disease term for Alzheimer disease and the gene TP53 in PubTator?",
-    "expected_answer": "Specific PMIDs linking TP53 to Alzheimer research",
-    "notes": "Databases: PubTator, PubMed. Tests literature-based gene-disease association. Requires finding co-annotated articles. Verified using PubTator queries. Found in pubtator_exploration.md."
+    "question": "What MONDO ID is mapped to NANDO Parkinson's disease (NANDO:1200010)?",
+    "expected_answer": "MONDO:0005180",
+    "notes": "Database: NANDO, MONDO. Verified in nando_exploration.md via skos:closeMatch. Tests rare disease ontology integration."
   },
   {
     "id": 67,
     "category": "Currency",
-    "question": "What new disease pathways related to metabolic syndrome have been added to Reactome in 2024?",
-    "expected_answer": "Recent pathway additions for diabetes, obesity, and metabolic disorders",
-    "notes": "Database: Reactome. Tests access to recent pathway curation. Reactome continuously adds pathways based on new research. Requires filtering by update date and disease category. Found in reactome_exploration.md."
+    "question": "How many NMR structures are in the PDB?",
+    "expected_answer": "13,902",
+    "notes": "Database: PDB. Verified in pdb_exploration.md via SPARQL GROUP BY experimental method. NMR is third most common after X-ray and cryo-EM. Tests structural methodology statistics."
   },
   {
     "id": 68,
     "category": "Currency",
-    "question": "How many new antimicrobial resistance genes were identified in AMR Portal data from 2024?",
-    "expected_answer": "Multiple new AMR gene annotations from recent surveillance",
-    "notes": "Database: AMR Portal. Tests access to emerging resistance mechanisms. AMR surveillance identifies new resistance determinants. Requires temporal filtering of gene discovery. Found in amrportal_exploration.md."
+    "question": "How many NANDO diseases have MONDO ontology mappings?",
+    "expected_answer": "Approximately 2,341 (84%)",
+    "notes": "Database: NANDO. Verified in nando_exploration.md. Cross-references enable integration with international disease ontologies. Tests rare disease integration status."
   },
   {
     "id": 69,
     "category": "Specificity",
-    "question": "What is the notification number for Amyotrophic Lateral Sclerosis in NANDO?",
-    "expected_answer": "Specific Japanese government designation number",
-    "notes": "Database: NANDO. Tests Japanese rare disease administrative data. Notification numbers are used for healthcare reimbursement in Japan. Verified via NANDO search. Found in nando_exploration.md."
+    "question": "What glycosylation positions are known for Platelet glycoprotein Ib beta chain (P13224) in GlyCosmos?",
+    "expected_answer": "Positions 65, 66, 83",
+    "notes": "Database: GlyCosmos. Verified in glycosmos_exploration.md via glycosylation site query. Tests specific glycoprotein modification data."
   },
   {
     "id": 70,
     "category": "Specificity",
-    "question": "What is the minimal inhibitory concentration (MIC) breakpoint for carbapenem resistance in Klebsiella pneumoniae according to AMR Portal?",
-    "expected_answer": "Typically ≥4 μg/mL for meropenem resistance",
-    "notes": "Database: AMR Portal. Tests clinical microbiology resistance criteria. MIC breakpoints define resistance categories. This is biologically relevant as it affects treatment decisions. Verified via AMR Portal resistance data. Found in amrportal_exploration.md."
+    "question": "What is the Sialyl Lewis x epitope ID in GlyCosmos?",
+    "expected_answer": "EP0012",
+    "notes": "Database: GlyCosmos. Verified in glycosmos_exploration.md. Sialyl Lewis x is important in inflammation and cancer metastasis. Tests glycoepitope identification."
   },
   {
     "id": 71,
     "category": "Structured Query",
-    "question": "Find all ChEMBL compounds that target protein kinases and have oral bioavailability.",
-    "expected_answer": "Multiple kinase inhibitor drug candidates",
-    "notes": "Database: ChEMBL. Tests multi-property compound filtering. Requires combining target class with pharmacokinetic properties. Verified using ChEMBL search with filters. Found in chembl_exploration.md."
+    "question": "List the main components of standard LB medium according to MediaDive.",
+    "expected_answer": "Tryptone (10 g/L), Yeast extract (5 g/L), NaCl (10 g/L)",
+    "notes": "Database: MediaDive. Verified in mediadive_exploration.md via composition query for Medium 381. Tests medium recipe retrieval."
   },
   {
     "id": 72,
     "category": "Structured Query",
-    "question": "What UniProt proteins have both signal peptide and transmembrane domains?",
-    "expected_answer": "Thousands of membrane and secreted proteins",
-    "notes": "Database: UniProt. Tests protein feature combination query. Signal peptides direct secretion; transmembrane domains anchor proteins. Requires feature annotation filtering. Found in uniprot_exploration.md."
+    "question": "Which countries have the most ciprofloxacin-resistant E. coli isolates in AMR Portal?",
+    "expected_answer": "United States (1,041), United Kingdom (790), Norway (313)",
+    "notes": "Database: AMR Portal. Verified in amrportal_exploration.md via geographic aggregation query. Tests geographic resistance pattern analysis."
   }
 ]

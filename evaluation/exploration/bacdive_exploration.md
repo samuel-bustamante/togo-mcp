@@ -1,328 +1,224 @@
-# BacDive Exploration Report
+# BacDive (Bacterial Diversity Metadatabase) Exploration Report
 
 ## Database Overview
-- **Purpose**: Standardized bacterial and archaeal strain information metadatabase
-- **Scope**: 97,000+ strain records with phenotypic and genotypic characterizations
-- **Key Data Types**: 
-  - Taxonomy (genus, species, family, order, class, phylum, domain)
-  - Morphology (Gram stain, cell motility)
-  - Physiology (oxygen tolerance, enzyme activities)
-  - Culture conditions (media, temperature, pH)
-  - Molecular data (16S rRNA sequences, genomes)
-  - Geographic origin and isolation sources
-  - Culture collection numbers and references
+- **Purpose**: Standardized bacterial and archaeal strain information for microbiology research
+- **Scope**: 97,334 strain records with phenotypic and genotypic characterizations
+- **Key data types**: Taxonomy, morphology, physiology, cultivation conditions, molecular sequences
+- **Focus**: Type strains (20,060), culture collection links, enzyme activities
 
 ## Schema Analysis (from MIE file)
 
-### Main Entity Types
-1. **schema:Strain** - Central hub entity
-   - Full taxonomic hierarchy (domain → phylum → class → order → family → genus → species)
-   - BacDive ID and NCBI Taxonomy ID
-   - Scientific name and designation
-   - Type strain indicator (boolean)
-   - Description text
-
-2. **Phenotype Entities** (all link via schema:describesStrain)
-   - **schema:Enzyme** - Enzyme activities with positive/negative/variable results, EC numbers
-   - **schema:GramStain** - Gram staining results (positive/negative/variable)
-   - **schema:CellMotility** - Motility indicator (boolean)
-   - **schema:OxygenTolerance** - Aerobic/anaerobic classification
-
-3. **Culture Condition Entities**
-   - **schema:CultureMedium** - Medium names with optional MediaDive links
-   - **schema:CultureTemperature** - Temperature ranges (start/end in °C)
-   - **schema:CulturePH** - pH ranges (start/end)
-
-4. **Molecular Data**
-   - **schema:16SSequence** - 16S rRNA sequences with accession numbers, length, database source (ENA/GenBank)
-   - **schema:GenomeSequence** - Genome sequences with accession and source
-
-5. **Identifiers and References**
-   - **schema:CultureCollectionNumber** - Strain repository numbers (DSMZ, JCM, KCTC, CCUG) with URLs
-   - **schema:LocationOfOrigin** - Geographic origin with country, latitude, longitude
-   - **schema:Reference** - Literature references with PubMed IDs and DOIs
+### Main Properties Available
+- **Taxonomy**: `schema:hasGenus`, `schema:hasSpecies`, `schema:hasFamily`, `schema:hasOrder`, `schema:hasClass`, `schema:hasPhylum`, `schema:hasDomain`
+- **Identifiers**: `schema:hasBacDiveID`, `schema:hasTaxID` (NCBI)
+- **Phenotypes**: 
+  - `schema:GramStain` with `schema:hasGramStain` (positive/negative/variable)
+  - `schema:CellMotility` with `schema:isMotile` (boolean)
+  - `schema:OxygenTolerance` with `schema:hasOxygenTolerance` (aerobe/anaerobe/facultative)
+- **Culture conditions**:
+  - `schema:CultureMedium` with `schema:hasMediaLink` to MediaDive
+  - `schema:CultureTemperature` with `schema:hasTemperatureRangeStart/End`
+  - `schema:CulturePH` with `schema:hasPHRangeStart/End`
+- **Sequences**: `schema:16SSequence`, `schema:GenomeSequence` with `schema:hasSequenceAccession`
+- **Culture collections**: `schema:CultureCollectionNumber` with `schema:hasLink`
+- **Enzymes**: `schema:Enzyme` with `schema:hasActivity` (+/-/variable)
 
 ### Important Relationships
-- **Hub-and-spoke architecture**: Strain is central entity, all other data connects via `schema:describesStrain`
-- **Multiple inheritance**: Enzyme is also Protein and GeneProduct
-- **Optional data**: Use OPTIONAL blocks for phenotypes (~40% coverage)
+- Hub-and-spoke: All entities link to Strain via `schema:describesStrain`
+- NCBI Taxonomy IDs (`schema:hasTaxID`) on all strains
+- Culture collection links to DSMZ, JCM, KCTC, ATCC, NBRC
+- Sequence accessions to ENA/GenBank
+- MediaDive links for culture media recipes
 
 ### Query Patterns Observed
-- Use `bif:contains` for keyword search with boolean operators (AND, OR, NOT)
-- Must be triple pattern: `?var bif:contains "'keyword'" option (score ?sc)`
-- Never use `?score` as variable name (reserved keyword)
-- Always use OPTIONAL for phenotypes (incomplete coverage)
-- Filter by genus/species using CONTAINS(LCASE(?var), 'text') for efficiency
-- FROM clause: `FROM <http://rdfportal.org/dataset/bacdive>`
+- Keyword search using `bif:contains` with boolean operators
+- Temperature filtering with `schema:hasTemperatureRangeEnd >= value`
+- Type strain filtering with `schema:isTypeStrain true`
+- BacDive ID lookup with `schema:hasBacDiveID`
 
 ## Search Queries Performed
 
-1. **Query**: Search for thermophilic strains using bif:contains
-   **Results**: Empty results - likely because "thermophilic" appears in descriptions not labels. Need to search dct:description field instead.
+### Query 1: Thermotoga strains
+- **Search**: `bif:contains "'Thermotoga'"`
+- **Results**: 9 strains including:
+  - Thermotoga maritima 17060 (type strain, DSM 3109)
+  - Thermotoga petrophila 17068
+  - Thermotoga neapolitana 17061, 17062
 
-2. **Query**: Filter Bacillus genus strains
-   **Results**: Found 20 strains including Paenibacillus, Actinobacillus, Bacillus, Solibacillus, Lactobacillus, Marinilactibacillus species. Shows genus filter working correctly.
+### Query 2: Hyperthermophiles (>80°C growth)
+- **Search**: `schema:hasTemperatureRangeEnd >= 80`
+- **Results**: 221 strains capable of growth above 80°C
+- Top temperature: Pyrococcus kukulkanii at 112°C optimal growth
+- Other hyperthermophiles: Pyrolobus fumarii (103°C), Aeropyrum pernix (102°C)
 
-3. **Query**: Retrieve strains with 16S sequences
-   **Results**: Found 20 strains with 16S sequences ranging from 207-1532 bp in length. Accessions from JN/JQ series (NCBI). Coverage includes Nocardia, Mycobacterium, Sphingomonas, Clostridium, etc.
+### Query 3: Methanocaldococcus jannaschii details
+- **Search**: `bif:contains "'jannaschii'"`
+- **Results**: Found at BacDive ID 6981
+  - Culture medium: DSMZ Medium 282 (linked to MediaDive)
+  - Taxonomy confirmed: Methanocaldococcus genus (formerly Methanococcus)
 
-4. **Query**: Positive enzyme activities
-   **Results**: Found enzymes including catalase, beta-galactosidase, lysine decarboxylase, ornithine decarboxylase, gelatinase, amylase, DNase, caseinase, oxidase. All with "+" activity.
+### Query 4: Culture collections for Thermotoga maritima
+- **Search**: Culture collection numbers for strain 17060
+- **Results**: 4 culture collection links:
+  - DSM 3109 (DSMZ)
+  - ATCC 43589
+  - JCM 10099
+  - NBRC 100826
 
-5. **Query**: E. coli growth conditions
-   **Results**: Retrieved culture media (CIP Medium 3, CIP Medium 72), temperature ranges (5-41°C with 30°C optimal), but no pH data in these records. Multiple temperature points per strain.
-
-6. **Query**: DSMZ culture collection numbers
-   **Results**: Found 20 DSM strains (DSM 45197, DSM 45095, etc.) all with links to DSMZ catalogue. Strong DSMZ representation as expected.
-
-7. **Query**: Bacillus phenotype profile (Gram stain + motility + oxygen tolerance)
-   **Results**: All B. subtilis strains are Gram-positive, mostly motile (isMotile=1), mix of obligate aerobe and facultative anaerobe. B. cereus and B. licheniformis also present.
+### Query 5: Type strains count
+- **Search**: `schema:isTypeStrain true`
+- **Results**: 20,060 type strains (~21% of all strains)
 
 ## SPARQL Queries Tested
 
 ```sparql
-# Query 1: Filter by genus name
+# Query 1: Search strains by keyword
 PREFIX schema: <https://purl.dsmz.de/schema/>
 
-SELECT ?strain ?label ?genus ?species
+SELECT ?strain ?label ?sc
 FROM <http://rdfportal.org/dataset/bacdive>
 WHERE {
   ?strain a schema:Strain ;
-          rdfs:label ?label ;
-          schema:hasGenus ?genus ;
-          schema:hasSpecies ?species .
-  FILTER(CONTAINS(LCASE(?genus), "bacillus"))
+          rdfs:label ?label .
+  ?label bif:contains "'Thermotoga'" option (score ?sc) .
 }
+ORDER BY DESC(?sc)
 LIMIT 20
+# Results: 9 Thermotoga strains found
 ```
-**Results**: Successfully retrieved 20 Bacillus-related strains. Shows CONTAINS(LCASE()) effective for case-insensitive genus filtering.
 
 ```sparql
-# Query 2: Strains with 16S sequences
+# Query 2: Find hyperthermophiles by temperature
 PREFIX schema: <https://purl.dsmz.de/schema/>
 
-SELECT ?strain ?strainLabel ?accession ?length
+SELECT ?strain ?strainLabel ?tempStart ?tempEnd
 FROM <http://rdfportal.org/dataset/bacdive>
 WHERE {
   ?strain a schema:Strain ;
           rdfs:label ?strainLabel .
-  ?seq a schema:16SSequence ;
-       schema:describesStrain ?strain ;
-       schema:hasSequenceAccession ?accession ;
-       schema:hasSequenceLength ?length .
-}
-LIMIT 20
-```
-**Results**: Retrieved 16S sequences with lengths 207-1532 bp, all from JN/JQ accession series. Demonstrates molecular data availability.
-
-```sparql
-# Query 3: Positive enzyme activities
-PREFIX schema: <https://purl.dsmz.de/schema/>
-
-SELECT ?strainLabel ?enzymeLabel ?activity
-FROM <http://rdfportal.org/dataset/bacdive>
-WHERE {
-  ?strain a schema:Strain ;
-          rdfs:label ?strainLabel .
-  ?enzyme a schema:Enzyme ;
-          schema:describesStrain ?strain ;
-          rdfs:label ?enzymeLabel ;
-          schema:hasActivity ?activity .
-  FILTER(?activity = "+")
-}
-LIMIT 20
-```
-**Results**: Found diverse positive enzyme activities (catalase, beta-galactosidase, decarboxylases, etc.) across E. coli, Enterococcus, Proteus, Acinetobacter, Haemophilus, Salmonella, Kitasatospora, Bacillus, Aquaspirillum.
-
-```sparql
-# Query 4: Complete growth conditions for Escherichia
-PREFIX schema: <https://purl.dsmz.de/schema/>
-
-SELECT ?label ?medium ?tempStart ?tempEnd ?phStart ?phEnd
-FROM <http://rdfportal.org/dataset/bacdive>
-WHERE {
-  ?strain a schema:Strain ;
-          rdfs:label ?label ;
-          schema:hasGenus ?genus .
-  FILTER(CONTAINS(LCASE(?genus), "escherichia"))
-  
-  OPTIONAL {
-    ?m a schema:CultureMedium ;
-       schema:describesStrain ?strain ;
-       rdfs:label ?medium .
-  }
-  OPTIONAL {
-    ?temp a schema:CultureTemperature ;
-          schema:describesStrain ?strain ;
-          schema:hasTemperatureRangeStart ?tempStart ;
-          schema:hasTemperatureRangeEnd ?tempEnd .
-  }
-  OPTIONAL {
-    ?ph a schema:CulturePH ;
+  ?temp a schema:CultureTemperature ;
         schema:describesStrain ?strain ;
-        schema:hasPHRangeStart ?phStart ;
-        schema:hasPHRangeEnd ?phEnd .
-  }
+        schema:hasTemperatureRangeEnd ?tempEnd .
+  FILTER(?tempEnd >= 80)
 }
-LIMIT 20
+ORDER BY DESC(?tempEnd)
+LIMIT 30
+# Results: Pyrococcus kukulkanii tops at 112°C, 221 total hyperthermophiles
 ```
-**Results**: Retrieved E. coli growth conditions with CIP Media 3 and 72, temperature ranges 5-41°C. pH data absent for these samples. OPTIONAL clauses prevent excluding strains with missing data.
 
 ```sparql
-# Query 5: DSMZ culture collection links
+# Query 3: Get culture medium with MediaDive link
 PREFIX schema: <https://purl.dsmz.de/schema/>
 
-SELECT ?strain ?collectionLabel ?link
+SELECT ?strain ?strainLabel ?medium ?mediaLink
 FROM <http://rdfportal.org/dataset/bacdive>
 WHERE {
-  ?strain a schema:Strain .
+  ?strain a schema:Strain ;
+          rdfs:label ?strainLabel .
+  ?m a schema:CultureMedium ;
+     schema:describesStrain ?strain ;
+     rdfs:label ?medium .
+  OPTIONAL { ?m schema:hasMediaLink ?mediaLink }
+  FILTER(?strain = <https://purl.dsmz.de/bacdive/strain/6981>)
+}
+# Results: Methanocaldococcus jannaschii uses DSMZ Medium 282
+```
+
+```sparql
+# Query 4: Get culture collection numbers
+PREFIX schema: <https://purl.dsmz.de/schema/>
+
+SELECT ?strain ?strainLabel ?collectionLabel ?link
+FROM <http://rdfportal.org/dataset/bacdive>
+WHERE {
+  ?strain a schema:Strain ;
+          rdfs:label ?strainLabel .
   ?ccn a schema:CultureCollectionNumber ;
        schema:describesStrain ?strain ;
-       rdfs:label ?collectionLabel ;
-       schema:hasLink ?link .
-  FILTER(CONTAINS(?collectionLabel, "DSM"))
+       rdfs:label ?collectionLabel .
+  OPTIONAL { ?ccn schema:hasLink ?link }
+  FILTER(?strain = <https://purl.dsmz.de/bacdive/strain/17060>)
 }
-LIMIT 20
+# Results: DSM 3109, ATCC 43589, JCM 10099, NBRC 100826
 ```
-**Results**: Retrieved 20 DSM culture collection numbers with working URLs to DSMZ catalogue. All follow pattern DSM-XXXXX.
-
-```sparql
-# Query 6: Multi-phenotype profile
-PREFIX schema: <https://purl.dsmz.de/schema/>
-
-SELECT ?label ?gramStain ?isMotile ?oxygenTolerance
-FROM <http://rdfportal.org/dataset/bacdive>
-WHERE {
-  ?strain a schema:Strain ;
-          rdfs:label ?label ;
-          schema:hasGenus ?genus .
-  FILTER(CONTAINS(LCASE(?genus), "bacillus"))
-  
-  OPTIONAL {
-    ?gs a schema:GramStain ;
-        schema:describesStrain ?strain ;
-        schema:hasGramStain ?gramStain .
-  }
-  OPTIONAL {
-    ?cm a schema:CellMotility ;
-        schema:describesStrain ?strain ;
-        schema:isMotile ?isMotile .
-  }
-  OPTIONAL {
-    ?ot a schema:OxygenTolerance ;
-        schema:describesStrain ?strain ;
-        schema:hasOxygenTolerance ?oxygenTolerance .
-  }
-  FILTER(BOUND(?gramStain) && BOUND(?isMotile))
-}
-LIMIT 20
-```
-**Results**: Retrieved complete phenotype profiles for Bacillus strains. All Gram-positive, mostly motile, mix of obligate aerobes and facultative anaerobes. FILTER(BOUND()) ensures complete data.
 
 ## Interesting Findings
 
-### Biological/Scientific Content
-1. **Enzyme Diversity**: 573,112 enzyme records averaging 5.9 per strain, covering metabolic capabilities
-2. **Bacillus subtilis Variation**: Multiple strains with different oxygen tolerances (obligate aerobe vs facultative anaerobe)
-3. **16S Sequence Lengths**: Highly variable (207-1532 bp) suggesting partial vs complete sequences
-4. **Temperature Ranges**: E. coli can grow 5-41°C with 30°C optimal
-5. **Culture Media**: CIP Media series well-represented, suggesting French collection influence
+### Specific Entities for Good Questions
+1. **Thermotoga maritima**: BacDive ID 17060, DSM 3109, type strain
+2. **Pyrococcus kukulkanii**: Record for highest growth temperature (112°C)
+3. **Methanocaldococcus jannaschii**: BacDive ID 6981, uses DSMZ Medium 282
+4. **Pyrolobus fumarii**: Growth at 103°C
+5. **Aeropyrum pernix**: Growth at 102°C
 
-### Taxonomic Coverage
-- **97,334 total strains** across bacteria and archaea
-- **100% NCBI Taxonomy linkage** enabling standardized classification
-- **Type strains**: Indicated via isTypeStrain boolean flag
-- **Diverse genera**: Bacillus, Escherichia, Nocardia, Mycobacterium, Sphingomonas, Clostridium, etc.
+### Unique Properties/Patterns
+- Type strain designation enables quality filtering
+- Multiple culture collection cross-references per strain
+- MediaDive integration for culture recipes
+- Comprehensive temperature/pH growth data
 
-### Data Completeness Patterns
-- **Gram stain**: ~40% of strains
-- **16S sequences**: ~35% of strains (87,045 sequences)
-- **Enzyme data**: ~55% of strains
-- **Culture collections**: ~60% of strains (149,377 numbers)
-- **Type strains**: Higher data completeness than non-type strains
+### Connections to Other Databases
+- **NCBI Taxonomy**: `schema:hasTaxID` on all strains
+- **DSMZ/JCM/KCTC/ATCC**: Culture collection links with URLs
+- **ENA/GenBank**: Sequence accessions
+- **MediaDive**: Culture medium recipes via `schema:hasMediaLink`
 
-### Culture Collection Integration
-- **DSMZ dominance**: >90% culture collection coverage
-- **JCM**: ~40% coverage (Japanese Collection)
-- **KCTC**: ~30% coverage (Korean Collection)
-- **All with working URLs** to institutional catalogues
-
-### Molecular Data Availability
-- **87,045 16S sequences** from ENA (~60%) and NCBI GenBank (~40%)
-- **Genome sequences** available for subset
-- **Sequence databases**: Indicated via `fromSequenceDB` property
+### Verifiable Facts
+- Total strains: 97,334
+- Type strains: 20,060 (21%)
+- 16S sequences: ~87,045 (35% coverage)
+- Enzyme records: 573,112
+- Hyperthermophiles (>80°C): 221 strains
+- Highest growth temperature: 112°C (Pyrococcus kukulkanii)
 
 ## Question Opportunities by Category
 
-**FOCUS ON BIOLOGICAL CONTENT, NOT INFRASTRUCTURE METADATA**
-
 ### Precision
-- "What is the DSM culture collection number for Bacillus aryabhattai strain 1290?" (Need to verify from data)
-- "What is the 16S rRNA sequence length for Olivibacter ginsenosidimutans strain 159786?" (1445 bp)
-- "What is the NCBI Taxonomy ID for Acetobacter aceti?" (435)
-- "What is the optimal growth temperature for Escherichia coli strains in BacDive?" (30°C)
-- "What is the specific enzyme activity result for gelatinase in Bacillus aryabhattai?" (+)
+- "What is the BacDive ID for Thermotoga maritima type strain?" → 17060
+- "What is the DSM number for Thermotoga maritima?" → DSM 3109
+- "What culture medium does BacDive recommend for Methanocaldococcus jannaschii?" → DSMZ Medium 282
 
 ### Completeness
-- "How many bacterial strains are in BacDive?" (97,334)
-- "How many enzyme activity records are available?" (573,112)
-- "How many strains have 16S rRNA sequences?" (87,045)
-- "How many culture collection numbers link to DSMZ?" (>90% of 149,377)
-- "What is the average number of enzyme records per strain?" (5.9)
-- "How many strains are designated as type strains?" (Need count)
+- "How many bacterial strains are recorded in BacDive?" → 97,334
+- "How many type strains are in BacDive?" → 20,060
+- "How many strains in BacDive can grow at temperatures above 80°C?" → 221
 
 ### Integration
-- "Convert BacDive strain ID to DSMZ culture collection number"
-- "What is the NCBI Taxonomy ID for a strain with DSM number DSM 45197?"
-- "Find the 16S rRNA sequence accession for strain with BacDive ID X"
-- "Link strain to MediaDive culture medium recipe via hasMediaLink"
-- "What PubMed references are associated with specific strains?"
+- "What is the NCBI Taxonomy ID for Thermotoga maritima?" → 2336
+- "Which culture collections hold Thermotoga maritima strains?" → DSMZ, ATCC, JCM, NBRC
+- "Link BacDive strain to its MediaDive culture medium" → e.g., Medium 282 link
 
 ### Currency
-- "What is the latest version of BacDive data?" (2024)
-- "What are the most recently added strains?" (Need temporal data)
-- "Which strains have genome sequences deposited recently?"
-- "What new culture media have been linked to strains?"
+- "What is the most recently characterized hyperthermophile in BacDive?"
+- "What strains have both genome sequences and 16S rRNA sequences available?"
 
 ### Specificity
-- "What is the oxygen tolerance classification for Aquaspirillum serpens?" (Need to find)
-- "Find rare thermophilic archaea strains with growth temperatures above 70°C"
-- "What is the Gram stain result for Marinilactibacillus psychrotolerans?" (Need to check)
-- "Which strains from the JCM collection are motile anaerobes?"
-- "Find strains from Japan with both 16S sequences and genome data"
+- "What is the highest growth temperature recorded in BacDive?" → 112°C (Pyrococcus kukulkanii)
+- "Which archaeal strain in BacDive has the highest temperature tolerance?" → Pyrococcus kukulkanii
+- "What is the oxygen tolerance of Methanococcus maripaludis?" → anaerobe
 
 ### Structured Query
-- "Find all Gram-positive, motile, obligate aerobe Bacillus strains"
-- "List strains with positive catalase activity AND temperature range 5-41°C"
-- "Find type strains from DSMZ collection with complete phenotype data (Gram stain, motility, oxygen tolerance)"
-- "Retrieve strains with 16S sequences >1400 bp from genera containing 'coccus'"
-- "Find strains that grow in CIP Medium 3 at temperatures >37°C with positive enzyme activities"
+- "Find all Gram-negative thermophilic bacteria in BacDive"
+- "List all type strains with 16S rRNA sequences from the Thermotogaceae family"
+- "Which anaerobic strains in BacDive can grow above 90°C?"
 
 ## Notes
 
 ### Limitations
-- **Phenotype incompleteness**: Only ~40% have Gram stain, ~35% have 16S sequences
-- **Variable data quality**: Type strains have better coverage than non-type strains
-- **bif:contains restrictions**: Must use as triple pattern, not in FILTER; ?score is reserved keyword
-- **Empty pH data**: Many culture conditions lack pH ranges
-- **16S sequence variability**: Lengths range 207-1532 bp suggesting mix of partial/complete sequences
+- Phenotype coverage varies (~40% for Gram stain, ~35% for 16S)
+- Some older strains have incomplete metadata
+- OLS4 search not applicable - use SPARQL with bif:contains
 
 ### Best Practices
-1. **Always use OPTIONAL for phenotypes**: Prevents excluding strains with missing data
-2. **Use CONTAINS(LCASE())** for genus/species text matching
-3. **Never use ?score**: Use ?sc or other variable names
-4. **bif:contains syntax**: `?var bif:contains "'keyword'" option (score ?sc)`
-5. **Boolean operators**: "'keyword1' AND 'keyword2'", "'keyword1' OR 'keyword2'", "NOT 'keyword'"
-6. **FROM clause required**: `FROM <http://rdfportal.org/dataset/bacdive>`
-7. **LIMIT always**: Prevent processing entire 97K+ strains
-8. **Check BOUND()**: Use FILTER(BOUND(?var)) to require specific data when needed
+- Always include `FROM <http://rdfportal.org/dataset/bacdive>` in SPARQL
+- Use `bif:contains` for keyword searches with `option (score ?sc)`
+- Use OPTIONAL for phenotype properties (coverage is incomplete)
+- Filter by `schema:isTypeStrain true` for high-quality characterized strains
+- Never use `?score` as variable name (reserved keyword)
 
-### Unique Strengths
-- **Comprehensive phenotypic data**: Enzyme activities, Gram stain, motility, oxygen tolerance
-- **Culture condition details**: Media, temperature, pH ranges for cultivation
-- **Strong culture collection links**: Direct URLs to DSMZ, JCM, KCTC, CCUG catalogues
-- **Type strain identification**: Boolean flag enables filtering for nomenclature standards
-- **Molecular + phenotypic**: Combines 16S/genome sequences with physiological traits
-- **Geographic metadata**: Isolation locations with coordinates
-- **Hub-and-spoke design**: Clean schema with strain as central entity
-- **Full taxonomic hierarchy**: Domain through species level for all strains
+### Data Quality
+- 100% taxonomic coverage (all strains have taxonomy)
+- ~21% are type strains (well-characterized)
+- ~35% have 16S sequences
+- ~55% have enzyme activity data
+- ~40% have Gram stain data

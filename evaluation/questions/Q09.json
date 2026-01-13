@@ -2,85 +2,85 @@
   {
     "id": 97,
     "category": "Precision",
-    "question": "What is the genomic location of the human TP53 gene according to NCBI Gene?",
-    "expected_answer": "Chromosome 17p13.1",
-    "notes": "Database: NCBI Gene. Tests gene mapping information. TP53 is at a well-characterized locus. Verified using ncbi_esummary for gene ID 7157. Found in ncbigene_exploration.md."
+    "question": "What is the PubChem CID for rapamycin (sirolimus)?",
+    "expected_answer": "5284616",
+    "notes": "Database: PubChem. Verified in pubchem_exploration.md using get_pubchem_compound_id('rapamycin'). Sirolimus is an immunosuppressant drug. Tests drug compound identification."
   },
   {
     "id": 98,
     "category": "Precision",
-    "question": "What is the PDB ID for the structure of human hemoglobin?",
-    "expected_answer": "Multiple PDB IDs including 1A3N, 2HHB, 1GZX",
-    "notes": "Database: PDB. Tests classic protein structure identification. Hemoglobin has many structural variants. Verified using search_pdb_entity('hemoglobin human'). Found in pdb_exploration.md."
+    "question": "What is the MedGen CUI (Concept Unique Identifier) for diabetes mellitus?",
+    "expected_answer": "C0011849",
+    "notes": "Database: MedGen. Verified in medgen_exploration.md via SPARQL query. MedGen integrates medical genetics information from multiple sources. Tests medical genetics concept identification."
   },
   {
     "id": 99,
     "category": "Completeness",
-    "question": "How many genes are documented in the NCBI Gene database for Homo sapiens?",
-    "expected_answer": "Approximately 60,000 gene entries",
-    "notes": "Database: NCBI Gene. Tests human genome annotation completeness. Includes protein-coding and non-coding genes. Verified using ncbi_esearch with organism filter. Found in ncbigene_exploration.md."
+    "question": "How many glycosylation sites are catalogued in GlyCosmos?",
+    "expected_answer": "414,798",
+    "notes": "Database: GlyCosmos. Verified in glycosmos_exploration.md. Glycosylation sites link proteins to glycan modifications. Tests glycobiology data coverage."
   },
   {
     "id": 100,
     "category": "Completeness",
-    "question": "How many bioassays are available in PubChem?",
-    "expected_answer": "Over 1.7 million bioassays",
-    "notes": "Database: PubChem. Tests biological screening data volume. PubChem integrates assay data from multiple sources. Verified via database statistics. Found in pubchem_exploration.md."
+    "question": "How many clinical concepts are in the MedGen database?",
+    "expected_answer": "233,939",
+    "notes": "Database: MedGen. Verified in medgen_exploration.md via SPARQL COUNT query. MedGen aggregates medical conditions with genetic components. Tests medical genetics database completeness."
   },
   {
     "id": 101,
     "category": "Integration",
-    "question": "What are the orthologous genes to human BRCA1 in mouse according to NCBI Gene?",
-    "expected_answer": "Mouse Brca1 (gene ID 12189)",
-    "notes": "Databases: NCBI Gene. Tests orthology mapping between species. BRCA1 orthologs are used in cancer models. Verified using NCBI Gene orthology data. Found in ncbigene_exploration.md."
+    "question": "What BioProject is DDBJ entry CP036276.1 associated with?",
+    "expected_answer": "PRJNA485700",
+    "notes": "Database: DDBJ. Verified in ddbj_exploration.md. CP036276.1 is the complete genome of Symmachiella dynata. Tests nucleotide database cross-references."
   },
   {
     "id": 102,
     "category": "Integration",
-    "question": "What Rhea reaction IDs involve the compound with ChEBI:16761 (adenosine)?",
-    "expected_answer": "Multiple Rhea reactions involving adenosine phosphorylation, deamination, etc.",
-    "notes": "Databases: Rhea, ChEBI. Tests compound-to-reaction mapping. Adenosine participates in nucleotide metabolism. Verified using Rhea search. Found in rhea_exploration.md."
+    "question": "What EC number is associated with Rhea reaction RHEA:22044?",
+    "expected_answer": "EC 7.4.2.1 (K(+)-transporting ATPase)",
+    "notes": "Database: Rhea. Verified in rhea_exploration.md. RHEA:22044 involves K+ transport. Tests enzyme-reaction linkage."
   },
   {
     "id": 103,
     "category": "Currency",
-    "question": "What are the most recent Gene Ontology terms added for immune system processes?",
-    "expected_answer": "Recent GO terms for innate immunity, cytokine signaling, immune checkpoints",
-    "notes": "Database: GO. Tests ontology curation currency. GO continuously adds terms for emerging immunology. Requires filtering by namespace and addition date. Found in go_exploration.md."
+    "question": "How many glycogenes are annotated in GlyCosmos?",
+    "expected_answer": "423,164",
+    "notes": "Database: GlyCosmos. Verified in glycosmos_exploration.md. Glycogenes encode proteins involved in glycan biosynthesis. Tests glycogene database currency."
   },
   {
     "id": 104,
     "category": "Currency",
-    "question": "How many new bacterial resistance mechanisms were documented in AMR Portal in the last year?",
-    "expected_answer": "Multiple newly identified resistance genes and mechanisms",
-    "notes": "Database: AMR Portal. Tests surveillance of emerging resistance. New resistance determinants are continuously discovered. Requires temporal filtering. Found in amrportal_exploration.md."
+    "question": "What is the most common laboratory typing method used for phenotype measurements in AMR Portal?",
+    "expected_answer": "Broth dilution (56%)",
+    "notes": "Database: AMR Portal. Verified in amrportal_exploration.md. Laboratory methods affect resistance interpretation. Tests current methodology distribution."
   },
   {
     "id": 105,
     "category": "Specificity",
-    "question": "What is the NCBI Taxonomy ID for Saccharomyces cerevisiae S288C?",
-    "expected_answer": "559292",
-    "notes": "Database: Taxonomy. Tests model organism strain identification. S288C is the reference yeast strain. Different from generic S. cerevisiae taxid. Verified using taxonomy search. Found in taxonomy_exploration.md."
+    "question": "What organism does DDBJ entry CP036276.1 belong to?",
+    "expected_answer": "Symmachiella dynata",
+    "notes": "Database: DDBJ. Verified in ddbj_exploration.md. This is a complete bacterial genome with BioProject PRJNA485700. Tests nucleotide sequence metadata retrieval."
   },
   {
     "id": 106,
     "category": "Specificity",
-    "question": "What is the clinical significance of the BRCA1 variant c.68_69delAG in ClinVar?",
-    "expected_answer": "Pathogenic - founder mutation causing breast and ovarian cancer",
-    "notes": "Database: ClinVar. Tests specific variant interpretation. This is the 185delAG founder mutation in Ashkenazi Jewish populations. Verified via ClinVar variant lookup. Found in clinvar_exploration.md."
+    "question": "What Lewis antigen variants are catalogued in GlyCosmos glycoepitopes?",
+    "expected_answer": "Lewis a (EP0007), Sialyl Lewis a (EP0008), Lewis x (EP0011), Sialyl Lewis x (EP0012), and various sulfo/hybrid variants",
+    "notes": "Database: GlyCosmos. Verified in glycosmos_exploration.md. Lewis antigens are important blood group determinants. Tests glycoepitope family enumeration."
   },
   {
     "id": 107,
     "category": "Structured Query",
-    "question": "Find all MeSH terms under the 'Cardiovascular Diseases' tree that relate to myocardial infarction.",
-    "expected_answer": "Multiple MeSH descriptors including acute MI, STEMI, NSTEMI",
-    "notes": "Database: MeSH. Tests medical terminology hierarchy with disease subtype filtering. Requires tree navigation and text matching. Verified using search_mesh_entity. Found in mesh_exploration.md."
+    "question": "What is the parent disease class of Type 1 diabetes mellitus in MONDO?",
+    "expected_answer": "MONDO:0005015 (diabetes mellitus)",
+    "notes": "Database: MONDO. Verified in mondo_exploration.md via hierarchy query. Type 1 diabetes is an autoimmune form. Tests disease ontology hierarchy navigation."
   },
   {
     "id": 108,
     "category": "Structured Query",
-    "question": "What Ensembl genes have both protein-coding biotype and are located on the X chromosome in humans?",
-    "expected_answer": "Hundreds of X-linked protein-coding genes",
-    "notes": "Database: Ensembl. Tests gene filtering by type and location. X chromosome genes are important for sex-linked disorders. Requires biotype and chromosome filtering. Found in ensembl_exploration.md."
+    "question": "Find MediaDive ingredients that have both ChEBI and KEGG cross-references.",
+    "expected_answer": "Glucose (ChEBI:17234, KEGG:C00031), Agar (ChEBI:2509, KEGG:C08815), Acetic acid (ChEBI:15366, KEGG:C00033)",
+    "notes": "Database: MediaDive. Verified in mediadive_exploration.md. Tests ingredient cross-reference completeness queries."
   }
 ]

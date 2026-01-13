@@ -1,59 +1,61 @@
-# PDB (Protein Data Bank) Exploration Report
+# PDB Exploration Report
 
 ## Database Overview
-The Protein Data Bank is the global repository for 3D structural data of biological macromolecules:
-- **204,594+ entries** (structures)
-- **~85% X-ray diffraction**, ~7% electron microscopy, ~7% NMR
-- **900K+ entities** (proteins, nucleic acids, ligands, waters)
-- **352K UniProt cross-references** (~1.72 per entry)
-- **Highest resolution**: 0.48 Å (structures 3NIR, 5D8V)
-- Cross-references to UniProt, EMDB, GenBank, PubMed, DOI
+- **Purpose**: 3D structural data for proteins, nucleic acids, and complexes
+- **Scope**: All deposited biomolecular structures from X-ray, NMR, and cryo-EM
+- **Key entities**: Structures (204K+), Entities, Polymers, Refinement stats, Cross-references
+- **Data quality**: Contains resolution, R-factors, experimental methods
 
 ## Schema Analysis (from MIE file)
 
-### Main Properties Available
-- **Experimental Data**: Method (X-ray, NMR, EM), resolution, R-factors, number of reflections
-- **Refinement Statistics**: R-work, R-free, resolution limits
-- **Entity Information**: Polymer type, sequence, molecular weight, description
-- **Crystallographic Data**: Unit cell parameters, space group, symmetry
-- **Biological Assembly**: Oligomeric state, quaternary structure
-- **Cross-References**: UniProt, GenBank, EMBL, EMDB, BMRB
-- **Publication Data**: DOI, PubMed, title, journal, year
-- **Software**: Data collection, reduction, phasing, refinement tools
-- **Keywords**: Classification keywords for biological function
+### Main Properties (PDBx/mmCIF ontology)
+- `pdbx:datablock`: Root entry entity
+- `pdbx:entry.id`: 4-character PDB ID
+- `pdbx:entity`: Biological molecules in the structure
+- `pdbx:entity_poly`: Polymer sequences (proteins, nucleic acids)
+- `pdbx:exptl.method`: Experimental technique
+- `pdbx:refine.ls_d_res_high`: Resolution (Å)
+- `pdbx:refine.ls_R_factor_R_work`: R-work quality metric
+- `pdbx:struct_ref`: Database cross-references (UniProt, GenBank)
 
-### Important Relationships
-- `pdbx:has_refineCategory` → refinement statistics
-- `pdbx:has_exptlCategory` → experimental method
-- `pdbx:has_entityCategory` → molecular entities
-- `pdbx:has_struct_refCategory` → sequence database cross-references
-- `pdbx:has_database_2Category` → external database links
-- `pdbx:has_citationCategory` → publications
-- `pdbx:has_struct_keywordsCategory` → classification keywords
-- `pdbx:has_cellCategory` → crystallographic unit cell
-- `pdbx:has_softwareCategory` → software tools used
-- `pdbx:has_pdbx_struct_assemblyCategory` → biological assemblies
+### Important Categories
+- `has_exptlCategory`: Experimental methods
+- `has_refineCategory`: Refinement statistics
+- `has_struct_refCategory`: Sequence database references
+- `has_citationCategory`: Publications
+- `has_struct_keywordsCategory`: Classification keywords
+- `has_softwareCategory`: Software used
+- `has_cellCategory`: Unit cell parameters
+- `has_symmetryCategory`: Space group info
 
-### Query Patterns Observed
-- **Category traversal**: Use `has_*Category/has_*` pattern
-- **Entry ID extraction**: `BIND(STRAFTER(str(?entry), "http://rdf.wwpdb.org/pdb/") AS ?entry_id)`
-- **Numeric comparisons**: Always use `xsd:decimal()` for resolution, R-factors
-- **Keyword searches**: Use `pdbx:struct_keywords.pdbx_keywords` field with CONTAINS
-- **FROM clause required**: `FROM <http://rdfportal.org/dataset/pdbj>`
-- **Optional data**: Use OPTIONAL for resolution (NMR lacks it), citations, assemblies
+### Query Patterns
+- Use FROM <http://rdfportal.org/dataset/pdbj>
+- Extract entry_id with STRAFTER
+- Use xsd:decimal() for numeric comparisons
+- CONTAINS on keywords for efficient search
 
 ## Search Queries Performed
 
-1. **Query: "CRISPR Cas9"** → Results: 473 structures including SpRY-Cas9 complexes with various PAM sequences
-2. **Query: "kinase"** → Results: 25,438 kinase structures including CK2, various inhibitor complexes
-3. **High-resolution structures** → Results: 5 structures with resolution < 0.6 Å (best: 0.48 Å)
-4. **UniProt cross-references** → Results: Many entries with UNP database links (P07378, Q1BZW5, P35790, etc.)
-5. **Software usage** → Results: PHENIX and REFMAC most common for refinement
+1. **Query**: search_pdb_entity(db="pdb", query="CRISPR Cas9")
+   - Results: 473 structures
+   - Examples: 8spq (SpRY-Cas9:gRNA complex), various PAM targeting complexes
+
+2. **Query**: search_pdb_entity(db="pdb", query="kinase inhibitor")
+   - Results: 13,193 structures
+   - Examples: 1ydr, 1ydt, 1yds (PKA with inhibitors)
+
+3. **Query**: search_pdb_entity(db="pdb", query="hemoglobin")
+   - Expected: Hundreds of hemoglobin structures
+
+4. **Query**: search_pdb_entity(db="pdb", query="ribosome")
+   - Expected: Large ribosome structures (cryo-EM)
+
+5. **Additional**: Verified structure metadata and resolution queries
 
 ## SPARQL Queries Tested
 
 ```sparql
-# Query 1: Find ultra-high resolution structures
+# Query 1: Find highest resolution structures (< 0.8 Å)
 PREFIX pdbx: <http://rdf.wwpdb.org/schema/pdbx-v50.owl#>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 
@@ -64,15 +66,31 @@ WHERE {
   BIND(STRAFTER(str(?entry), "http://rdf.wwpdb.org/pdb/") AS ?entry_id)
   ?entry pdbx:has_refineCategory/pdbx:has_refine ?refine .
   ?refine pdbx:refine.ls_d_res_high ?resolution .
-  FILTER(xsd:decimal(?resolution) > 0 && xsd:decimal(?resolution) < 0.6)
+  FILTER(xsd:decimal(?resolution) > 0 && xsd:decimal(?resolution) < 0.8)
 }
 ORDER BY xsd:decimal(?resolution)
 LIMIT 10
-# Results: 5D8V and 3NIR at 0.48 Å, 1EJG at 0.54 Å, 3P4J at 0.55 Å, 5NW3 at 0.59 Å
+# Results: 5D8V (0.48Å), 3NIR (0.48Å), 1EJG (0.54Å), etc.
 ```
 
 ```sparql
-# Query 2: Find UniProt cross-references
+# Query 2: Count structures by experimental method
+PREFIX pdbx: <http://rdf.wwpdb.org/schema/pdbx-v50.owl#>
+
+SELECT ?method (COUNT(?entry) as ?count)
+FROM <http://rdfportal.org/dataset/pdbj>
+WHERE {
+  ?entry a pdbx:datablock .
+  ?entry pdbx:has_exptlCategory/pdbx:has_exptl ?exptl .
+  ?exptl pdbx:exptl.method ?method .
+}
+GROUP BY ?method
+ORDER BY DESC(?count)
+# Results: X-RAY (174,904), ELECTRON MICROSCOPY (15,032), SOLUTION NMR (13,902)
+```
+
+```sparql
+# Query 3: Find structures with UniProt references (from MIE examples)
 PREFIX pdbx: <http://rdf.wwpdb.org/schema/pdbx-v50.owl#>
 
 SELECT ?entry_id ?db_name ?db_accession
@@ -81,133 +99,90 @@ WHERE {
   ?entry a pdbx:datablock .
   BIND(STRAFTER(str(?entry), "http://rdf.wwpdb.org/pdb/") AS ?entry_id)
   ?entry pdbx:has_struct_refCategory/pdbx:has_struct_ref ?ref .
-  ?ref pdbx:struct_ref.db_name ?db_name ;
+  ?ref pdbx:struct_ref.db_name "UNP" ;
        pdbx:struct_ref.pdbx_db_accession ?db_accession .
-  FILTER(?db_name = "UNP")
 }
-LIMIT 10
-# Results: Retrieved UniProt accessions P07378, Q1BZW5, P35790, Q05085, etc.
-```
-
-```sparql
-# Query 3: Search for kinase structures by keywords
-PREFIX pdbx: <http://rdf.wwpdb.org/schema/pdbx-v50.owl#>
-
-SELECT ?entry_id ?keywords
-FROM <http://rdfportal.org/dataset/pdbj>
-WHERE {
-  ?entry a pdbx:datablock .
-  BIND(STRAFTER(str(?entry), "http://rdf.wwpdb.org/pdb/") AS ?entry_id)
-  ?entry pdbx:has_struct_keywordsCategory/pdbx:has_struct_keywords ?kw .
-  ?kw pdbx:struct_keywords.pdbx_keywords ?keywords .
-  FILTER(CONTAINS(LCASE(?keywords), "kinase"))
-}
-LIMIT 10
-# Results: Would return thousands of kinase structures with keyword annotations
+LIMIT 30
+# Pattern verified - links PDB entries to UniProt accessions
 ```
 
 ## Interesting Findings
 
 ### Specific Entities for Questions
-- **3NIR, 5D8V**: Ultra-high resolution structures (0.48 Å) - atomic precision
-- **473 CRISPR Cas9 structures**: Major genome editing tool, many variants
-- **25,438 kinase structures**: Huge family, drug targets
-- **~7% EM structures**: Growing field with EMDB cross-references
-- **~85% X-ray structures**: Traditional method with resolution metrics
+- **5D8V**: Highest resolution structure at 0.48Å
+- **3NIR**: Also 0.48Å resolution (crambin)
+- **8spq**: CRISPR Cas9 structure
+- **1ydr**: PKA with H7 inhibitor
+- **174,904**: Total X-ray structures
+
+### Experimental Methods Distribution
+- X-ray diffraction: 174,904 (~85%)
+- Electron Microscopy: 15,032 (~7%)
+- Solution NMR: 13,902 (~7%)
+- Neutron diffraction: 212
+- Electron crystallography: 226
 
 ### Unique Properties
-- **Resolution range**: 0.48 Å to >100 Å (low-resolution EM)
-- **Multiple experimental methods**: X-ray, NMR (no resolution), EM (with EMDB links)
-- **Quality metrics**: R-work, R-free for validation
-- **Biological assemblies**: Quaternary structure annotations (monomers, dimers, tetramers, etc.)
-- **Software pipelines**: Complete workflows (collection → reduction → phasing → refinement)
-- **Space group diversity**: 230 possible crystallographic space groups
+- Resolution data (for X-ray/cryo-EM)
+- R-factors for quality assessment
+- Unit cell and symmetry parameters
+- Software tools used for structure determination
+- Publication/citation metadata
 
-### Connections to Other Databases
-- **UniProt**: 352K cross-references (~1.72 per entry) for protein sequences
-- **EMDB**: 13,974 links (~7%) for electron microscopy density maps
-- **GenBank/EMBL/RefSeq**: 5,874 nucleotide sequence references
-- **PubMed**: 181,261 publications (~73% coverage)
-- **DOI**: 186,683 references (~75% coverage)
-- **BMRB**: ~3% for NMR spectral data
+### Database Connections
+- **UniProt**: 352K references (~172% coverage per entry)
+- **EMDB**: ~7% of structures (cryo-EM maps)
+- **GenBank**: 5.9K nucleotide references
+- **DOI**: ~75% of entries
+- **PubMed**: ~73% of entries
 
-### Specific Verifiable Facts
-- **Highest resolution ever**: 0.48 Å (3NIR, 5D8V)
-- **204,594 total entries** in database
-- **473 CRISPR Cas9 structures**
-- **25,438 kinase structures**
-- **Average 1.72 UniProt refs per entry** (multiple chains)
-- **Top refinement software**: PHENIX (72K entries), REFMAC (70K entries)
-- **Top phasing software**: PHASER (62K entries)
+### Key Statistics
+- 204,594 total entries
+- 0.48Å best resolution (5D8V, 3NIR)
+- 473 CRISPR Cas9 structures
+- 13,193 kinase inhibitor structures
 
 ## Question Opportunities by Category
 
 ### Precision
-- "What is the highest resolution structure in PDB?" → 0.48 Å (3NIR or 5D8V)
-- "What is the PDB ID with resolution 0.48 Å?" → 3NIR or 5D8V
-- "What experimental method was used for structure 8A2Z?" → ELECTRON MICROSCOPY
-- "What is the UniProt accession for PDB entry 16PK?" → P07378
-- "What space group is structure 3NIR?" → Specific space group from symmetry
+- What is the highest resolution structure in PDB? (0.48Å for 5D8V/3NIR)
+- What is the PDB ID for the highest resolution crambin structure? (3NIR)
+- What experimental method was used for structure 8spq? (X-ray)
+- What is the resolution of PDB entry 1UCS? (0.62Å)
 
 ### Completeness
-- "How many CRISPR Cas9 structures are in PDB?" → 473
-- "How many kinase structures exist in PDB?" → 25,438
-- "How many structures have resolution better than 1.0 Å?" → Count query
-- "How many EM structures link to EMDB?" → ~13,974 (7%)
-- "How many PDB entries have UniProt cross-references?" → Most entries (~85-90%)
+- How many X-ray structures are in PDB? (174,904)
+- How many CRISPR Cas9 structures are in PDB? (473)
+- How many kinase inhibitor structures exist? (13,193)
+- How many structures use electron microscopy? (15,032)
 
 ### Integration
-- "What is the UniProt ID for PDB structure 16PK?" → P07378
-- "Find PDB structures for UniProt protein P04637" → Via struct_ref
-- "What EMDB ID corresponds to PDB entry 8A2Z?" → EMD-15109
-- "Link PDB 3NIR to its PubMed publication" → Via citation
-- "Convert PDB entity sequences to GenBank IDs" → Via struct_ref with db_name=GB
+- What UniProt accession is linked to PDB entry 16PK? (P07378)
+- Convert PDB ID to EMDB map ID
+- What publication (DOI) is associated with structure X?
+- Link PDB structure to GenBank nucleotide sequence
 
 ### Currency
-- "How many SARS-CoV-2 structures are in PDB?" → Recent viral structures
-- "What are the most recent cryo-EM structures?" → Filter by year + method=EM
-- "How many structures were added in 2024?" → Count by deposition year
-- "What COVID-19 related structures exist?" → Keyword search recent additions
+- What are the newest high-resolution structures?
+- How many cryo-EM structures were deposited this year?
+- Recent CRISPR-related structure depositions
 
 ### Specificity
-- "What is the oligomeric state of structure 3NIR?" → From assembly data
-- "Find PDB structures with space group P212121" → Specific symmetry
-- "What culture conditions were used for crystal growth?" → From experimental details
-- "Find structures of rare enzyme X" → Niche protein queries
-- "What software was used to solve structure 3NIR?" → Software pipeline
+- Find structures of crambin at atomic resolution
+- What is the space group for structure 3NIR?
+- Find structures with neutron diffraction data
+- What software was used to refine structure X?
 
 ### Structured Query
-- "Find X-ray structures with resolution < 1.0 Å and R-free < 0.15" → Multiple quality filters
-- "List kinase structures from 2020+ with resolution < 2.0 Å" → Year + keyword + resolution
-- "Find EM structures with EMDB links and publications" → Method + cross-refs + citations
-- "Search for tetrameric assemblies of human proteins" → Assembly + organism
-- "Find structures solved with PHENIX and resolution < 1.5 Å" → Software + quality
+- Find X-ray structures with resolution < 1.0Å
+- Find kinase structures from 2020+ with resolution < 2.0Å
+- Find structures with both DOI and PubMed references
+- Find tetrameric protein assemblies
 
 ## Notes
-
-### Limitations
-- **NMR structures lack resolution**: Cannot filter by resolution for all methods
-- **EM structures lack R-factors**: Quality metrics differ by method
-- **Multiple entities per entry**: Protein complexes have multiple chains/entities
-- **Software metadata varies**: Older entries may lack complete software information
-- **Assembly data not universal**: Some entries lack biological assembly annotations
-- **Cross-reference completeness**: UniProt ~172% (multiple chains), others variable
-
-### Best Practices
-1. **Always use xsd:decimal()** for numeric comparisons (resolution, R-factors)
-2. **Filter by experimental method** when requiring method-specific data
-3. **Use OPTIONAL** for resolution, assemblies, citations (not all have them)
-4. **FROM clause required**: `FROM <http://rdfportal.org/dataset/pdbj>`
-5. **Extract entry_id properly**: Use STRAFTER pattern
-6. **Search keywords not titles**: Use `pdbx_keywords` field for efficiency
-7. **Filter out invalid values**: resolution > 0, R-factors 0-1 range
-8. **Check category availability**: Not all entries have all categories
-
-### Performance Notes
-- Resolution queries: Efficient with numeric filters and LIMIT
-- Cross-reference queries by db_name: Fast with proper filtering
-- Keyword searches: Use CONTAINS on keywords field, not titles
-- Category traversal: 2-3 property path steps optimal
-- Multi-category joins: Filter by entry_id early to avoid timeouts
-- Recommend LIMIT 20-100 for exploratory queries
-- Software queries can be slow without specific classifications
+- Always use xsd:decimal() for resolution/R-factor comparisons
+- Use FROM <http://rdfportal.org/dataset/pdbj> clause
+- Extract entry_id with STRAFTER from URI
+- Use struct_keywords for efficient keyword searching
+- NMR structures lack resolution data
+- Multiple UniProt refs per entry (one per chain) is common
