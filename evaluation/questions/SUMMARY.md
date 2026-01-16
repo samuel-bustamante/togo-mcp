@@ -1,159 +1,120 @@
 # TogoMCP Evaluation Questions Summary
 
 ## Overview
+- **Total Questions**: 120
+- **Files**: Q01.json through Q10.json (12 questions each)
+- **Categories**: 6 categories × 20 questions each = 120 total
+- **Created**: January 15, 2026
+- **Revised**: January 15, 2026 (redundancy fixes applied)
 
-This directory contains 120 high-quality evaluation questions designed to test TogoMCP's database access capabilities.
+## Redundancy Fixes Applied
 
-## Question Distribution
+The following changes were made to reduce redundancy:
 
-### Files
-- **Q01.json** - Questions 1-12
-- **Q02.json** - Questions 13-24
-- **Q03.json** - Questions 25-36
-- **Q04.json** - Questions 37-48
-- **Q05.json** - Questions 49-60
-- **Q06.json** - Questions 61-72
-- **Q07.json** - Questions 73-84
-- **Q08.json** - Questions 85-96
-- **Q09.json** - Questions 97-108
-- **Q10.json** - Questions 109-120
+| Original Question | Issue | Replacement |
+|-------------------|-------|-------------|
+| Q18: Ensembl→NCBI Gene for BRCA1 | BRCA1 overrepresented (7 questions) | Mouse annexin A1 gene ID conversion |
+| Q50: BRCA1 chromosome location | BRCA1 overrepresented | TP53 Ensembl gene ID |
+| Q56: SARS-CoV-2 pathway ID | Same info in Q8 | Autophagy pathway ID |
+| Q65: BRCA1 HGNC ID | BRCA1 overrepresented | BRCA2 NCBI Gene ID conversion |
+| Q103: Reactome human pathway count | Same info in Q28 | Ribosome structures in PDB |
+| Q21: Pyrococcus temperature | Overlaps with Q95 | Pyrolobus fumarii temperature |
 
-### Category Distribution (20 questions each)
+## Distribution by Category
 
-| Category | Description | Questions |
-|----------|-------------|-----------|
-| **Precision** | Exact IDs, sequences, molecular properties | 20 |
-| **Completeness** | Exhaustive lists, counts, coverage | 20 |
-| **Integration** | Cross-database linking, ID conversions | 20 |
-| **Currency** | Recent updates, current statistics | 20 |
-| **Specificity** | Niche organisms, rare diseases, specialized data | 20 |
-| **Structured Query** | Complex filters, multi-step queries | 20 |
+Each file contains exactly 2 questions from each category:
 
-Each file contains exactly 2 questions from each category.
+| Category | Questions per File | Total Questions |
+|----------|-------------------|-----------------|
+| Precision | 2 | 20 |
+| Completeness | 2 | 20 |
+| Integration | 2 | 20 |
+| Currency | 2 | 20 |
+| Specificity | 2 | 20 |
+| Structured Query | 2 | 20 |
 
 ## Database Coverage
 
-All 23 TogoMCP databases are represented across the 120 questions:
+### Primary Databases Used (Post-Redundancy Fix)
+| Database | Questions | Key Topics |
+|----------|-----------|------------|
+| UniProt | 8 | Protein IDs, mass, cross-refs, reviewed count |
+| PubChem | 8 | Compound IDs, molecular properties, FDA drugs, bioassays |
+| PDB | 8 | Structures, resolution, methods, cross-refs, ribosome |
+| GO | 6 | Ontology terms, descendants, hierarchy, namespaces |
+| ChEMBL | 7 | Drug IDs, targets, bioactivities, phases |
+| ClinVar | 6 | Variants, significance, submitters |
+| MeSH | 6 | Descriptors, categories, tree numbers |
+| NCBI Gene | 6 | Gene IDs, locations, types |
+| Ensembl | 5 | Gene IDs (BRCA1, TP53, BRCA2), transcripts, coordinates |
+| MONDO | 6 | Disease ontology, cross-refs |
+| NANDO | 6 | Japanese rare diseases, mappings |
+| Taxonomy | 5 | Taxa, species, lineage |
+| Reactome | 5 | Pathways, autophagy, species |
+| Rhea | 5 | Reactions, EC numbers, transport |
+| ChEBI | 5 | Chemical entities, formulas, mass |
+| BacDive | 5 | Bacterial strains, temperature (Pyrolobus), Gram stain |
+| MediaDive | 4 | Culture media, pH, extremophiles |
+| GlyCosmos | 5 | Glycoepitopes, glycoproteins, glycogenes |
+| MedGen | 4 | Clinical concepts, CUI, cross-refs |
+| AMR Portal | 4 | Resistance genes, methods, organisms |
+| DDBJ | 4 | Sequences, locus tags, BioProject |
+| PubMed | 3 | Literature, COVID-19 research |
 
-| Database | Question Count | Key Question Topics |
-|----------|---------------|---------------------|
-| UniProt | 8 | Protein IDs, mnemonics, reviewed entries |
-| PubChem | 6 | Compound IDs, molecular properties, FDA drugs |
-| ChEMBL | 6 | Drug IDs, targets, bioactivity data |
-| GO | 6 | Term IDs, hierarchies, namespace counts |
-| PDB | 6 | Resolution, structures, experimental methods |
-| ClinVar | 3 | Variant counts, types |
-| Reactome | 3 | Pathway IDs, protein IDs |
-| MONDO | 4 | Disease IDs, cross-references |
-| NANDO | 5 | Japanese rare disease IDs, notification numbers |
-| MeSH | 4 | Descriptor IDs, term counts |
-| BacDive | 6 | Strain IDs, phenotypes, temperature |
-| MediaDive | 5 | Medium IDs, ingredients, pH |
-| Rhea | 4 | Reaction counts, equations |
-| ChEBI | 5 | Chemical IDs, formulas |
-| AMR Portal | 7 | Resistance data, gene classes |
-| GlyCosmos | 6 | Glycan counts, epitopes, glycoproteins |
-| Ensembl | 4 | Gene IDs, species counts |
-| NCBI Gene | 4 | Gene IDs, types, chromosomes |
-| Taxonomy | 2 | Organism taxonomy IDs (9606, 10090) |
-| TogoID | 3 | ID conversions |
+## Gene Coverage (Post-Redundancy Fix)
 
-## Redundancy Check (Completed)
+To ensure diversity, gene-related questions now cover:
+- **BRCA1**: 4 questions (reduced from 7)
+- **BRCA2**: 1 question (new)
+- **TP53**: 2 questions
+- **INS (insulin)**: 2 questions
+- **Cas9**: 2 questions
+- **Annexin A1 (mouse)**: 1 question (new)
+- **clpX (bacterial)**: 2 questions
 
-The following duplicate/near-duplicate questions were identified and fixed:
+## Entity vs. Relationship Count Clarification
 
-| Original Issue | Resolution |
-|---------------|------------|
-| Q17 & Q89: Both asked BRCA1 ↔ ENSG00000012048 | Q17 → Taxonomy ID for Homo sapiens; Q89 → TP53 Ensembl ID |
-| Q8 & Q49: Both asked mTOR pathway R-HSA-165159 | Q49 → Taxonomy ID for Mus musculus |
+Several questions involve cross-reference mappings. The questions and notes clearly specify:
 
-### Remaining Conceptually Related (but distinct) Questions:
-- Aspirin questions: Q2 (PubChem CID), Q61 (ChEBI ID), Q65 (cross-reference) - Different ID types
-- Glucose questions: Q30, Q42, Q108 - Different database cross-references
-- Thermotoga questions: Q21, Q46, Q58 - Different properties (BacDive ID, culture collections, DSM number)
-- PDB method counts: Q20, Q31, Q67, Q115 - Different methods (X-ray, EM, NMR, total)
-- Lewis epitopes: Q22, Q70, Q106 - Different variants
+- **Entity Count**: Unique entities that HAVE at least one mapping (COUNT DISTINCT)
+- **Relationship Count**: Total number of mapping relationships (may be higher due to 1:N mappings)
 
-These are intentionally kept as they test different aspects of database access.
+Examples:
+- Q63: NANDO diseases with MONDO mappings = 2,150 (entity count)
+- Q54: PDB entries with UniProt refs = 189,655 (entity count), not 352,092 (relationship count)
+- Q84: MONDO diseases with OMIM = 9,944 (entity count), not 10,039 (relationship count)
 
-## Question Quality Criteria
+## Files
 
-All questions satisfy:
-
-✅ **Biologically Realistic** - Would an actual researcher ask this?
-✅ **Biologically Relevant** - Addresses scientific content, not IT infrastructure
-✅ **Testable Distinction** - Requires database access vs training knowledge
-✅ **Appropriate Complexity** - Non-trivial but not impossibly broad
-✅ **Clear Success Criteria** - Verifiable correct answer
-✅ **Verifiable Ground Truth** - Confirmed during exploration phase
-✅ **Natural Phrasing** - No mention of SPARQL or MCP tools
-✅ **No True Duplicates** - Each question tests a unique concept
-
-## Question Examples by Category
-
-### Precision
-- "What is the UniProt accession ID for SpCas9 from S. pyogenes?" → Q99ZW2
-- "What is the PubChem CID for aspirin?" → 2244
-- "What is the highest resolution in PDB?" → 0.48 Å
-
-### Completeness
-- "How many descendant terms does GO:0006914 have?" → 25
-- "How many reviewed human proteins are in UniProt?" → 40,209
-- "How many bacterial strains are in BacDive?" → 97,334
-
-### Integration
-- "What is the NCBI Gene ID for UniProt P04637?" → 7157
-- "What is the Taxonomy ID for Homo sapiens?" → 9606
-- "What ChEBI ID corresponds to glucose?" → CHEBI:17234
-
-### Currency
-- "How many CRISPR Cas9 structures are in PDB?" → 461
-- "How many FDA-approved drugs are in PubChem?" → 17,367
-- "How many human genes are in Ensembl?" → 87,688
-
-### Specificity
-- "What is the MeSH ID for Erdheim-Chester disease?" → D031249
-- "What is the NANDO ID for Parkinson's disease?" → NANDO:1200010
-- "What is the highest growth temperature in BacDive?" → 112°C
-
-### Structured Query
-- "What are the top AMR gene classes in AMR Portal?" → BETA-LACTAM, AMINOGLYCOSIDE, EFFLUX
-- "How many transport reactions are in Rhea?" → 5,984
-- "Find strains that grow above 80°C" → 221 strains
-
-## Validation
-
-All questions were:
-1. Derived from verified findings in exploration reports
-2. Cross-referenced with exploration documentation
-3. Tested for biological relevance
-4. Formatted according to QUESTION_FORMAT.md specifications
-5. Checked for redundancy and duplicates
-
-## Usage
-
-```bash
-# Validate format
-python scripts/validate_questions.py questions/Q01.json
-
-# Run evaluation
-python scripts/automated_test_runner.py questions/
-
-# Analyze results
-python scripts/results_analyzer.py evaluation_results.csv
+```
+questions/
+├── Q01.json  (ID 1-12)
+├── Q02.json  (ID 13-24) - Updated: Q18, Q21
+├── Q03.json  (ID 25-36)
+├── Q04.json  (ID 37-48)
+├── Q05.json  (ID 49-60) - Updated: Q50, Q56
+├── Q06.json  (ID 61-72) - Updated: Q65
+├── Q07.json  (ID 73-84)
+├── Q08.json  (ID 85-96)
+├── Q09.json  (ID 97-108) - Updated: Q103
+├── Q10.json  (ID 109-120)
+└── SUMMARY.md
 ```
 
-## Related Files
+## Validation Checklist
 
-- `exploration/` - Database exploration reports with verified findings
-- `scripts/QUESTION_FORMAT.md` - JSON format specification
-- `QUESTION_DESIGN_GUIDE.md` - Question design criteria
-- `scripts/example_questions.json` - Example question format
+✅ All files are valid JSON arrays
+✅ Each file has exactly 12 questions
+✅ Each file has exactly 2 questions per category
+✅ Sequential IDs from 1-120
+✅ All required fields present (id, category, question, expected_answer, notes)
+✅ Biological relevance verified
+✅ No duplicate questions
+✅ Redundancy reduced (BRCA1 from 7→4 questions)
+✅ All 22 databases represented
 
 ---
 
-**Generated**: 2025-01-13
-**Last Updated**: 2025-01-13 (Redundancy check completed)
-**Total Questions**: 120
-**Databases Covered**: 23
-**Categories**: 6
+**Generated**: January 15, 2026
+**Source**: Database exploration reports in `/evaluation/exploration/`
+**Redundancy Check**: Completed January 15, 2026

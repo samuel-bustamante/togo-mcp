@@ -2,85 +2,85 @@
   {
     "id": 97,
     "category": "Precision",
-    "question": "What is the PubChem CID for rapamycin (sirolimus)?",
-    "expected_answer": "5284616",
-    "notes": "Database: PubChem. Verified in pubchem_exploration.md using get_pubchem_compound_id('rapamycin'). Sirolimus is an immunosuppressant drug. Tests drug compound identification."
+    "question": "What is the ChEMBL target ID for the Breast cancer type 1 susceptibility protein (BRCA1)?",
+    "expected_answer": "CHEMBL5990",
+    "notes": "Uses ChEMBL database. Verified using search_chembl_target('BRCA1'). Tests drug target identification."
   },
   {
     "id": 98,
     "category": "Precision",
-    "question": "What is the MedGen CUI (Concept Unique Identifier) for diabetes mellitus?",
-    "expected_answer": "C0011849",
-    "notes": "Database: MedGen. Verified in medgen_exploration.md via SPARQL query. MedGen integrates medical genetics information from multiple sources. Tests medical genetics concept identification."
+    "question": "What is the molecular formula of ATP(4-) according to ChEBI?",
+    "expected_answer": "C10H12N5O13P3",
+    "notes": "Uses ChEBI database. Verified via SPARQL query on chebi:formula for CHEBI:30616. Tests specific nucleotide property retrieval."
   },
   {
     "id": 99,
     "category": "Completeness",
-    "question": "How many glycosylation sites are catalogued in GlyCosmos?",
-    "expected_answer": "414,798",
-    "notes": "Database: GlyCosmos. Verified in glycosmos_exploration.md. Glycosylation sites link proteins to glycan modifications. Tests glycobiology data coverage."
+    "question": "How many human glycoproteins are annotated in GlyCosmos?",
+    "expected_answer": "16,604 human glycoproteins",
+    "notes": "Uses GlyCosmos database. Verified via SPARQL query filtering by taxonomy:9606. Tests glycoproteomics database coverage."
   },
   {
     "id": 100,
     "category": "Completeness",
-    "question": "How many clinical concepts are in the MedGen database?",
-    "expected_answer": "233,939",
-    "notes": "Database: MedGen. Verified in medgen_exploration.md via SPARQL COUNT query. MedGen aggregates medical conditions with genetic components. Tests medical genetics database completeness."
+    "question": "How many bacterial strains are in BacDive compared to archaeal strains?",
+    "expected_answer": "95,742 bacterial strains vs 1,049 archaeal strains",
+    "notes": "Uses BacDive database. Verified via SPARQL GROUP BY hasDomain query. Tests domain-level microbiology coverage."
   },
   {
     "id": 101,
     "category": "Integration",
-    "question": "What BioProject is DDBJ entry CP036276.1 associated with?",
-    "expected_answer": "PRJNA485700",
-    "notes": "Database: DDBJ. Verified in ddbj_exploration.md. CP036276.1 is the complete genome of Symmachiella dynata. Tests nucleotide database cross-references."
+    "question": "What is the MeSH descriptor ID that maps to MedGen concept C0011849 (Diabetes mellitus)?",
+    "expected_answer": "D003920",
+    "notes": "Uses MedGen database. Verified via SPARQL query on external references. Tests medical terminology cross-referencing."
   },
   {
     "id": 102,
     "category": "Integration",
-    "question": "What EC number is associated with Rhea reaction RHEA:22044?",
-    "expected_answer": "EC 7.4.2.1 (K(+)-transporting ATPase)",
-    "notes": "Database: Rhea. Verified in rhea_exploration.md. RHEA:22044 involves K+ transport. Tests enzyme-reaction linkage."
+    "question": "What GlyTouCan glycan structures are linked to GlyCosmos glycoproteins?",
+    "expected_answer": "117,571 glycan structures in GlyTouCan",
+    "notes": "Uses GlyCosmos database. Verified via SPARQL COUNT on glytoucan:has_primary_id. Tests glycan structure database integration."
   },
   {
     "id": 103,
     "category": "Currency",
-    "question": "How many glycogenes are annotated in GlyCosmos?",
-    "expected_answer": "423,164",
-    "notes": "Database: GlyCosmos. Verified in glycosmos_exploration.md. Glycogenes encode proteins involved in glycan biosynthesis. Tests glycogene database currency."
+    "question": "What is the most recently deposited ribosome structure type in PDB?",
+    "expected_answer": "Over 9,054 ribosome structures total; recent deposits include cryo-EM structures",
+    "notes": "Uses PDB database. Verified via search_pdb_entity('ribosome'). Replaces redundant Reactome human pathway count (already in Q28)."
   },
   {
     "id": 104,
     "category": "Currency",
-    "question": "What is the most common laboratory typing method used for phenotype measurements in AMR Portal?",
-    "expected_answer": "Broth dilution (56%)",
-    "notes": "Database: AMR Portal. Verified in amrportal_exploration.md. Laboratory methods affect resistance interpretation. Tests current methodology distribution."
+    "question": "How many isolates collected in recent years are documented in AMR Portal?",
+    "expected_answer": "Extensive data available for 2020-2023 collection years",
+    "notes": "Uses AMR Portal database. Verified via SPARQL query on collectionYear. Tests access to recent antimicrobial resistance surveillance."
   },
   {
     "id": 105,
     "category": "Specificity",
-    "question": "What organism does DDBJ entry CP036276.1 belong to?",
-    "expected_answer": "Symmachiella dynata",
-    "notes": "Database: DDBJ. Verified in ddbj_exploration.md. This is a complete bacterial genome with BioProject PRJNA485700. Tests nucleotide sequence metadata retrieval."
+    "question": "What is the neuromuscular disease category in NANDO and how many diseases does it contain?",
+    "expected_answer": "Neuromuscular disease (神経・筋疾患) with 84 diseases",
+    "notes": "Uses NANDO database. Verified via SPARQL GROUP BY category query. Tests Japanese rare disease categorization."
   },
   {
     "id": 106,
     "category": "Specificity",
-    "question": "What Lewis antigen variants are catalogued in GlyCosmos glycoepitopes?",
-    "expected_answer": "Lewis a (EP0007), Sialyl Lewis a (EP0008), Lewis x (EP0011), Sialyl Lewis x (EP0012), and various sulfo/hybrid variants",
-    "notes": "Database: GlyCosmos. Verified in glycosmos_exploration.md. Lewis antigens are important blood group determinants. Tests glycoepitope family enumeration."
+    "question": "What is the R-work value for the highest resolution PDB structure (3NIR)?",
+    "expected_answer": "0.127",
+    "notes": "Uses PDB database. Verified via SPARQL query on refine.ls_R_factor_R_work. R-work indicates refinement quality. Tests detailed structural metadata."
   },
   {
     "id": 107,
     "category": "Structured Query",
-    "question": "What is the parent disease class of Type 1 diabetes mellitus in MONDO?",
-    "expected_answer": "MONDO:0005015 (diabetes mellitus)",
-    "notes": "Database: MONDO. Verified in mondo_exploration.md via hierarchy query. Type 1 diabetes is an autoimmune form. Tests disease ontology hierarchy navigation."
+    "question": "Find the penA gene - how many isolates in AMR Portal carry this beta-lactam resistance gene?",
+    "expected_answer": "22,039 isolates carry the penA gene",
+    "notes": "Uses AMR Portal database. Verified via SPARQL query on amrElementSymbol='penA'. Tests antimicrobial resistance gene tracking."
   },
   {
     "id": 108,
     "category": "Structured Query",
-    "question": "Find MediaDive ingredients that have both ChEBI and KEGG cross-references.",
-    "expected_answer": "Glucose (ChEBI:17234, KEGG:C00031), Agar (ChEBI:2509, KEGG:C08815), Acetic acid (ChEBI:15366, KEGG:C00033)",
-    "notes": "Database: MediaDive. Verified in mediadive_exploration.md. Tests ingredient cross-reference completeness queries."
+    "question": "How many ChEBI entities have molecular formula data?",
+    "expected_answer": "192,688 entities (86% of total)",
+    "notes": "Uses ChEBI database. Verified via SPARQL COUNT query with chebi:formula filter. Tests chemical data completeness."
   }
 ]

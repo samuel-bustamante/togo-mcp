@@ -2,85 +2,85 @@
   {
     "id": 49,
     "category": "Precision",
-    "question": "What is the NCBI Taxonomy ID for Mus musculus (house mouse)?",
-    "expected_answer": "10090",
-    "notes": "Database: NCBI Taxonomy. Verified in taxonomy_exploration.md. Mouse is the most widely used model organism. Tests organism taxonomy identification."
+    "question": "What is the MeSH descriptor ID for Diabetes Mellitus, Type 2?",
+    "expected_answer": "D003924",
+    "notes": "Uses MeSH database. Verified via search_mesh_entity and SPARQL. Type 2 diabetes is a major public health concern. Tests medical vocabulary lookup."
   },
   {
     "id": 50,
     "category": "Precision",
-    "question": "What is the GO term ID for 'nucleus' (cellular component)?",
-    "expected_answer": "GO:0005634",
-    "notes": "Database: GO. Verified in go_exploration.md via OLS4:searchClasses. The nucleus is a fundamental cellular compartment. Tests cellular component ontology access."
+    "question": "What is the Ensembl gene ID for human TP53 (tumor protein p53)?",
+    "expected_answer": "ENSG00000141510",
+    "notes": "Uses Ensembl database. Verified via SPARQL query. TP53 is located on chromosome 17. Tests gene identification - replaces BRCA1 chromosome question to reduce redundancy."
   },
   {
     "id": 51,
     "category": "Completeness",
-    "question": "How many type strains are catalogued in BacDive?",
-    "expected_answer": "20,060",
-    "notes": "Database: BacDive. Verified in bacdive_exploration.md via SPARQL COUNT with isTypeStrain filter. Type strains are reference specimens. Tests microbial taxonomy coverage."
+    "question": "How many chemical entities are in the ChEBI ontology?",
+    "expected_answer": "223,078 chemical entities",
+    "notes": "Uses ChEBI database. Verified via SPARQL COUNT on owl:Class with CHEBI_ prefix filter. Tests chemical ontology statistics."
   },
   {
     "id": 52,
     "category": "Completeness",
-    "question": "How many glycan structures are in GlyTouCan/GlyCosmos?",
-    "expected_answer": "117,571",
-    "notes": "Database: GlyCosmos. Verified in glycosmos_exploration.md via SPARQL COUNT. GlyTouCan is the international glycan structure repository. Tests glycoscience coverage."
+    "question": "How many small molecules are catalogued in ChEMBL?",
+    "expected_answer": "1,920,809 small molecules",
+    "notes": "Uses ChEMBL database. Verified via SPARQL COUNT on cco:SmallMolecule. Tests drug discovery database statistics."
   },
   {
     "id": 53,
     "category": "Integration",
-    "question": "What CAS registry number is assigned to agar in MediaDive?",
-    "expected_answer": "9002-18-0",
-    "notes": "Database: MediaDive, ChEBI. Verified in mediadive_exploration.md. Agar also has ChEBI:2509, KEGG:C08815. Tests chemical ingredient identification."
+    "question": "What PDB structures contain the human BRCA1 protein (UniProt P38398)?",
+    "expected_answer": "Multiple structures including 7LYB, 7JZV, 1T29, and others",
+    "notes": "Uses UniProt and PDB databases. Verified via SPARQL query on rdfs:seeAlso cross-references. Tests protein-structure database linking."
   },
   {
     "id": 54,
     "category": "Integration",
-    "question": "What OMIM ID is cross-referenced from the MONDO entry for Huntington disease?",
-    "expected_answer": "OMIM:143100",
-    "notes": "Database: MONDO. Verified in mondo_exploration.md. MONDO integrates disease classifications from multiple sources. Tests disease ontology cross-referencing."
+    "question": "How many PDB entries have UniProt cross-references?",
+    "expected_answer": "189,655 PDB entries have UniProt references (entity count)",
+    "notes": "Uses PDB database. Entity count (unique PDB entries with UniProt), not relationship count (352,092 total refs due to multi-chain structures). Tests understanding of cross-reference statistics."
   },
   {
     "id": 55,
     "category": "Currency",
-    "question": "How many phenotype measurements are recorded in AMR Portal?",
-    "expected_answer": "1,714,486",
-    "notes": "Database: AMR Portal. Verified in amrportal_exploration.md. Phenotype data includes MIC and disk diffusion results. Tests antimicrobial surveillance data volume."
+    "question": "How many COVID-19 vaccine mRNA research articles are indexed in PubMed?",
+    "expected_answer": "Approximately 11,226 articles (or current count)",
+    "notes": "Uses PubMed database. Verified using search_articles tool. This topic emerged in 2020-2021. Tests access to recent biomedical literature."
   },
   {
     "id": 56,
     "category": "Currency",
-    "question": "How many genotype features (AMR genes) are in AMR Portal?",
-    "expected_answer": "1,164,007",
-    "notes": "Database: AMR Portal. Verified in amrportal_exploration.md. Genotype data includes resistance genes and mutations. Tests molecular resistance data access."
+    "question": "What is the Reactome pathway ID for the Autophagy process in humans?",
+    "expected_answer": "R-HSA-9612973",
+    "notes": "Uses Reactome database. Verified using search_reactome_entity. Autophagy is a fundamental cellular process. Replaces SARS-CoV-2 pathway question (covered in Q8)."
   },
   {
     "id": 57,
     "category": "Specificity",
-    "question": "What is the recommended pH for LB (Luria-Bertani) medium according to MediaDive?",
-    "expected_answer": "7.0",
-    "notes": "Database: MediaDive. Verified in mediadive_exploration.md. Medium 381 is the standard LB formulation. Tests culture medium specification access."
+    "question": "What is the lowest pH culture medium recorded in MediaDive?",
+    "expected_answer": "ACIDIANUS SP. JP7 MEDIUM with pH 0.8",
+    "notes": "Uses MediaDive database. Verified via SPARQL query on hasMinPH < 2. Tests access to extremophile cultivation data for acidophiles."
   },
   {
     "id": 58,
     "category": "Specificity",
-    "question": "What is the DSM number for Thermotoga maritima type strain?",
-    "expected_answer": "DSM 3109",
-    "notes": "Database: BacDive. Verified in bacdive_exploration.md. T. maritima 17060 is deposited at multiple culture collections. Tests strain repository linkage."
+    "question": "What is the NCBI Gene ID for human insulin (INS)?",
+    "expected_answer": "3630",
+    "notes": "Uses NCBI Gene database. Verified using ncbi_esearch and SPARQL. INS is located on chromosome 11p15.5. Tests specific gene identification."
   },
   {
     "id": 59,
     "category": "Structured Query",
-    "question": "How many molecular_function terms are in the Gene Ontology?",
-    "expected_answer": "12,793",
-    "notes": "Database: GO. Verified in go_exploration.md via SPARQL COUNT by namespace. Molecular function describes activities at molecular level. Tests ontology namespace queries."
+    "question": "How many Reactome entities have UniProt cross-references?",
+    "expected_answer": "204,415 entities",
+    "notes": "Uses Reactome database. Verified via SPARQL query on bp:xref with bp:db='UniProt'. Tests cross-reference statistics in pathway database."
   },
   {
     "id": 60,
     "category": "Structured Query",
-    "question": "What is the ampicillin resistance rate in E. coli isolates in AMR Portal?",
-    "expected_answer": "Approximately 49% (7,688 resistant out of 15,663 total)",
-    "notes": "Database: AMR Portal. Verified in amrportal_exploration.md. E. coli ampicillin resistance is high due to widespread beta-lactamase genes. Tests organism-antibiotic resistance queries."
+    "question": "What are the top 3 organisms with the most phenotypic AMR measurements in AMR Portal?",
+    "expected_answer": "Salmonella enterica (443,249), Escherichia coli (364,088), Mycobacterium tuberculosis (330,880)",
+    "notes": "Uses AMR Portal database. Verified via SPARQL GROUP BY organism query. Tests antimicrobial resistance surveillance data aggregation."
   }
 ]

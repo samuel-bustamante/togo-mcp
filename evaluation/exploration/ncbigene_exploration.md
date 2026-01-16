@@ -1,89 +1,97 @@
-# NCBI Gene Database Exploration
+# NCBI Gene Database Exploration Report
 
-## Overview
-- **Total entries**: 57.7M+ genes across all organisms
-- **Human genes**: ~193K (20,595 protein-coding, 22,103 ncRNA, 17,483 pseudogenes)
-- **Endpoint**: https://rdfportal.org/ncbi/sparql
-- **Graph**: http://rdfportal.org/dataset/ncbigene
-- **Base URI**: http://identifiers.org/ncbigene/
+## Database Overview
+- **Purpose**: Comprehensive gene database covering all organisms
+- **Scope**: 57M+ gene entries including protein-coding, ncRNA, tRNA, pseudogenes
+- **Key data types**: Gene symbols, descriptions, chromosomal locations, gene types, cross-references, orthology
 
-## Key Entities (Verified)
-| Gene ID | Symbol | Description | Type | Chromosome |
-|---------|--------|-------------|------|------------|
-| 672 | BRCA1 | BRCA1 DNA repair associated | protein-coding | 17 |
-| 7157 | TP53 | tumor protein p53 | protein-coding | 17 |
-| 3630 | INS | insulin | protein-coding | 11 |
-| 1 | A1BG | alpha-1-B glycoprotein | protein-coding | 19 |
+## Schema Analysis (from MIE file)
 
-## Human Gene Type Distribution
-| Type | Count |
-|------|-------|
-| biological-region | 128,261 |
-| ncRNA | 22,103 |
-| protein-coding | 20,595 |
-| pseudo | 17,483 |
-| snoRNA | 1,201 |
-| unknown | 1,191 |
-| other | 845 |
-| rRNA | 781 |
-| tRNA | 658 |
-| snRNA | 166 |
-| scRNA | 4 |
+### Main Entity Type
+- **insdc:Gene** - Gene entity with comprehensive properties
 
-## Search Tools
+### Key Properties
+- `rdfs:label` - Gene symbol (INS, BRCA1, TP53)
+- `dct:description` - Full gene name (insulin, tumor protein p53)
+- `dct:identifier` - NCBI Gene ID (integer)
+- `ncbio:typeOfGene` - Gene type (protein-coding, ncRNA, pseudo, etc.)
+- `ncbio:taxid` - Taxonomic classification (identifiers.org/taxonomy/ID)
+- `insdc:chromosome` - Chromosome location
+- `insdc:map` - Cytogenetic map location (e.g., "11p15.5")
+- `insdc:gene_synonym` - Alternative names
+- `insdc:dblink` - External database links (IRI)
+- `orth:hasOrtholog` - Orthologous genes in other species
 
-### ncbi_esearch (RECOMMENDED for Discovery)
-Use for finding gene IDs before SPARQL queries:
-```python
-ncbi_esearch(database='gene', query='BRCA1 AND human[organism]')
-# Returns: Gene IDs 7157, 1956, 3569, 7422, 7040...
-```
+## Search Queries Performed
 
-Supports Entrez syntax:
-- Field tags: `[Gene Name]`, `[Symbol]`, `[Organism]`
-- Boolean: `AND`, `OR`, `NOT`
-- Example: `"insulin receptor" AND human[organism]`
+1. **Gene ID 1 (A1BG)** → alpha-1-B glycoprotein, protein-coding, chr19, 19q13.43
 
-### SPARQL (for Detailed Metadata)
+2. **Insulin gene (3630)** → INS, protein-coding, chr11, 11p15.5
 
-#### Basic Gene Lookup
+3. **BRCA1 (672)** → BRCA1 DNA repair associated, protein-coding, chr17, 17q21.31
+
+4. **TP53 (7157)** → tumor protein p53, protein-coding, chr17, 17p13.1
+
+5. **Human gene type distribution** → biological-region (128K), ncRNA (22K), protein-coding (20.5K), pseudo (17K)
+
+## SPARQL Queries Tested
+
 ```sparql
-PREFIX insdc: <http://ddbj.nig.ac.jp/ontologies/nucleotide/>
+# Query 1: Basic gene info retrieval
 PREFIX ncbio: <https://dbcls.github.io/ncbigene-rdf/ontology.ttl#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX dct: <http://purl.org/dc/terms/>
 
-SELECT ?label ?description ?type ?chromosome
+SELECT ?label ?description ?type ?chromosome ?map
 FROM <http://rdfportal.org/dataset/ncbigene>
 WHERE {
   <http://identifiers.org/ncbigene/672> rdfs:label ?label ;
     ncbio:typeOfGene ?type .
   OPTIONAL { <http://identifiers.org/ncbigene/672> dct:description ?description }
   OPTIONAL { <http://identifiers.org/ncbigene/672> insdc:chromosome ?chromosome }
+  OPTIONAL { <http://identifiers.org/ncbigene/672> insdc:map ?map }
 }
+# Results: BRCA1, "BRCA1 DNA repair associated", protein-coding, 17, 17q21.31
 ```
 
-#### Text Search in Descriptions
 ```sparql
+# Query 2: Gene type distribution for human
+PREFIX ncbio: <https://dbcls.github.io/ncbigene-rdf/ontology.ttl#>
+
+SELECT ?type (COUNT(?gene) as ?count)
+FROM <http://rdfportal.org/dataset/ncbigene>
+WHERE {
+  ?gene ncbio:typeOfGene ?type ;
+        ncbio:taxid <http://identifiers.org/taxonomy/9606> .
+}
+GROUP BY ?type
+ORDER BY DESC(?count)
+# Results: biological-region (128,261), ncRNA (22,103), protein-coding (20,595), etc.
+```
+
+```sparql
+# Query 3: Search insulin-related genes
 PREFIX ncbio: <https://dbcls.github.io/ncbigene-rdf/ontology.ttl#>
 PREFIX dct: <http://purl.org/dc/terms/>
 
-SELECT ?gene ?description ?sc
+SELECT ?gene ?label ?description ?sc
 FROM <http://rdfportal.org/dataset/ncbigene>
 WHERE {
-  ?gene ncbio:taxid <http://identifiers.org/taxonomy/9606> ;
-        dct:description ?description .
+  ?gene a insdc:Gene ;
+        rdfs:label ?label ;
+        dct:description ?description ;
+        ncbio:taxid <http://identifiers.org/taxonomy/9606> .
   ?description bif:contains "'insulin'" option (score ?sc) .
 }
 ORDER BY DESC(?sc)
 LIMIT 20
+# Results: INS, INSR, IGF1, IGF2, IGFBPs, IRS1, etc.
 ```
 
-#### Get Orthologs
 ```sparql
+# Query 4: Find INS orthologs across species
 PREFIX orth: <http://purl.org/net/orth#>
 PREFIX ncbio: <https://dbcls.github.io/ncbigene-rdf/ontology.ttl#>
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
 SELECT ?ortholog ?label ?taxid
 FROM <http://rdfportal.org/dataset/ncbigene>
@@ -92,70 +100,81 @@ WHERE {
   ?ortholog rdfs:label ?label ;
             ncbio:taxid ?taxid .
 }
-LIMIT 100
+LIMIT 20
+# Results: Found orthologs in mouse (Ins2), rat (Ins2), cattle (INS), pig (INS), etc.
 ```
 
-## Schema Notes
-- `rdfs:label` = gene symbols (INS, BRCA1)
-- `dct:description` = full names (insulin, BRCA1 DNA repair associated)
-- `ncbio:typeOfGene` = protein-coding, ncRNA, pseudo, etc.
-- `insdc:dblink` = IRI links (Ensembl, HGNC, OMIM)
-- `insdc:db_xref` = string references (Database:ID format)
-- `orth:hasOrtholog` = orthology relationships
+## Interesting Findings
 
-## Cross-References
-| Target | Property | Coverage |
-|--------|----------|----------|
-| Ensembl | insdc:dblink | ~70% |
-| HGNC | insdc:dblink | ~100% (human) |
-| OMIM | insdc:dblink | variable |
-| NCBI Taxonomy | ncbio:taxid | 100% |
+### Specific Verifiable Facts
+- Gene ID 1 = A1BG (alpha-1-B glycoprotein), chromosome 19q13.43
+- Gene ID 3630 = INS (insulin), chromosome 11p15.5
+- Gene ID 672 = BRCA1, chromosome 17q21.31
+- Gene ID 7157 = TP53, chromosome 17p13.1
+- Human has 20,595 protein-coding genes
 
-## Critical Patterns
+### Gene Type Distribution (Human)
+1. biological-region: 128,261
+2. ncRNA: 22,103
+3. protein-coding: 20,595
+4. pseudo: 17,483
+5. snoRNA: 1,201
 
-### RECOMMENDED WORKFLOW
-1. Use `ncbi_esearch` for initial gene discovery
-2. Use SPARQL for detailed metadata and cross-references
-3. Always filter by `ncbio:taxid` to avoid timeouts
+### Cross-Database Links
+- BRCA1 (672) links to:
+  - OMIM: 113705
+  - Ensembl: ENSG00000012048
+  - HGNC: 1100
 
-### ALWAYS
-- Include `FROM <http://rdfportal.org/dataset/ncbigene>`
-- Filter by taxid early (57M+ genes cause timeouts)
-- Use `bif:contains` for text search
-- Add LIMIT to orthology queries
+### Orthology
+- INS has orthologs across mammals (mouse, rat, cattle, pig, dog, cat)
+- Mouse uses "Ins2" symbol, while most other mammals use "INS"
 
-### NEVER
-- Search without organism filter
-- Search full names in `rdfs:label` (use `dct:description`)
-- Run unbounded orthology queries
+## Question Opportunities by Category
 
-## Anti-Patterns
+### Precision Questions
+- What is the NCBI Gene ID for human insulin (INS)?
+- What chromosome is BRCA1 located on?
+- What is the cytogenetic location of TP53?
+- What is the gene type of NCBI Gene ID 7157?
 
-### ❌ No Organism Filter (Timeout)
-```sparql
-SELECT ?gene ?description
-WHERE {
-  ?gene dct:description ?description .
-  FILTER(CONTAINS(?description, "insulin"))
-}
-```
+### Completeness Questions
+- How many protein-coding genes does human have in NCBI Gene?
+- How many ncRNA genes are annotated for human?
+- How many orthologs does the human INS gene have?
 
-### ✅ Correct: Filter by Taxid First
-```sparql
-SELECT ?gene ?description ?sc
-FROM <http://rdfportal.org/dataset/ncbigene>
-WHERE {
-  ?gene ncbio:taxid <http://identifiers.org/taxonomy/9606> ;
-        dct:description ?description .
-  ?description bif:contains "'insulin'" option (score ?sc) .
-}
-ORDER BY DESC(?sc)
-LIMIT 100
-```
+### Integration Questions
+- What is the Ensembl ID for BRCA1 (NCBI Gene 672)?
+- What OMIM ID is linked to BRCA1?
+- What is the HGNC ID for gene 672?
 
-## Question Opportunities
-1. **Precision**: "What chromosome is BRCA1 located on?" → Chr 17
-2. **Counting**: "How many protein-coding genes in humans?" → 20,595
-3. **Cross-ref**: "What is the Ensembl ID for gene 672?" → ENSG00000012048
-4. **Orthology**: "How many orthologs does INS have?" → ~150
-5. **Type distribution**: "What are the types of human genes?"
+### Specificity Questions
+- Find all insulin-related genes in human
+- What genes are located on chromosome 17q21?
+- Find tumor suppressor genes in human
+
+### Structured Query Questions
+- List all orthologs of human insulin gene
+- Find all protein-coding genes on chromosome 19
+- Get genes with both Ensembl and HGNC cross-references
+
+## Cross-Reference Mapping Analysis
+
+### External Database Links (insdc:dblink)
+- Links via identifiers.org URIs
+- Common targets: Ensembl, HGNC, OMIM
+- Format: http://identifiers.org/{database}/{id}
+
+### Orthology (orth:hasOrtholog)
+- Bidirectional orthology relationships
+- ~40% of genes have orthologs
+- Average ~150 orthologs per gene
+
+## Notes
+- Use `bif:contains` for text search on descriptions
+- Always filter by `ncbio:taxid` for organism-specific queries (essential for 57M+ genes!)
+- Label = gene symbol (INS), description = full name (insulin)
+- Use `ncbi_esearch` for initial discovery, then SPARQL for detailed data
+- Human taxonomy ID: 9606 (`http://identifiers.org/taxonomy/9606`)
+- Gene IDs are integers, use full URI: `<http://identifiers.org/ncbigene/ID>`
+- Always include `FROM <http://rdfportal.org/dataset/ncbigene>` clause

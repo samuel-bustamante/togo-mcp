@@ -67,6 +67,56 @@ Currency questions should test access to RECENT BIOLOGICAL DATA, not database ma
 - ❌ "What is the current database release number?"
 - ❌ "When was the database last updated?"
 
+COUNTING QUESTIONS - ENTITY vs. RELATIONSHIP COUNTS:
+
+⚠️ **CRITICAL: Distinguish Between Entity Counts and Relationship Counts** ⚠️
+
+When databases have cross-references or mappings, there are TWO different counts:
+
+**Entity Count**: Number of unique entities that HAVE mappings
+- Query uses: `COUNT(DISTINCT ?entity)`
+- Example: "How many NANDO diseases have MONDO mappings?" → 2,150 unique diseases
+
+**Relationship Count**: Total number of mapping relationships
+- Query uses: `COUNT(?target)` (without DISTINCT)
+- Example: "How many total NANDO→MONDO mappings exist?" → 2,341 total mappings
+
+**Why They Differ**: Some entities map to multiple targets
+- Example: NANDO:1200001 maps to BOTH MONDO:0010735 AND MONDO:0016113
+- This counts as: 1 entity with mappings, but 2 total mapping relationships
+
+**Question Formulation Guidelines:**
+
+✅ **CLEAR - Explicitly state what you're counting:**
+- "How many proteins HAVE UniProt→PDB mappings?" (entity count)
+- "How many total protein→structure mapping relationships exist?" (relationship count)
+- "How many diseases map to exactly 2 MONDO IDs?" (structured query on distribution)
+
+⚠️ **AMBIGUOUS - Avoid vague phrasing:**
+- "How many UniProt→PDB mappings are there?" (unclear: entities or relationships?)
+- "What is the count of cross-references?" (unclear: which count?)
+
+**Expected Answer Formatting:**
+- For entity counts: "2,150 diseases have mappings" ✅
+- For relationship counts: "2,341 total mapping relationships" ✅
+- Always clarify in the answer which count you're providing
+- In the notes field, explain if there's a difference and why
+
+**Example Questions:**
+
+**Completeness Category:**
+- ✅ "How many NANDO diseases have at least one MONDO mapping?" → "2,150 unique diseases"
+- ✅ "How many total NANDO→MONDO mapping relationships exist?" → "2,341 total mappings"
+- ✅ "What percentage of NANDO diseases map to exactly 1 MONDO ID?" → "~92% (1,976/2,150)"
+
+**Structured Query Category:**
+- ✅ "Find NANDO diseases that map to multiple MONDO IDs" → "174 diseases (157 with 2 mappings + 17 with 3 mappings)"
+- ✅ "Which disease has the most MONDO mappings?" → "17 diseases tie with 3 mappings each"
+
+**Integration Category:**
+- ✅ "What MONDO IDs does NANDO:1200001 map to?" → "MONDO:0010735 and MONDO:0016113 (2 mappings)"
+- ✅ "Convert NANDO:1200010 to its MONDO equivalent" → "MONDO:0005180"
+
 QUESTION DESIGN CRITERIA:
 Each question MUST satisfy:
 
@@ -77,6 +127,7 @@ Each question MUST satisfy:
 ✓ **Clear Success Criteria**: Verifiable correct answer
 ✓ **Verifiable Ground Truth**: Confirmed during exploration phase
 ✓ **Natural Phrasing**: No mention of "SPARQL" or "MCP tools"
+✓ **Precise Counting**: If asking about cross-references, clearly specify entity vs. relationship count
 
 QUESTION CREATION PROCESS:
 For each question:
@@ -90,20 +141,28 @@ For each question:
    - Does this provide scientific insight or just administrative information?
    - If this is a methodology question, does the methodology choice affect scientific interpretation?
 
-4. **Verify the answer**: Based on the exploration report, confirm:
+4. **For counting questions involving cross-references**:
+   - Check the exploration report for BOTH entity count AND relationship count
+   - Decide which count you're asking about
+   - Formulate the question to make this clear
+   - Document both counts in the notes field for clarity
+
+5. **Verify the answer**: Based on the exploration report, confirm:
    - The entity/concept exists in the database
    - You know how to query for it (from tested SPARQL queries)
    - The answer is specific and verifiable
    - The answer relates to biological/scientific content
+   - If asking about counts, you know WHICH count (entity or relationship)
 
-5. **Formulate naturally**: Write the question as a researcher would ask it
+6. **Formulate naturally**: Write the question as a researcher would ask it
 
-6. **Document thoroughly**: In the "notes" field, include:
+7. **Document thoroughly**: In the "notes" field, include:
    - Which database(s) are involved
    - Reference to exploration report findings
    - How the answer was verified
    - Why this tests database access vs training knowledge
    - Why this is biologically relevant (if not obvious)
+   - **For cross-reference counts: Clarify whether asking about entity or relationship count**
 
 OUTPUT FORMAT:
 
@@ -122,9 +181,9 @@ Each file MUST be a JSON **ARRAY** (not an object), following this EXACT structu
   {
     "id": 2,
     "category": "Completeness",
-    "question": "How many human genes are annotated with GO:0006281?",
-    "expected_answer": "523 genes (as of exploration)",
-    "notes": "Uses GO database. Verified via SPARQL query in go_exploration.md. Tests counting and filtering."
+    "question": "How many NANDO diseases have MONDO ontology mappings?",
+    "expected_answer": "2,150 unique diseases have mappings (out of 2,777 total NANDO diseases)",
+    "notes": "Uses NANDO database. Verified in nando_exploration.md via SPARQL with COUNT(DISTINCT ?disease). Entity count, not relationship count (2,341 total mapping relationships exist because some diseases map to multiple MONDO IDs). Tests understanding of cross-reference mappings."
   }
 ]
 ```
@@ -144,7 +203,11 @@ Each file MUST be a JSON **ARRAY** (not an object), following this EXACT structu
   * "Specificity"
   * "Structured Query"
 - `expected_answer` (string): The verified correct answer
+  - **For cross-reference counts**: Clarify which count in the answer
+  - Example: "2,150 diseases have mappings" (entity count) OR "2,341 total mappings" (relationship count)
 - `notes` (string): Rationale, databases used, verification method
+  - **For cross-reference counts**: Explain entity vs. relationship count if relevant
+  - Example: "Entity count (2,150), not relationship count (2,341). Some diseases map to multiple IDs."
 
 **Format Rules:**
 - ✅ Root element MUST be an array `[...]`
@@ -210,7 +273,9 @@ WORKFLOW:
       - Consult relevant exploration report(s)
       - Select a verified BIOLOGICAL/SCIENTIFIC finding (not IT metadata)
       - **CHECK: Is this biologically relevant? Would a researcher care?**
+      - **CHECK: If counting cross-references, which count am I asking about?**
       - Formulate the question naturally (10-500 characters)
+      - Write clear expected answer (specify entity vs. relationship count if relevant)
       - Write detailed notes referencing the exploration
       - Assign sequential ID (1-120 globally across all files)
       - Ensure category name is EXACTLY one of the 6 valid values (case-sensitive)
@@ -226,6 +291,7 @@ WORKFLOW:
    - All databases from the summary are represented
    - All questions reference findings from exploration reports
    - **ALL questions are biologically/scientifically relevant (not IT infrastructure)**
+   - **Counting questions about cross-references clearly specify entity vs. relationship count**
 
 VALIDATION CHECKLIST:
 Before finalizing each file, verify:
@@ -239,6 +305,7 @@ Before finalizing each file, verify:
 - [ ] JSON syntax is valid (commas, quotes, brackets)
 - [ ] **ALL questions focus on biological/scientific content, not IT infrastructure**
 - [ ] **NO questions about database versions, software tools (unless interpretation-critical), or administrative metadata**
+- [ ] **Counting questions about cross-references clearly specify which count**
 
 DUPLICATE DETECTION:
 After creating all questions:
@@ -259,5 +326,6 @@ IMPORTANT REMINDERS:
 - Maintain even distribution across categories and databases
 - **Avoid database versions, release numbers, and pure IT metadata**
 - **Currency questions should test recent biological data, not database maintenance info**
+- **⚠️ CRITICAL: For cross-reference counting questions, distinguish entity counts from relationship counts**
 
-Begin by reading the exploration summary and example_questions.json, then generate the 120 questions across 10 files following the EXACT format specification and ensuring ALL questions are biologically relevant.
+Begin by reading the exploration summary and example_questions.json, then generate the 120 questions across 10 files following the EXACT format specification and ensuring ALL questions are biologically relevant with clear counting semantics.

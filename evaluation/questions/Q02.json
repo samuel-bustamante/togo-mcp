@@ -2,85 +2,85 @@
   {
     "id": 13,
     "category": "Precision",
-    "question": "What is the highest resolution ever achieved for a protein structure in the PDB?",
-    "expected_answer": "0.48 Å",
-    "notes": "Database: PDB. Verified in pdb_exploration.md via SPARQL query filtering by resolution. PDB entries 5D8V and 3NIR achieve 0.48Å resolution. Tests retrieval of structural quality metrics."
+    "question": "What is the PubChem Compound ID (CID) for aspirin?",
+    "expected_answer": "2244",
+    "notes": "Uses PubChem database. Verified using get_pubchem_compound_id('aspirin'). Tests specific compound identification - baseline cannot reliably provide database IDs."
   },
   {
     "id": 14,
     "category": "Precision",
-    "question": "What is the molecular formula for caffeine according to PubChem?",
+    "question": "What is the molecular formula of caffeine according to PubChem?",
     "expected_answer": "C8H10N4O2",
-    "notes": "Database: PubChem. Verified in pubchem_exploration.md using get_compound_attributes_from_pubchem for CID 2519. Caffeine has MW 194.19. Tests retrieval of molecular properties."
+    "notes": "Uses PubChem database. Verified using get_compound_attributes_from_pubchem for CID 2519. Tests retrieval of specific molecular property."
   },
   {
     "id": 15,
     "category": "Completeness",
-    "question": "How many reviewed human proteins are in UniProt?",
-    "expected_answer": "40,209",
-    "notes": "Database: UniProt. Verified in uniprot_exploration.md via SPARQL COUNT query with up:reviewed 1 and taxonomy/9606 filters. Tests comprehensive protein database coverage."
+    "question": "How many single nucleotide variants (SNVs) are recorded in ClinVar?",
+    "expected_answer": "3,236,823 SNVs",
+    "notes": "Uses ClinVar database. Verified via SPARQL COUNT query filtered by variation_type='single nucleotide variant'. Tests comprehensive count retrieval."
   },
   {
     "id": 16,
     "category": "Completeness",
-    "question": "How many disease classes are defined in the MONDO ontology?",
-    "expected_answer": "30,304",
-    "notes": "Database: MONDO. Verified in mondo_exploration.md via SPARQL COUNT query. MONDO integrates disease definitions from multiple sources. Tests ontology completeness."
+    "question": "How many pathogenic variants are classified in ClinVar?",
+    "expected_answer": "200,004 pathogenic variants",
+    "notes": "Uses ClinVar database. Verified via SPARQL query on germline_classification description = 'Pathogenic'. Tests database filtering and counting capability."
   },
   {
     "id": 17,
     "category": "Integration",
-    "question": "What is the NCBI Taxonomy ID for Homo sapiens?",
-    "expected_answer": "9606",
-    "notes": "Database: NCBI Taxonomy. Verified in taxonomy_exploration.md. This is a fundamental organism identifier used across all biological databases. Tests organism taxonomy integration."
+    "question": "What is the Ensembl gene ID for human BRCA1?",
+    "expected_answer": "ENSG00000012048",
+    "notes": "Uses Ensembl database. Verified in ensembl_exploration.md using SPARQL query. BRCA1 is located on chromosome 17. Tests gene identification across databases."
   },
   {
     "id": 18,
     "category": "Integration",
-    "question": "What MONDO disease ontology ID corresponds to Fabry disease?",
-    "expected_answer": "MONDO:0010526",
-    "notes": "Database: MONDO. Verified in mondo_exploration.md using OLS4:searchClasses. Fabry disease is a lysosomal storage disorder. Tests disease ontology identification."
+    "question": "What is the UniProt ID for mouse annexin A1 (encoded by NCBI Gene ID 11461)?",
+    "expected_answer": "P10107",
+    "notes": "Uses NCBI Gene and UniProt databases via TogoID. Tests cross-species ID conversion capability. Replaces BRCA1 question to reduce redundancy."
   },
   {
     "id": 19,
     "category": "Currency",
-    "question": "How many FDA-approved drugs are catalogued in PubChem?",
-    "expected_answer": "17,367",
-    "notes": "Database: PubChem. Verified in pubchem_exploration.md via SPARQL COUNT query filtering by FDAApprovedDrugs role. Tests access to current drug regulatory status."
+    "question": "Which ClinVar variant has the most submitters (highest consensus)?",
+    "expected_answer": "GJB2 c.35del (variation ID 17004) with 80 submitters",
+    "notes": "Uses ClinVar database. Verified via SPARQL query ORDER BY DESC(number_of_submitters). Most-submitted variants indicate clinical consensus. Tests access to database statistics."
   },
   {
     "id": 20,
     "category": "Currency",
-    "question": "How many X-ray crystallography structures are in the PDB?",
-    "expected_answer": "174,904",
-    "notes": "Database: PDB. Verified in pdb_exploration.md via SPARQL GROUP BY experimental method. X-ray is the dominant method at ~85% of all structures. Tests current structural database statistics."
+    "question": "What is the highest resolution ever achieved for a protein structure in the PDB?",
+    "expected_answer": "0.48 Å (PDB entries 5D8V and 3NIR)",
+    "notes": "Uses PDB database. Verified via SPARQL query ORDER BY resolution. 0.48 Å represents sub-atomic resolution. Tests access to current best-in-class structural data."
   },
   {
     "id": 21,
     "category": "Specificity",
-    "question": "What is the BacDive ID for the Thermotoga maritima type strain?",
-    "expected_answer": "17060",
-    "notes": "Database: BacDive. Verified in bacdive_exploration.md via SPARQL query. T. maritima DSM 3109 is a model hyperthermophile. Tests specialized microbial database access."
+    "question": "What is the optimal growth temperature for the hyperthermophilic archaeon Pyrolobus fumarii in BacDive?",
+    "expected_answer": "103°C",
+    "notes": "Uses BacDive database. Verified via SPARQL query. Pyrolobus fumarii is distinct from Pyrococcus kukulkanii (covered in Q95). Tests extremophile cultivation data."
   },
   {
     "id": 22,
     "category": "Specificity",
-    "question": "What is the GlyCosmos glycoepitope ID for Lewis a antigen?",
-    "expected_answer": "EP0007",
-    "notes": "Database: GlyCosmos. Verified in glycosmos_exploration.md via SPARQL query. Lewis antigens are important blood group determinants. Tests specialized glycoscience database access."
+    "question": "What is the Japanese government notification number assigned to Huntington's disease in NANDO?",
+    "expected_answer": "8",
+    "notes": "Uses NANDO database. Verified in nando_exploration.md. Huntington's disease is NANDO:1200012 with notification number 8. Tests specialized rare disease database access."
   },
   {
     "id": 23,
     "category": "Structured Query",
-    "question": "How many biological_process terms are in the Gene Ontology?",
-    "expected_answer": "30,804",
-    "notes": "Database: GO. Verified in go_exploration.md via SPARQL COUNT query filtering by hasOBONamespace. Biological_process is the largest GO namespace. Tests structured ontology queries."
+    "question": "How many FDA-approved drugs are catalogued in PubChem?",
+    "expected_answer": "17,367 FDA-approved drugs",
+    "notes": "Uses PubChem database. Verified via SPARQL query filtering by FDAApprovedDrugs role annotation. Tests structured query on compound classification."
   },
   {
     "id": 24,
     "category": "Structured Query",
-    "question": "What are the top AMR gene classes by number of genotype features in AMR Portal?",
-    "expected_answer": "BETA-LACTAM (243,389), AMINOGLYCOSIDE (187,430), EFFLUX (180,406)",
-    "notes": "Database: AMR Portal. Verified in amrportal_exploration.md via SPARQL GROUP BY and COUNT. Tests complex aggregation queries on resistance surveillance data."
+    "question": "What experimental method is most commonly used to determine protein structures in the PDB?",
+    "expected_answer": "X-RAY DIFFRACTION with 174,904 structures",
+    "notes": "Uses PDB database. Verified via SPARQL GROUP BY exptl.method query. Tests aggregation query capability on experimental methodology."
   }
 ]
