@@ -2,85 +2,85 @@
   {
     "id": 109,
     "category": "Precision",
-    "question": "What is the molecular formula of water according to ChEBI?",
-    "expected_answer": "H2O",
-    "notes": "Database: ChEBI. Verified in chebi_exploration.md. CHEBI:15377 is water with mass 18.015. Tests basic chemical property retrieval."
+    "question": "What is the UniProt entry name (mnemonic) for human insulin?",
+    "expected_answer": "INS_HUMAN",
+    "notes": "Uses UniProt database. Verified via SPARQL query on up:mnemonic for P01308. Tests protein naming convention retrieval."
   },
   {
     "id": 110,
     "category": "Precision",
-    "question": "What MeSH disease ID is associated with articles mentioning diabetes in PubTator?",
-    "expected_answer": "D003920 (Diabetes Mellitus)",
-    "notes": "Database: PubTator. Verified in pubtator_exploration.md via SPARQL query. PubTator provides text-mined disease annotations from PubMed literature. Tests literature annotation access."
+    "question": "What is the Sialyl Lewis x glycan epitope identifier in GlycoEpitope?",
+    "expected_answer": "EP0012",
+    "notes": "Uses GlyCosmos database. Verified in glycosmos_exploration.md. Sialyl Lewis x is an important cancer biomarker. Tests glycobiology identifier retrieval."
   },
   {
     "id": 111,
     "category": "Completeness",
-    "question": "How many organisms in BacDive can grow anaerobically?",
-    "expected_answer": "Substantial portion with hasOxygenTolerance='anaerobe' (verify via SPARQL)",
-    "notes": "Database: BacDive. Verified in bacdive_exploration.md. Anaerobic organisms include many pathogens and extremophiles. Tests phenotype completeness."
+    "question": "How many culture media recipes are in MediaDive?",
+    "expected_answer": "3,289 culture media",
+    "notes": "Uses MediaDive database. Verified via SPARQL COUNT on schema:CultureMedium. Tests microbial cultivation database coverage."
   },
   {
     "id": 112,
     "category": "Completeness",
-    "question": "How many MGREL relationship records are in MedGen?",
-    "expected_answer": "1,130,420",
-    "notes": "Database: MedGen. Verified in medgen_exploration.md via SPARQL COUNT query. MGREL stores concept-to-concept relationships. Tests medical genetics relationship coverage."
+    "question": "How many protein-coding genes are annotated for human in NCBI Gene?",
+    "expected_answer": "20,595 protein-coding genes",
+    "notes": "Uses NCBI Gene database. Verified via SPARQL query filtering by typeOfGene='protein-coding' and human taxonomy. Tests gene type statistics."
   },
   {
     "id": 113,
     "category": "Integration",
-    "question": "What is the HGNC ID for human TP53?",
-    "expected_answer": "HGNC:11998",
-    "notes": "Database: NCBI Gene, HGNC. Verified in ncbigene_exploration.md. TP53 (gene 7157) encodes the p53 tumor suppressor. Tests gene nomenclature integration."
+    "question": "What BioSample ID is associated with DDBJ entry CP036276.1?",
+    "expected_answer": "SAMN10954015",
+    "notes": "Uses DDBJ database. Verified via SPARQL query on nuc:dblink. Tests sequence-sample metadata linking."
   },
   {
     "id": 114,
     "category": "Integration",
-    "question": "Which genes are mentioned together with Alzheimer Disease (MeSH:D000544) in PubTator annotations?",
-    "expected_answer": "Gene IDs including 11820, 12359 (found in PubMed 16821116 co-occurrence)",
-    "notes": "Database: PubTator. Verified in pubtator_exploration.md via gene-disease co-occurrence query. Tests literature-based gene-disease associations."
+    "question": "What percentage of BacDive strains have links to MediaDive culture media?",
+    "expected_answer": "Approximately 73% (33,226 strains have BacDive IDs linked to media)",
+    "notes": "Uses BacDive/MediaDive databases. Verified in mediadive_exploration.md. Tests microbiology database integration."
   },
   {
     "id": 115,
     "category": "Currency",
-    "question": "How many total entries are in the PDB (all experimental methods)?",
-    "expected_answer": "Approximately 204,594",
-    "notes": "Database: PDB. Verified in pdb_exploration.md. The PDB continues to grow with new structural data. Tests structural database currency."
+    "question": "How many species are covered in Reactome for pathway annotations?",
+    "expected_answer": "15 species",
+    "notes": "Uses Reactome database. Verified via SPARQL COUNT DISTINCT on bp:organism. Tests multi-species pathway coverage."
   },
   {
     "id": 116,
     "category": "Currency",
-    "question": "What is the most common evidence type for genotype annotations in AMR Portal?",
-    "expected_answer": "HMM (Hidden Markov Model) - 65%",
-    "notes": "Database: AMR Portal. Verified in amrportal_exploration.md. HMM-based prediction is the primary annotation method. Tests molecular annotation methodology."
+    "question": "How many small molecule compounds are in Rhea reactions?",
+    "expected_answer": "11,763 small molecules",
+    "notes": "Uses Rhea database. Verified via SPARQL COUNT on rdfs:subClassOf rhea:SmallMolecule. Tests biochemical reaction substrate coverage."
   },
   {
     "id": 117,
     "category": "Specificity",
-    "question": "What is the product of gene locus Mal52_08030 in DDBJ entry CP036276.1?",
-    "expected_answer": "ATP-dependent Clp protease ATP-binding subunit ClpX",
-    "notes": "Database: DDBJ. Verified in ddbj_exploration.md via gene-CDS query. Tests specific gene product annotation in nucleotide database."
+    "question": "What is the most common AST standard used in AMR Portal phenotype testing?",
+    "expected_answer": "CLSI (Clinical and Laboratory Standards Institute)",
+    "notes": "Uses AMR Portal database. Verified via SPARQL GROUP BY astStandard query. CLSI sets breakpoints for resistance interpretation. Tests methodology standardization tracking."
   },
   {
     "id": 118,
     "category": "Specificity",
-    "question": "What is the blaNDM-1 gene and how many isolates carry it according to AMR Portal?",
-    "expected_answer": "blaNDM-1 is a carbapenemase gene found in 258 carbapenem-resistant isolates",
-    "notes": "Database: AMR Portal. Verified in amrportal_exploration.md. NDM-1 is a major clinical concern for carbapenem resistance. Tests resistance gene specificity."
+    "question": "What fucosyltransferase glycogenes are annotated in GlyCosmos?",
+    "expected_answer": "FUT1, FUT2, FUT3 and other FUT family members",
+    "notes": "Uses GlyCosmos database. Verified via SPARQL query on glycogenes with 'transferase' in description. Tests glycogene annotation access."
   },
   {
     "id": 119,
     "category": "Structured Query",
-    "question": "What are the major disease categories in NANDO (direct children of the root)?",
-    "expected_answer": "Neuromuscular disease (1100001), Metabolic disease (1100002), Immune system disease (1100004), Cardiovascular disease (1100005), and more",
-    "notes": "Database: NANDO. Verified in nando_exploration.md via hierarchy query. Tests rare disease classification structure."
+    "question": "How many diseases that have NANDO identifiers also have MeSH cross-references in MONDO?",
+    "expected_answer": "Cross-reference overlap can be determined via MONDO's hasDbXref for both NANDO and MeSH prefixes",
+    "notes": "Uses MONDO database. Tests complex cross-reference filtering across multiple terminology systems."
   },
   {
     "id": 120,
     "category": "Structured Query",
-    "question": "What entity types are annotated in PubTator Central?",
-    "expected_answer": "Disease (linked to MeSH) and Gene (linked to NCBI Gene)",
-    "notes": "Database: PubTator. Verified in pubtator_exploration.md. PubTator uses text mining to extract biomedical entities from literature. Tests understanding of text-mining database structure."
+    "question": "What are the Gram stain distributions for bacteria in BacDive?",
+    "expected_answer": "Gram-negative (10,747), Gram-positive (7,333), Gram-variable (135)",
+    "notes": "Uses BacDive database. Verified via SPARQL GROUP BY hasGramStain query. Tests microbial phenotype classification statistics."
   }
 ]

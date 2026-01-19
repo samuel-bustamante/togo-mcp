@@ -1,75 +1,57 @@
 # GlyCosmos Exploration Report
 
 ## Database Overview
-- **Purpose**: Comprehensive glycoscience portal integrating glycan structures, glycoproteins, glycosylation sites, glycogenes, and glycoepitopes
-- **Scope**: 117,571 glycans, 153,178 glycoproteins, 414,798 glycosylation sites, 423,164 glycogenes, 173 glycoepitopes
-- **Key data types**: GlyTouCan structures, glycosylation sites with FALDO positions, glycogene annotations
-- **Focus**: Multi-species glycobiology research, biomarker discovery, lectin-glycan interactions
+- **Purpose**: Comprehensive glycoscience portal integrating glycan structures, glycoproteins, glycosylation sites, glycogenes, glycoepitopes, and lectin-glycan interactions
+- **Scope**: Multi-species glycobiology research and biomarker discovery
+- **Key entities**: Saccharide (glycans), Glycoprotein, Glycosylation_Site, Glycogene, Glycan_epitope, Lectin
+- **Cross-references**: ChEBI, PubChem, UniProt, NCBI Gene, KEGG, PDB
 
 ## Schema Analysis (from MIE file)
 
 ### Main Properties Available
-- **Glycans**: `glycan:Saccharide` with `glytoucan:has_primary_id`, `glycan:has_Resource_entry`
-- **Glycoproteins**: `glycan:Glycoprotein` with `rdfs:label`, `glycan:has_taxon`, `glycoconjugate:glycosylated_at`
-- **Glycosylation sites**: `glycoconjugate:Glycosylation_Site` with `sio:SIO_000772` (protein ref), `faldo:location/faldo:position`
-- **Glycogenes**: `glycan:Glycogene` with `rdfs:label`, `dcterms:description`, `glycan:has_taxon`
-- **Glycoepitopes**: `glycan:Glycan_epitope` with `rdfs:label`, `skos:altLabel`, `glycoepitope:has_antibody`
-- **Lectins**: `sugarbind:Lectin` with `sugarbind:uniprotId`
+- **Saccharide (Glycan)**: glytoucan:has_primary_id (GlyTouCan ID), glycan:has_Resource_entry (external DB)
+- **Glycoprotein**: rdfs:label, glycan:has_taxon, glycoconjugate:glycosylated_at
+- **Glycosylation_Site**: sio:SIO_000772 (protein reference), faldo:location (position)
+- **Glycogene**: rdfs:label (symbol), dcterms:description, glycan:has_taxon, rdfs:seeAlso
+- **Glycan_epitope**: rdfs:label, skos:altLabel, glycoepitope:has_antibody, glycoepitope:organism, glycoepitope:tissue
 
 ### Important Relationships
-- Multi-graph architecture: separate graphs for core glycans, glycoproteins, glycogenes, epitopes
-- FALDO for glycosylation site positions
-- Cross-references to ChEBI, PubChem, KEGG, PDB for glycans
-- UniProt, NCBI Gene links for proteins and genes
-- NCBI Taxonomy for species
+- Glycoprotein → Glycosylation_Site via `glycoconjugate:glycosylated_at`
+- Glycosylation_Site → Protein via `sio:SIO_000772`
+- Glycosylation_Site → Position via `faldo:location/faldo:position`
+- External links via `glycan:has_Resource_entry` and `rdfs:seeAlso`
 
-### Query Patterns Observed
-- Always specify FROM clause (100+ graphs)
-- Use `bif:contains` for label searches with relevance scoring
-- Filter by taxonomy early for performance
-- Use LIMIT for large datasets (414K+ glycosylation sites)
+### Key Query Patterns
+- Must specify FROM clause with graph URI (100+ graphs)
+- Use `bif:contains` for label searches in epitopes
+- Filter by taxonomy for species-specific queries
+- Always use LIMIT for large datasets (414K+ sites)
 
 ## Search Queries Performed
 
-### Query 1: Lewis antigen epitopes
-- **Search**: `bif:contains "'Lewis'"`
-- **Results**: 20 Lewis-related epitopes:
-  - EP0007 - Lewis a
-  - EP0008 - Sialyl Lewis a
-  - EP0011 - Lewis x
-  - EP0012 - Sialyl Lewis x
-  - Various sulfo and hybrid variants
+1. **Query: Lewis epitopes**
+   - Results: 20 Lewis-related epitopes (Lewis a, Lewis b, Lewis x, Lewis y, Sialyl Lewis variants)
+   - EP0007 = Lewis a, EP0011 = Lewis x, EP0012 = Sialyl Lewis x
 
-### Query 2: Total glycans count
-- **Search**: COUNT with GlyTouCan IDs
-- **Results**: 117,571 glycan structures
+2. **Query: Total glycan epitopes**
+   - Results: 173 epitopes total
+   - Manageable dataset for complete enumeration
 
-### Query 3: Human glycoproteins
-- **Search**: Filter by taxonomy/9606
-- **Results**: Found many human glycoproteins:
-  - P13224 - Platelet glycoprotein Ib beta chain
-  - P15529 - Membrane cofactor protein
-  - MHC class I antigens (various)
+3. **Query: Glycoproteins by species**
+   - Results: Human (9606): 16,604; Mouse (10090): 10,713; Rat (10116): 2,576; Arabidopsis (3702): 2,251
+   - Multi-species coverage
 
-### Query 4: Human glycosylation sites with positions
-- **Search**: Glycoprotein → glycosylated_at → position
-- **Results**: Sites with specific positions:
-  - P13224 (Platelet GP Ib beta): positions 65, 66, 83
-  - HLA class I B: position 110
-  - Membrane cofactor protein: position 83
+4. **Query: Human glycosylation sites with positions**
+   - Results: Found sites with specific positions (e.g., HLA class I at position 110, Platelet glycoprotein at 65, 66, 83)
+   - P15529 (Membrane cofactor protein) has many sites at position 83
 
-### Query 5: Human glycogenes with descriptions
-- **Search**: Filter by taxon/9606 with description
-- **Results**: 20 genes including:
-  - ARID1A - AT-rich interaction domain 1A
-  - CTNNB1 - catenin beta 1
-  - INSR - insulin receptor
-  - EXTL3 - exostosin like glycosyltransferase 3
+5. **Query: Glycogenes with "transferase" function**
+   - Results: FUT1, FUT2, FUT3 (fucosyltransferases), B4GALNT2, A4GALT (galactosyltransferases), ABO blood group gene
 
 ## SPARQL Queries Tested
 
 ```sparql
-# Query 1: Search glycan epitopes by label
+# Query 1: Search Lewis epitopes
 PREFIX glycan: <http://purl.jp/bio/12/glyco/glycan#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
@@ -82,45 +64,47 @@ WHERE {
 }
 ORDER BY DESC(?sc)
 LIMIT 20
-# Results: 20 Lewis antigen variants found
+# Results: 20 Lewis-family epitopes (Lewis a, x, b, y, sialyl variants)
 ```
 
 ```sparql
-# Query 2: Human glycoproteins with labels
+# Query 2: Count glycoproteins by species
 PREFIX glycan: <http://purl.jp/bio/12/glyco/glycan#>
 
-SELECT ?protein ?label
+SELECT ?taxon (COUNT(DISTINCT ?protein) as ?count)
 FROM <http://rdf.glycosmos.org/glycoprotein>
 WHERE {
   ?protein a glycan:Glycoprotein ;
-           rdfs:label ?label ;
-           glycan:has_taxon <http://identifiers.org/taxonomy/9606> .
+    glycan:has_taxon ?taxon .
 }
-LIMIT 20
-# Results: Human glycoproteins including Platelet GP Ib beta, MHC class I antigens
+GROUP BY ?taxon
+ORDER BY DESC(?count)
+LIMIT 10
+# Results: Human 16,604; Mouse 10,713; Rat 2,576
 ```
 
 ```sparql
-# Query 3: Glycosylation sites with positions
+# Query 3: Human glycosylation sites with positions
 PREFIX glycan: <http://purl.jp/bio/12/glyco/glycan#>
 PREFIX glycoconjugate: <http://purl.jp/bio/12/glyco/conjugate#>
 PREFIX faldo: <http://biohackathon.org/resource/faldo#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
 SELECT ?protein ?label ?site ?position
 FROM <http://rdf.glycosmos.org/glycoprotein>
 WHERE {
   ?protein a glycan:Glycoprotein ;
-           rdfs:label ?label ;
-           glycan:has_taxon <http://identifiers.org/taxonomy/9606> ;
-           glycoconjugate:glycosylated_at ?site .
+    rdfs:label ?label ;
+    glycan:has_taxon <http://identifiers.org/taxonomy/9606> ;
+    glycoconjugate:glycosylated_at ?site .
   ?site faldo:location/faldo:position ?position .
 }
-LIMIT 20
-# Results: Sites with specific positions (e.g., P13224 at 65, 66, 83)
+LIMIT 30
+# Results: HLA class I (position 110), Platelet glycoprotein (65, 66, 83), Membrane cofactor protein (83)
 ```
 
 ```sparql
-# Query 4: Human glycogenes with functional descriptions
+# Query 4: Glycogenes encoding transferases
 PREFIX glycan: <http://purl.jp/bio/12/glyco/glycan#>
 PREFIX dcterms: <http://purl.org/dc/terms/>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
@@ -130,93 +114,104 @@ FROM <http://rdf.glycosmos.org/glycogenes>
 WHERE {
   ?gene a glycan:Glycogene ;
     rdfs:label ?symbol ;
-    dcterms:description ?description ;
-    glycan:has_taxon <http://identifiers.org/taxonomy/9606> .
+    dcterms:description ?description .
+  FILTER(CONTAINS(LCASE(?description), "transferase"))
 }
 LIMIT 20
-# Results: Human glycogenes like INSR (insulin receptor), EXTL3, CTNNB1
+# Results: FUT1, FUT2, FUT3 (fucosyltransferases), ABO blood group, galactosyltransferases
+```
+
+```sparql
+# Query 5: GlyTouCan glycan entries
+PREFIX glycan: <http://purl.jp/bio/12/glyco/glycan#>
+PREFIX glytoucan: <http://www.glytoucan.org/glyco/owl/glytoucan#>
+
+SELECT (COUNT(DISTINCT ?glycan) as ?total)
+FROM <http://rdf.glytoucan.org/core>
+WHERE {
+  ?glycan glytoucan:has_primary_id ?glycanId .
+}
+# Results: 117,571 glycan structures
 ```
 
 ## Interesting Findings
 
-### Specific Entities for Good Questions
-1. **Lewis a epitope**: EP0007 - classic blood group antigen
-2. **Sialyl Lewis x**: EP0012 - important in inflammation and cancer metastasis
-3. **Platelet GP Ib beta**: P13224 - glycosylated at positions 65, 66, 83
-4. **EXTL3 glycogene**: Exostosin-like glycosyltransferase 3
-5. **GM1 ganglioside**: EP0050 - neural ganglioside epitope
+### Specific Entities for Questions
+- **Lewis a epitope**: EP0007 - well-known blood group antigen
+- **Sialyl Lewis x**: EP0012 - important cancer biomarker
+- **FUT1/FUT2/FUT3**: Fucosyltransferases involved in blood group synthesis
+- **ABO gene**: Blood group determination (alpha-galactosyltransferase)
+- **P13224**: Platelet glycoprotein Ib beta chain with glycosylation at positions 65, 66, 83
 
-### Unique Properties/Patterns
-- GlyTouCan IDs: G[0-9]{5}[A-Z]{2} pattern
-- Multi-graph architecture requires explicit FROM clause
-- Glycosylation sites link proteins to glycans with specific positions
-- Lewis antigen family extensively catalogued (20+ variants)
+### Key Statistics
+- Glycans: 117,571 structures in GlyTouCan
+- Glycoproteins: 153,178 total (16,604 human)
+- Glycosylation sites: 414,798 total
+- Glycogenes: 423,164 entries
+- Glycoepitopes: 173 defined epitopes
+- Lectins: 739 entries
 
-### Connections to Other Databases
-- **ChEBI**: 11K glycan cross-references
-- **PubChem**: 32K compound and substance links
-- **KEGG**: 10K glycan-pathway links
-- **PDB**: 6K structure links
-- **UniProt**: 139K glycoprotein links
-- **NCBI Gene**: 423K glycogene links
+### Cross-Database Connections
+- Glycans → ChEBI, PubChem, KEGG, PDB
+- Glycoproteins → UniProt
+- Glycogenes → NCBI Gene, KEGG Genes, HGNC
 
 ### Verifiable Facts
-- Total glycans: 117,571
-- Total glycoproteins: 153,178
-- Total glycosylation sites: 414,798
-- Total glycogenes: 423,164
-- Total glycoepitopes: 173
-- Lewis epitopes: ~20 variants (Lewis a, b, x, y and derivatives)
+- Total glycan epitopes: 173
+- Total GlyTouCan glycans: 117,571
+- Human glycoproteins: 16,604
+- Lewis a epitope ID: EP0007
+- FUT3 gene ID: 2525 (Lewis blood group fucosyltransferase)
 
 ## Question Opportunities by Category
 
 ### Precision
-- "What is the GlyCoEpitope ID for Lewis a antigen?" → EP0007
-- "What is the Sialyl Lewis x epitope ID in GlyCosmos?" → EP0012
-- "At what positions is Platelet glycoprotein Ib beta chain (P13224) glycosylated?" → 65, 66, 83
+- "What is the GlycoEpitope identifier for Lewis a antigen?" (Answer: EP0007)
+- "What is the GlyCosmos glycogene ID for the FUT3 fucosyltransferase?" (Answer: 2525)
+- "What position is the glycosylation site on human platelet glycoprotein Ib beta chain (P13224)?" (Answer: 65, 66, 83)
 
 ### Completeness
-- "How many glycan structures are in GlyTouCan/GlyCosmos?" → 117,571
-- "How many glycan epitopes are catalogued in GlyCosmos?" → 173
-- "List all Lewis antigen variants in GlyCosmos"
+- "How many glycan epitopes are defined in GlycoEpitope?" (Answer: 173)
+- "How many glycan structures are in GlyTouCan?" (Answer: ~117,571)
+- "How many human glycoproteins are in GlyCosmos?" (Answer: 16,604)
+- "List all Lewis family glycan epitopes" (Lewis a, b, x, y, sialyl variants)
 
 ### Integration
-- "What human glycogenes are associated with glycosyltransferase activity?"
-- "Link glycoproteins to their glycosylation site positions"
-- "Find glycans cross-referenced to ChEBI"
+- "What is the NCBI Gene ID for the FUT1 fucosyltransferase glycogene?" (Answer: 2523)
+- "Which UniProt proteins are annotated as glycoproteins in GlyCosmos?"
+- "What ChEBI IDs correspond to glycans in GlyTouCan?"
 
 ### Currency
-- "What are the recently added glycan structures?"
+- "What recent glycan structures have been added to GlyTouCan?"
+- "What new glycosylation sites have been identified for cancer biomarkers?"
 
 ### Specificity
-- "What is the functional description of glycogene EXTL3?" → exostosin like glycosyltransferase 3
-- "Which ganglioside epitopes are catalogued in GlyCosmos?"
-- "What glycosylation positions are known for membrane cofactor protein (P15529)?" → 83
+- "What is the glycosylation site pattern for HLA class I histocompatibility antigens?"
+- "Which glycogenes encode sialyltransferases?"
+- "What epitopes contain sulfated Lewis structures?"
 
 ### Structured Query
-- "Find all human glycoproteins with glycosylation sites"
-- "List glycogenes involved in receptor functions"
-- "Find epitopes from the Lewis blood group family"
+- "Find all human glycoproteins with more than 3 glycosylation sites"
+- "List all fucosyltransferase glycogenes (FUT family)"
+- "Find glycan epitopes with associated antibodies and tissue annotations"
 
 ## Notes
 
 ### Limitations
-- Multi-graph architecture requires explicit FROM clause for performance
-- Glycan labels rarely populated (<1%)
-- Protein/gene labels partial (17%/32%)
-- Some cross-reference coverage incomplete
+- Glycan labels rarely populated (<1%) - use GlyTouCan IDs
+- Multi-graph architecture requires explicit FROM clauses
+- 414K+ glycosylation sites require pagination/filtering
+- bif:contains only optimized for rdfs:label, not descriptions
 
 ### Best Practices
-- Always specify FROM clause with specific graph(s)
-- Use `bif:contains` for label searches (rdfs:label, skos:altLabel)
-- Use FILTER(CONTAINS()) for dcterms:description (not indexed)
-- Filter by taxonomy early for large datasets
-- Use LIMIT for glycosylation sites (414K+)
-- Use GlyTouCan IDs rather than glycan labels
+- Always specify FROM clause with appropriate graph
+- Use bif:contains for epitope label searches
+- Filter by taxonomy for species-specific queries
+- Use FILTER(CONTAINS()) for description searches
+- Add LIMIT for large result sets
 
-### Data Quality
-- ~99.8% glycans have GlyTouCan primary IDs
-- ~86% glycans have Resource_entry cross-references
-- ~17% glycoproteins have labels
-- >90% glycosylation sites have positions
-- ~8% glycogenes have descriptions
+### Important Graphs
+- `http://rdf.glytoucan.org/core` - Glycan structures
+- `http://rdf.glycosmos.org/glycoprotein` - Glycoproteins and sites
+- `http://rdf.glycosmos.org/glycogenes` - Glycogenes
+- `http://rdf.glycoinfo.org/glycoepitope` - Glycan epitopes

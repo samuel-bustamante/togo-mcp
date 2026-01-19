@@ -1,64 +1,45 @@
 # Gene Ontology (GO) Exploration Report
 
 ## Database Overview
-- **Purpose**: Controlled vocabulary for describing gene and gene product attributes
-- **Scope**: Three ontology domains covering biological processes, molecular functions, and cellular components
-- **Key entities**: 48,165 GO terms organized hierarchically
-- **Data quality**: Standardized definitions, synonyms, and cross-references
+- **Purpose**: Controlled vocabulary for describing gene and gene product attributes across all organisms
+- **Key data types**: GO terms organized into three namespaces (biological_process, molecular_function, cellular_component)
+- **Scale**: 48,165 GO terms (30,804 biological_process, 12,793 molecular_function, 4,568 cellular_component)
+- **Structure**: Hierarchical ontology with parent-child relationships (directed acyclic graph)
 
 ## Schema Analysis (from MIE file)
 
-### Main Properties
-- `owl:Class`: GO term entity type
-- `oboinowl:id`: GO identifier (e.g., "GO:0006914")
-- `rdfs:label`: Term name
-- `obo:IAO_0000115`: Definition
-- `oboinowl:hasOBONamespace`: Domain (biological_process, molecular_function, cellular_component)
-- `rdfs:subClassOf`: Hierarchical parent terms
-- `oboinowl:hasExactSynonym`: Exact synonyms
-- `oboinowl:hasDbXref`: External database cross-references
-- `owl:deprecated`: Obsolescence flag
-
-### Important Relationships
-- Parent-child via rdfs:subClassOf (DAG structure)
-- Cross-references to Wikipedia, Reactome, KEGG, MeSH
-- Subset membership (GO slims)
+### Main Entity Type
+**GOTermShape (owl:Class)**:
+- Properties: oboinowl:id, rdfs:label, obo:IAO_0000115 (definition)
+- Namespace: oboinowl:hasOBONamespace
+- Hierarchy: rdfs:subClassOf
+- Synonyms: hasExactSynonym, hasRelatedSynonym, hasNarrowSynonym, hasBroadSynonym
+- Cross-refs: hasDbXref
+- Status: owl:deprecated
 
 ### Query Patterns
-- CRITICAL: Always use FROM <http://rdfportal.org/ontology/go>
-- Use bif:contains for keyword search
-- Use STR() for namespace comparisons
-- Filter by GO_ prefix to exclude other ontologies
+- CRITICAL: Always use `FROM <http://rdfportal.org/ontology/go>`
+- Use `bif:contains` for keyword search
+- Use `STR()` for namespace comparisons
+- Filter by `STRSTARTS(STR(?go), "http://purl.obolibrary.org/obo/GO_")` to get only GO terms
+- Use DISTINCT to remove duplicates
 
 ## Search Queries Performed
 
-1. **Query**: OLS4:searchClasses(query="autophagy")
-   - Results: Found GO:0006914 (autophagy) with definition
-   - Also found related terms in APO, UPHENO, ChEBI ontologies
+1. **Query**: OLS4 getDescendants for GO:0006914 (autophagy)
+   - Results: 25 descendant terms including macroautophagy, microautophagy, mitophagy, pexophagy, etc.
 
-2. **Query**: OLS4:getDescendants(GO:0006914)
-   - Results: 25 descendant terms including:
-     - macroautophagy (GO:0016236)
-     - microautophagy (GO:0016237)
-     - mitophagy (GO:0000423)
-     - xenophagy (GO:0098792)
-     - reticulophagy (GO:0061709)
-
-3. **Query**: OLS4:searchClasses(query="kinase")
-   - Expected: Multiple kinase-related terms across namespaces
-
-4. **Query**: OLS4:searchClasses(query="nucleus")
-   - Expected: GO:0005634 and related cellular component terms
-
-5. **Query**: Namespace distribution via SPARQL
+2. **Query**: Terms by namespace distribution
    - Results: biological_process (30,804), molecular_function (12,793), cellular_component (4,568)
+
+3. **Query**: Autophagy-related terms hierarchy
+   - Results: macroautophagy (GO:0016236), microautophagy (GO:0016237), mitophagy (GO:0000423), etc.
 
 ## SPARQL Queries Tested
 
 ```sparql
 # Query 1: Count terms by namespace
 PREFIX oboinowl: <http://www.geneontology.org/formats/oboInOwl#>
-
 SELECT ?namespace (COUNT(DISTINCT ?go) as ?count)
 FROM <http://rdfportal.org/ontology/go>
 WHERE {
@@ -71,9 +52,8 @@ ORDER BY DESC(?count)
 ```
 
 ```sparql
-# Query 2: Search GO terms by keyword (from MIE examples)
+# Query 2: Search terms by keyword
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-
 SELECT DISTINCT ?go ?label
 FROM <http://rdfportal.org/ontology/go>
 WHERE {
@@ -82,107 +62,110 @@ WHERE {
   FILTER(STRSTARTS(STR(?go), "http://purl.obolibrary.org/obo/GO_"))
 }
 LIMIT 20
-# Pattern verified - returns apoptosis-related GO terms
+# Results: Multiple apoptosis-related terms
 ```
 
 ```sparql
-# Query 3: Find kinase-related molecular functions (from MIE examples)
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-PREFIX oboinowl: <http://www.geneontology.org/formats/oboInOwl#>
+# Query 3: Find parent terms of a specific term
 PREFIX obo: <http://purl.obolibrary.org/obo/>
-
-SELECT DISTINCT ?go ?label ?definition ?namespace
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+SELECT ?child ?childLabel ?parent ?parentLabel
 FROM <http://rdfportal.org/ontology/go>
 WHERE {
-  ?go rdfs:label ?label .
-  ?go obo:IAO_0000115 ?definition .
-  ?go oboinowl:hasOBONamespace ?namespace .
-  ?label bif:contains "'kinase'" .
-  FILTER(STR(?namespace) = "molecular_function")
-  FILTER(STRSTARTS(STR(?go), "http://purl.obolibrary.org/obo/GO_"))
+  ?child rdfs:subClassOf ?parent .
+  ?child rdfs:label ?childLabel .
+  ?parent rdfs:label ?parentLabel .
+  FILTER(?child = obo:GO_0006338)
+  FILTER(STRSTARTS(STR(?parent), "http://purl.obolibrary.org/obo/GO_"))
 }
-LIMIT 10
-# Pattern verified - returns kinase molecular function terms
+# Results: Parent relationships for chromatin remodeling
 ```
 
 ## Interesting Findings
 
 ### Specific Entities for Questions
-- **GO:0006914**: autophagy - 25 descendants (verified)
-- **GO:0005634**: nucleus - key cellular component
-- **GO:0004672**: protein kinase activity
-- **GO:0016236**: macroautophagy
-- **GO:0000423**: mitophagy
+- **GO:0006914 (autophagy)**: Has 25 descendant terms including macroautophagy, microautophagy, mitophagy
+- **GO:0016236 (macroautophagy)**: Child of autophagy
+- **GO:0005634 (nucleus)**: Cellular component term with extensive synonyms
+- **GO:0004672 (protein kinase activity)**: Molecular function term
 
-### Autophagy Descendants (25 terms)
+### Autophagy Hierarchy (25 descendants)
 - macroautophagy (GO:0016236)
 - microautophagy (GO:0016237)
 - chaperone-mediated autophagy (GO:0061684)
-- mitophagy (GO:0000423)
-- pexophagy (GO:0000425)
-- xenophagy (GO:0098792)
-- reticulophagy (GO:0061709)
-- nucleophagy (GO:0044804)
-- lipophagy (GO:0061724)
-- ribophagy (GO:0034517)
-- aggrephagy (GO:0035973)
-- And more specialized terms...
+- mitophagy (GO:0000423) - degradation of mitochondria
+- pexophagy (GO:0000425) - degradation of peroxisomes
+- reticulophagy (GO:0061709) - ER degradation
+- lipophagy (GO:0061724) - lipid droplet degradation
+- ribophagy (GO:0034517) - ribosome degradation
+- aggrephagy (GO:0035973) - protein aggregate degradation
+- xenophagy (GO:0098792) - pathogen degradation
 
-### Term Distribution
-- biological_process: 30,804 terms (64%)
-- molecular_function: 12,793 terms (27%)
-- cellular_component: 4,568 terms (9%)
-- Total: 48,165 terms
+### Cross-Database Connections
+- Wikipedia (extensive coverage)
+- Reactome (biochemical pathways)
+- KEGG_REACTION (metabolic reactions)
+- EC (enzyme classification)
+- MeSH (medical subject headings)
+- NIF_Subcellular (subcellular structures)
 
-### Unique Properties
-- Rich synonym system (exact, related, narrow, broad)
-- Hierarchical DAG structure
-- GO slim subsets for organism-specific views
-- External cross-references (Wikipedia, Reactome, KEGG, MeSH)
-
-### Database Connections (via OLS4 tools)
-- Can query across multiple ontologies (GO, ChEBI, MONDO, etc.)
-- getDescendants/getAncestors for hierarchy navigation
-- searchClasses for keyword discovery
+### Verifiable Facts
+- 48,165 total GO terms
+- 30,804 biological_process terms
+- 12,793 molecular_function terms
+- 4,568 cellular_component terms
+- GO:0006914 (autophagy) has exactly 25 descendant terms
+- ~100% of terms have definitions
+- ~80% of terms have synonyms
+- ~52% of terms have cross-references
 
 ## Question Opportunities by Category
 
 ### Precision
-- What is the GO ID for autophagy? (GO:0006914)
-- What is the GO ID for nucleus (cellular component)? (GO:0005634)
-- What is the definition of GO:0004672?
-- What namespace does GO:0006914 belong to? (biological_process)
+- "What is the GO ID for autophagy?" (Answer: GO:0006914)
+- "What is the GO ID for the nucleus cellular component?" (Answer: GO:0005634)
+- "What is the definition of GO:0004672 (protein kinase activity)?"
 
 ### Completeness
-- How many descendant terms does GO:0006914 (autophagy) have? (25)
-- How many biological_process terms are in GO? (30,804)
-- How many molecular_function terms are in GO? (12,793)
-- List all child terms of macroautophagy
+- "How many descendant terms does GO:0006914 (autophagy) have?" (Answer: 25)
+- "How many biological_process terms are in GO?" (Answer: 30,804)
+- "What are all the direct children of GO:0006914 (autophagy)?" (List of ~6 children)
 
 ### Integration
-- What Wikipedia article is linked to GO:0005634?
-- What Reactome pathways are cross-referenced from autophagy terms?
-- Find GO terms with MeSH cross-references
+- "What Wikipedia articles are linked to GO terms?" (via hasDbXref)
+- "Find GO terms linked to Reactome pathways"
 
 ### Currency
-- What new GO terms have been added recently?
-- What terms were recently deprecated?
+- "What new GO terms have been added recently?"
 
 ### Specificity
-- What is the GO term for pexophagy? (GO:0000425)
-- What is the GO term for xenophagy (pathogen autophagy)?
-- Find GO terms related to rare metabolic processes
+- "What is the GO ID for mitophagy (selective autophagy of mitochondria)?" (Answer: GO:0000423)
+- "Find GO terms related to protein kinase activity"
+- "What GO terms contain 'CRISPR' in their label or definition?"
 
 ### Structured Query
-- Find all biological_process terms containing "kinase"
-- Find GO terms that are both in autophagy pathway AND have mitochondria
-- Find molecular_function terms with enzyme activity definitions
+- "Find all molecular_function terms containing 'kinase'"
+- "Find biological_process terms with both 'DNA' AND 'repair' keywords"
+- "List GO terms in the goslim_generic subset"
+- "Find deprecated GO terms and their replacements"
 
 ## Notes
-- **CRITICAL**: Always use FROM <http://rdfportal.org/ontology/go>
-- Use bif:contains for text search (faster than REGEX)
-- Use STR() for namespace comparisons
-- Filter by GO_ prefix to exclude other ontology terms
-- Use DISTINCT to remove duplicates from results
-- OLS4 tools (getDescendants, getAncestors) are excellent for hierarchy queries
-- ~25% of terms are deprecated - filter with owl:deprecated if needed
+
+### Limitations
+- Aggregation queries may timeout without LIMIT
+- Duplicate rows common (use DISTINCT)
+- Graph may contain other OBO ontology terms (filter by GO_ prefix)
+
+### Best Practices
+- CRITICAL: Always use `FROM <http://rdfportal.org/ontology/go>`
+- Use `bif:contains` instead of REGEX for keyword search
+- Use `STR()` for namespace comparisons
+- Filter by `STRSTARTS(STR(?go), "http://purl.obolibrary.org/obo/GO_")`
+- Use DISTINCT in SELECT queries
+- Use LIMIT to prevent timeout
+
+### OLS4 Tools
+- OLS4:searchClasses - for keyword-based term search
+- OLS4:getDescendants - for finding all child terms
+- OLS4:getAncestors - for finding all parent terms
+- OLS4:fetch - for getting details of a specific term

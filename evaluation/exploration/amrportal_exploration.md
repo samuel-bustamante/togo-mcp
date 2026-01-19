@@ -1,154 +1,109 @@
 # AMR Portal Exploration Report
 
 ## Database Overview
-- **Purpose**: Antimicrobial resistance (AMR) surveillance database integrating phenotypic and genotypic data
-- **Scope**: 1.7M phenotype measurements, 1.1M genotype features from bacterial isolates worldwide
-- **Key data types**: Phenotypic AST results (MIC, disk diffusion), genotypic AMR features (genes, mutations)
-- **Focus**: Epidemiological surveillance, genotype-phenotype correlation, geographic resistance patterns
+- **Purpose**: Integrates antimicrobial resistance (AMR) surveillance data from NCBI Pathogen Detection, PATRIC, and CABBAGE
+- **Key data types**: Phenotypic antimicrobial susceptibility test (AST) results and genotypic AMR features from bacterial isolates
+- **Scale**: 1.7M+ phenotypic measurements, 1.1M+ genotypic features, ~1.4M unique biosamples
+- **Geographic coverage**: 150+ countries across all continents
 
 ## Schema Analysis (from MIE file)
 
-### Main Properties Available
-- **PhenotypeMeasurement**: Antimicrobial susceptibility test results
-  - `amr:organism`, `amr:species`, `amr:genus` - Organism identification
-  - `amr:antibioticName`, `amr:resistancePhenotype` - Test results (resistant/susceptible/intermediate)
-  - `amr:country`, `amr:geographicalRegion`, `amr:geographicalSubregion` - Geographic metadata
-  - `amr:collectionYear` - Temporal data
-  - `amr:bioSample`, `amr:assemblyId`, `amr:sraAccession` - Cross-references
-  - `amr:measurementValue`, `amr:measurementSign`, `amr:measurementUnits` - Quantitative MIC
-- **GenotypeFeature**: AMR gene/mutation annotations
-  - `amr:amrClass`, `amr:amrSubclass` - Resistance class (BETA-LACTAM, AMINOGLYCOSIDE, etc.)
-  - `amr:geneSymbol`, `amr:amrElementSymbol` - Gene identification
-  - `amr:region`, `amr:regionStart`, `amr:regionEnd` - Genomic coordinates
-  - `obo:RO_0002162` - NCBI Taxonomy link
+### Main Entity Types
+1. **PhenotypeMeasurement**: AST results with resistance phenotype
+   - Properties: organism, species, genus, antibioticName, resistancePhenotype
+   - Metadata: country, geographicalRegion, collectionYear, isolationSource, host
+   - Method info: laboratoryTypingMethod, astStandard, measurementValue/Sign/Units
+
+2. **GenotypeFeature**: AMR gene detections
+   - Properties: amrClass, amrSubclass, amrElementSymbol, geneSymbol
+   - Location: region, regionStart, regionEnd, strand
+   - Evidence: evidenceType, evidenceAccession, evidenceDescription
 
 ### Important Relationships
-- BioSample IRI links phenotype and genotype data from same isolate
-- Antibiotic Resistance Ontology (ARO) links for standardized terms
-- NCBI Taxonomy via `obo:RO_0002162`
-- PubMed references via `dct:references`
+- `amr:bioSample` links phenotype and genotype data from same isolate
+- `obo:RO_0002162` links to NCBI Taxonomy
+- `dct:references` links to PubMed literature
+- `amr:antibioticOntologyId` links to ARO (Antibiotic Resistance Ontology)
 
-### Query Patterns Observed
-- Always include FROM clause: `<http://rdfportal.org/dataset/amrportal>`
-- Filter by organism first for performance
-- Use `bif:contains` for flexible organism name matching
-- Use LIMIT to prevent timeouts on large aggregations
+### Query Patterns
+- Use `bif:contains` for keyword searches on organism names
+- Always specify `FROM <http://rdfportal.org/dataset/amrportal>`
+- Filter by organism/antibiotic before aggregations to avoid timeouts
 
 ## Search Queries Performed
 
-### Query 1: Sample phenotype data
-- **Search**: Basic PhenotypeMeasurement retrieval
-- **Results**: Found resistance data for multiple organisms:
-  - Streptococcus pneumoniae - trimethoprim-sulfamethoxazole (Thailand)
-  - Klebsiella pneumoniae - ceftriaxone resistant (USA)
-  - Salmonella enterica - multiple antibiotics susceptible (USA)
+1. **Query**: Top organisms with phenotype data
+   - Results: Salmonella enterica (443K), E. coli (364K), M. tuberculosis (331K), K. pneumoniae (133K), N. gonorrhoeae (95K)
 
-### Query 2: Organisms represented
-- **Search**: DISTINCT organisms in phenotype data
-- **Results**: 50+ bacterial species including:
-  - Escherichia coli, Klebsiella pneumoniae
-  - Salmonella enterica, Pseudomonas aeruginosa
-  - Staphylococcus aureus, Mycobacterium tuberculosis
-  - Neisseria gonorrhoeae, Acinetobacter baumannii
+2. **Query**: Antibiotic resistance in E. coli
+   - Results: Ampicillin most common resistance (7,688), followed by tetracycline (3,524), ciprofloxacin (3,289)
 
-### Query 3: Genotype features (AMR genes)
-- **Search**: GenotypeFeature retrieval with genomic coordinates
-- **Results**: AMR genes with precise locations:
-  - norM (EFFLUX) in N. gonorrhoeae: ERZ25089697.1:136650-138029
-  - blaZ (BETA-LACTAM) in S. aureus: DAKTIE010000166.1:2295-3140
-  - mecA (BETA-LACTAM) in S. aureus: DAKTIE010000169.1:1563-3569
-  - gyrA_S91F (QUINOLONE) in N. gonorrhoeae: mutation
+3. **Query**: AMR gene class distribution
+   - Results: BETA-LACTAM (243K), AMINOGLYCOSIDE (187K), EFFLUX (180K), TETRACYCLINE (89K), QUINOLONE (80K)
 
-### Query 4: AMR class distribution
-- **Search**: Gene class counts
-- **Results**: Most common AMR classes:
-  - BETA-LACTAM: 243,389 features
-  - AMINOGLYCOSIDE: 187,430
-  - EFFLUX: 180,406
-  - TETRACYCLINE: 89,420
-  - QUINOLONE: 80,396
-  - SULFONAMIDE: 63,261
+4. **Query**: Geographic distribution of ciprofloxacin-resistant E. coli
+   - Results: USA (1,041), UK (790), Norway (313), Vietnam (101), Thailand (91)
 
-### Query 5: Resistance phenotype distribution
-- **Search**: Phenotype value counts
-- **Results**: Phenotype breakdown:
-  - susceptible: 1,040,897 (61%)
-  - resistant: 302,729 (18%)
-  - intermediate: 35,332 (2%)
-  - non-susceptible: 828
-  - susceptible-dose dependent: 213
+5. **Query**: Common beta-lactam resistance genes
+   - Results: penA (22K isolates), blaC (21K), bla_1 (19K), bla_2 (18.5K), ampC variants (16K each)
 
-### Query 6: E. coli antibiotic resistance
-- **Search**: E. coli resistance by antibiotic
-- **Results**: Highest resistance rates in E. coli:
-  - ampicillin: 7,688 resistant / 15,663 total (49%)
-  - tetracycline: 3,524 / 8,807 (40%)
-  - ciprofloxacin: 3,289 / 16,726 (20%)
-  - trimethoprim-sulfamethoxazole: 2,848 / 12,361 (23%)
-
-### Query 7: Geographic distribution of ciprofloxacin resistance
-- **Search**: E. coli ciprofloxacin resistance by country
-- **Results**: Top countries:
-  - United States: 1,041 resistant isolates
-  - United Kingdom: 790
-  - Norway: 313
-  - Viet Nam: 101
-  - Thailand: 91
-
-### Query 8: Carbapenem resistance genes
-- **Search**: Beta-lactam genes in carbapenem-resistant isolates
-- **Results**: Associated genes:
-  - bla variants: 2,066 - 327 isolates (various)
-  - ampC: 1,891 isolates
-  - blaNDM-1: 258 isolates (carbapenemase)
-  - ompC: 515 isolates (porin)
-
-### Query 9: Temporal trends
-- **Search**: E. coli ciprofloxacin resistance 2010-2023
-- **Results**: Yearly data available (variable by year)
-  - 2015: 630/1,438 resistant (44%)
-  - 2020: 271/1,643 resistant (16%)
-  - 2023: 138/215 resistant (64%)
+6. **Query**: Laboratory typing methods
+   - Results: Broth dilution (959K, 56%), agar dilution (142K), disk diffusion (121K), E-test (34K)
 
 ## SPARQL Queries Tested
 
 ```sparql
-# Query 1: Basic phenotype retrieval
+# Query 1: Top organisms by phenotype count
 PREFIX amr: <http://example.org/ebiamr#>
-
-SELECT ?s ?organism ?antibiotic ?phenotype ?country
+SELECT DISTINCT ?organism (COUNT(*) as ?count)
 FROM <http://rdfportal.org/dataset/amrportal>
 WHERE {
   ?s a amr:PhenotypeMeasurement .
   ?s amr:organism ?organism .
-  ?s amr:antibioticName ?antibiotic .
-  ?s amr:resistancePhenotype ?phenotype .
-  OPTIONAL { ?s amr:country ?country }
 }
+GROUP BY ?organism
+ORDER BY DESC(?count)
 LIMIT 20
-# Results: Multiple organisms with resistance data
+# Results: 20+ species, led by Salmonella (443K), E. coli (364K), M. tuberculosis (331K)
 ```
 
 ```sparql
-# Query 2: AMR gene class distribution
+# Query 2: AMR gene class prevalence
 PREFIX amr: <http://example.org/ebiamr#>
-
-SELECT DISTINCT ?amrClass (COUNT(*) as ?count)
+SELECT ?amrClass (COUNT(*) as ?geneCount)
 FROM <http://rdfportal.org/dataset/amrportal>
 WHERE {
   ?s a amr:GenotypeFeature .
   ?s amr:amrClass ?amrClass .
 }
 GROUP BY ?amrClass
-ORDER BY DESC(?count)
-LIMIT 30
+ORDER BY DESC(?geneCount)
+LIMIT 20
 # Results: BETA-LACTAM (243K), AMINOGLYCOSIDE (187K), EFFLUX (180K)
 ```
 
 ```sparql
-# Query 3: Geographic resistance distribution
+# Query 3: Temporal trend of ampicillin resistance in E. coli
 PREFIX amr: <http://example.org/ebiamr#>
+SELECT ?year (COUNT(*) as ?total) (SUM(?isResistant) as ?resistant)
+FROM <http://rdfportal.org/dataset/amrportal>
+WHERE {
+  ?s a amr:PhenotypeMeasurement .
+  ?s amr:organism "Escherichia coli" .
+  ?s amr:antibioticName "ampicillin" .
+  ?s amr:collectionYear ?year .
+  ?s amr:resistancePhenotype ?phenotype .
+  BIND(IF(?phenotype = "resistant", 1, 0) as ?isResistant)
+  FILTER(?year >= 2015 && ?year <= 2023)
+}
+GROUP BY ?year
+ORDER BY ?year
+# Results: Shows annual variation with 2020 having highest total tests (1,643)
+```
 
+```sparql
+# Query 4: Geographic distribution of resistant isolates
+PREFIX amr: <http://example.org/ebiamr#>
 SELECT ?country ?region (COUNT(*) as ?resistantCount)
 FROM <http://rdfportal.org/dataset/amrportal>
 WHERE {
@@ -161,124 +116,79 @@ WHERE {
 }
 GROUP BY ?country ?region
 ORDER BY DESC(?resistantCount)
-LIMIT 20
-# Results: USA (1041), UK (790), Norway (313)
-```
-
-```sparql
-# Query 4: Genotype-phenotype correlation
-PREFIX amr: <http://example.org/ebiamr#>
-
-SELECT DISTINCT ?geneSymbol ?amrClass (COUNT(DISTINCT ?bioSample) as ?isolateCount)
-FROM <http://rdfportal.org/dataset/amrportal>
-WHERE {
-  ?pheno a amr:PhenotypeMeasurement .
-  ?pheno amr:bioSample ?bioSample .
-  ?pheno amr:antibioticName ?antibiotic .
-  ?pheno amr:resistancePhenotype "resistant" .
-  FILTER(?antibiotic IN ("meropenem", "imipenem", "ertapenem"))
-  
-  ?geno a amr:GenotypeFeature .
-  ?geno amr:bioSample ?bioSample .
-  ?geno amr:geneSymbol ?geneSymbol .
-  ?geno amr:amrClass ?amrClass .
-  FILTER(CONTAINS(?amrClass, "BETA-LACTAM"))
-}
-GROUP BY ?geneSymbol ?amrClass
-ORDER BY DESC(?isolateCount)
-LIMIT 20
-# Results: bla_1 (2066), ampC (1891), blaNDM-1 (258)
+LIMIT 15
+# Results: USA (1,041), UK (790), Norway (313), etc.
 ```
 
 ## Interesting Findings
 
-### Specific Entities for Good Questions
-1. **blaNDM-1**: Major carbapenemase gene (258 isolates in carbapenem-resistant bacteria)
-2. **mecA**: MRSA marker gene in S. aureus
-3. **gyrA_S91F**: Quinolone resistance mutation in N. gonorrhoeae
-4. **norM**: Efflux pump gene for multidrug resistance
-5. **E. coli ampicillin resistance**: 49% resistance rate (7,688/15,663)
+### Specific Entities for Questions
+- **Organisms**: Salmonella enterica, Escherichia coli, Mycobacterium tuberculosis, Klebsiella pneumoniae, Neisseria gonorrhoeae
+- **Antibiotics**: ampicillin, ciprofloxacin, meropenem, trimethoprim-sulfamethoxazole
+- **AMR genes**: penA, blaC, bla_1, ampC, blaZ
+- **Gene classes**: BETA-LACTAM, AMINOGLYCOSIDE, EFFLUX, QUINOLONE
 
-### Unique Properties/Patterns
-- Blank nodes for all measurements (no direct URIs)
-- BioSample IRI serves as primary linkage between phenotype and genotype
-- Geographic hierarchy: region → subregion → country → ISO code
-- AMR class names use abbreviated forms (BETA-LACTAM, AMINOGLYCOSIDE)
-- Resistance phenotypes: resistant, susceptible, intermediate, non-susceptible
+### Unique Properties
+- Detailed geographic hierarchy (region → subregion → country → ISO code)
+- Multiple AST methods tracked (broth dilution, disk diffusion, agar dilution, E-test)
+- Quantitative MIC values available (~30% of records)
+- Genotype-phenotype linkage via shared bioSample
 
-### Connections to Other Databases
-- **BioSample**: ~1.4M samples linked
-- **SRA**: ~870K sequence accessions
-- **INSDC/GenBank**: ~890K assembly IDs
-- **PubMed**: Literature references via dct:references
-- **ARO**: Antibiotic Resistance Ontology terms
-- **NCBI Taxonomy**: Via obo:RO_0002162
+### Cross-Database Connections
+- BioSample (~1.4M samples)
+- SRA (sequence data, ~870K accessions)
+- INSDC/GenBank assemblies (~890K)
+- PubMed literature references
+- ARO ontology for antibiotic classification
+- NCBI Taxonomy for organism classification
 
 ### Verifiable Facts
-- Total phenotype measurements: 1,714,486
-- Total genotype features: 1,164,007
-- Resistance rate: 18% resistant, 61% susceptible, 2% intermediate
-- Most common AMR class: BETA-LACTAM (243,389 features)
-- E. coli ampicillin resistance: ~49%
-- blaNDM-1 gene found in 258 carbapenem-resistant isolates
+- Salmonella enterica has 443,249 phenotype measurements (most of any organism)
+- 243,389 BETA-LACTAM class gene detections (most common AMR class)
+- penA gene found in 22,039 distinct isolates (most common beta-lactam gene)
+- Broth dilution is the dominant AST method (959,895 tests, 56%)
+- 150+ countries represented with geographic data
 
 ## Question Opportunities by Category
 
 ### Precision
-- "How many phenotype measurements in AMR Portal show resistance?" → 302,729
-- "What is the most common AMR gene class?" → BETA-LACTAM (243,389 features)
-- "What percentage of E. coli isolates are ampicillin-resistant?" → ~49%
-- "How many blaNDM-1-positive isolates are carbapenem-resistant?" → 258
+- "What is the most common AMR gene class detected in the AMR Portal database?" (Answer: BETA-LACTAM)
+- "How many phenotype measurements exist for Salmonella enterica?" (Answer: 443,249)
+- "What beta-lactam resistance gene is found in the most isolates?" (Answer: penA, 22,039 isolates)
 
 ### Completeness
-- "List all organisms in AMR Portal with phenotype data" → 50+ species
-- "What resistance phenotype categories exist?" → resistant, susceptible, intermediate, non-susceptible, susceptible-dose dependent
-- "List AMR gene classes with >50,000 features" → BETA-LACTAM, AMINOGLYCOSIDE, EFFLUX, TETRACYCLINE, QUINOLONE, SULFONAMIDE, MACROLIDE
+- "How many distinct bacterial species have phenotypic AMR data in AMR Portal?" (Need query: 20+)
+- "How many countries have AMR surveillance data?" (Answer: 150+)
+- "What are all the AMR gene classes detected in the database?" (List of 20+ classes)
 
 ### Integration
-- "Link E. coli ciprofloxacin-resistant isolates to their geographic regions"
-- "Find beta-lactam resistance genes in carbapenem-resistant isolates"
-- "Connect BioSample to both phenotype and genotype data"
+- "Link AMR Portal genotype data to NCBI Taxonomy IDs" (via obo:RO_0002162)
+- "Find PubMed references associated with AMR surveillance data" (via dct:references)
 
 ### Currency
-- "What are the resistance trends for E. coli ciprofloxacin from 2010-2023?"
+- "What is the most recent collection year for AMR data?" (2023-2024)
+- "How has ciprofloxacin resistance in E. coli changed from 2015-2023?"
 
 ### Specificity
-- "What is the genomic position of norM efflux pump in N. gonorrhoeae ERZ25089697?" → 136650-138029
-- "Which countries have the most ciprofloxacin-resistant E. coli isolates?" → USA (1041), UK (790)
-- "What antibiotics show >40% resistance in E. coli?" → ampicillin, tetracycline
+- "What AMR genes are associated with carbapenem resistance in Klebsiella pneumoniae?"
+- "Which countries in Asia have the most fluoroquinolone-resistant E. coli isolates?" (Vietnam, Thailand, Pakistan)
 
 ### Structured Query
-- "Find multi-drug resistant isolates (resistant to ≥3 antibiotics)"
-- "List genotype features with genomic coordinates for S. aureus"
-- "Find isolates with both phenotypic resistance and corresponding resistance genes"
+- "Find isolates with resistance to both meropenem AND imipenem"
+- "Find beta-lactam resistance genes in carbapenem-resistant Klebsiella pneumoniae"
+- "List organisms with more than 100,000 phenotype measurements"
 
 ## Notes
 
 ### Limitations
-- Large dataset requires careful query design (timeouts possible)
-- Not all isolates have both phenotype and genotype data (~65% linkage)
-- Geographic data coverage ~80% (not all records have country)
-- Quantitative MIC measurements ~30% coverage
-- Isolation source text inconsistent (Stool vs stool)
+- Large dataset can cause timeouts without proper filtering
+- Inconsistent text capitalization in some fields (Stool vs stool)
+- Not all biosamples have both phenotype and genotype data (~65% coverage)
+- Geographic data incomplete for some records (~80% coverage)
 
 ### Best Practices
-- Always use FROM clause: `<http://rdfportal.org/dataset/amrportal>`
-- Filter by organism first for performance
-- Use LIMIT for exploratory queries
-- Use `bif:contains` for flexible text matching on organism names
-- Use OPTIONAL for geographic/temporal fields (not always present)
-
-### Anti-Patterns to Avoid
-- ❌ Aggregations without organism filter (timeout)
-- ❌ Exact string match for organisms (use bif:contains)
-- ❌ Forgetting FROM clause (searches all graphs)
-- ❌ Complex joins without selective filters (timeout)
-- ❌ Case-sensitive matching on isolation sources
-
-### Data Quality
-- Phenotype values: controlled vocabulary (resistant/susceptible/intermediate)
-- Laboratory typing methods: broth dilution (56%), agar dilution (8%), disk diffusion (7%)
-- Evidence type in genotype: predominantly HMM (65%)
-- Temporal range: 1911-2025, concentrated in recent decades
-- Geographic coverage: 150+ countries across all continents
+- Always use `FROM <http://rdfportal.org/dataset/amrportal>` clause
+- Filter by organism or antibiotic before aggregations
+- Use `LIMIT` clauses for exploratory queries
+- Use `bif:contains` for flexible text matching
+- Check data existence before complex joins

@@ -31,6 +31,12 @@ For EACH database that needs exploration:
    - Test at least 3 SPARQL queries from the MIE file examples
    - Try variations to understand what data is available
    - Look for interesting, specific entities
+   - **CRITICAL: When exploring cross-references/mappings, distinguish between:**
+     * **Entity count**: Number of unique entities that have mappings
+     * **Relationship count**: Total number of mapping relationships
+     * Example: If 100 proteins map to 120 gene IDs (some proteins map to multiple genes), then:
+       - Entity count = 100 proteins with mappings
+       - Relationship count = 120 total protein→gene mappings
 
 4. **Document findings**: Create an exploration report at:
    `/Users/arkinjo/work/GitHub/togo-mcp/evaluation/exploration/[dbname]_exploration.md`
@@ -73,6 +79,62 @@ For EACH database that needs exploration:
    - Connections to other databases
    - Specific, verifiable facts not commonly known
    
+   **⚠️ CRITICAL: Cross-Reference/Mapping Analysis**
+   
+   When documenting cross-database mappings, ALWAYS clarify:
+   
+   1. **Entity Count** (unique entities with mappings):
+      - Query: `COUNT(DISTINCT ?source_entity)`
+      - Example: "2,150 NANDO diseases have MONDO mappings"
+   
+   2. **Relationship Count** (total mapping relationships):
+      - Query: `COUNT(?mapping_property)` (without DISTINCT)
+      - Example: "2,341 total NANDO→MONDO mapping relationships"
+   
+   3. **Mapping Distribution** (if entities can have multiple mappings):
+      - How many entities map to exactly 1, 2, 3+ targets?
+      - Example: "1,976 diseases (1 MONDO ID), 157 diseases (2 MONDO IDs), 17 diseases (3 MONDO IDs)"
+   
+   4. **Average Mappings** (if relevant):
+      - Total relationships ÷ Entity count
+      - Example: "Average 1.09 MONDO mappings per NANDO disease"
+   
+   **Why This Matters:**
+   - Questions like "How many diseases have MONDO mappings?" = Entity count (2,150)
+   - Questions like "How many MONDO mappings exist?" = Relationship count (2,341)
+   - Both are valid but measure different things!
+   - Document BOTH counts to enable precise question generation
+   
+   **Example SPARQL Queries for Mapping Analysis:**
+   
+```sparql
+   # Count unique entities WITH mappings
+   SELECT (COUNT(DISTINCT ?entity) as ?entity_count)
+   WHERE {
+     ?entity <mapping_property> ?target .
+   }
+   
+   # Count total mapping relationships
+   SELECT (COUNT(?target) as ?relationship_count)
+   WHERE {
+     ?entity <mapping_property> ?target .
+   }
+   
+   # Analyze mapping distribution
+   SELECT ?mapping_count (COUNT(?entity) as ?entity_count)
+   WHERE {
+     {
+       SELECT ?entity (COUNT(?target) as ?mapping_count)
+       WHERE {
+         ?entity <mapping_property> ?target .
+       }
+       GROUP BY ?entity
+     }
+   }
+   GROUP BY ?mapping_count
+   ORDER BY ?mapping_count
+```
+   
    ## Question Opportunities by Category
    
    **FOCUS ON BIOLOGICAL CONTENT, NOT INFRASTRUCTURE METADATA**
@@ -97,10 +159,18 @@ For EACH database that needs exploration:
    
    - **Completeness**: Counts of biological entities, comprehensive lists
      Example: "How many kinase structures in PDB?" ✅
+     Example: "How many proteins have GO annotations?" ✅
+     **⚠️ For cross-references, specify WHICH count:**
+       - "How many proteins HAVE GO annotations?" (entity count) ✅
+       - "How many total protein→GO annotation relationships?" (relationship count) ✅
      Avoid: "How many database updates this year?" ❌
    
    - **Integration**: Cross-database biological entity linking
      Example: "Convert UniProt ID to NCBI Gene ID" ✅
+     Example: "What MONDO IDs map to NANDO:1200001?" ✅
+     **⚠️ Be aware of one-to-many mappings:**
+       - Some entities may map to multiple targets
+       - Document both directions if mappings are asymmetric
      Avoid: "Which databases link to this server?" ❌
    
    - **Currency**: Recent biological discoveries, updated classifications
@@ -113,11 +183,13 @@ For EACH database that needs exploration:
    
    - **Structured Query**: Complex biological queries with multiple criteria
      Example: "Find kinase inhibitors with IC50 < 100 nM" ✅
+     Example: "Find diseases that map to exactly 2 MONDO IDs" ✅
      Avoid: "Find databases updated after date X" ❌
    
    ## Notes
    - Any limitations or challenges with this database
    - Best practices for querying
+   - **Important clarifications about counts (entity vs. relationship)**
 ````
 
 5. **Monitor your progress**: After completing each database exploration, check your token usage. If approaching limits, proceed to the STOPPING POINT section below.
@@ -131,6 +203,7 @@ WORKFLOW:
 5. For each database that needs exploration:
    - Get MIE file
    - Perform thorough exploration (searches, queries, analysis)
+   - **For databases with cross-references: Run queries to distinguish entity counts from relationship counts**
    - Create detailed exploration report
    - **Check token usage** - if approaching limit, go to STOPPING POINT
 6. If ALL databases are explored, proceed to COMPLETION section
@@ -231,5 +304,6 @@ IMPORTANT REMINDERS:
 - **Existing exploration reports will be preserved** across sessions
 - **The prompt will automatically resume** where you left off
 - **Focus on biological/scientific content** - avoid pure infrastructure metadata
+- **⚠️ CRITICAL: Distinguish entity counts from relationship counts in cross-reference mappings**
 
 Begin by checking for existing exploration reports, then proceed with thorough exploration of remaining databases.

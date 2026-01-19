@@ -1,224 +1,203 @@
-# BacDive (Bacterial Diversity Metadatabase) Exploration Report
+# BacDive Exploration Report
 
 ## Database Overview
-- **Purpose**: Standardized bacterial and archaeal strain information for microbiology research
-- **Scope**: 97,334 strain records with phenotypic and genotypic characterizations
-- **Key data types**: Taxonomy, morphology, physiology, cultivation conditions, molecular sequences
-- **Focus**: Type strains (20,060), culture collection links, enzyme activities
+- **Purpose**: Standardized bacterial and archaeal strain information including taxonomy, morphology, physiology, and cultivation conditions
+- **Key data types**: Strain records, enzyme activities, culture conditions (media, temperature, pH), 16S rRNA sequences, culture collection numbers
+- **Scale**: 97,334 strain records, 573K+ enzyme activities, 87K+ 16S sequences
+- **Scope**: Primarily bacteria (95,742) with archaea (1,049)
 
 ## Schema Analysis (from MIE file)
 
-### Main Properties Available
-- **Taxonomy**: `schema:hasGenus`, `schema:hasSpecies`, `schema:hasFamily`, `schema:hasOrder`, `schema:hasClass`, `schema:hasPhylum`, `schema:hasDomain`
-- **Identifiers**: `schema:hasBacDiveID`, `schema:hasTaxID` (NCBI)
-- **Phenotypes**: 
-  - `schema:GramStain` with `schema:hasGramStain` (positive/negative/variable)
-  - `schema:CellMotility` with `schema:isMotile` (boolean)
-  - `schema:OxygenTolerance` with `schema:hasOxygenTolerance` (aerobe/anaerobe/facultative)
-- **Culture conditions**:
-  - `schema:CultureMedium` with `schema:hasMediaLink` to MediaDive
-  - `schema:CultureTemperature` with `schema:hasTemperatureRangeStart/End`
-  - `schema:CulturePH` with `schema:hasPHRangeStart/End`
-- **Sequences**: `schema:16SSequence`, `schema:GenomeSequence` with `schema:hasSequenceAccession`
-- **Culture collections**: `schema:CultureCollectionNumber` with `schema:hasLink`
-- **Enzymes**: `schema:Enzyme` with `schema:hasActivity` (+/-/variable)
+### Main Entity Types
+1. **Strain**: Core entity with taxonomic classification
+   - Properties: hasBacDiveID, hasTaxID, hasGenus, hasSpecies, hasFamily, hasOrder, hasClass, hasPhylum, hasDomain
+   - Metadata: isTypeStrain, designation, scientific name
+
+2. **Phenotype entities**:
+   - GramStain: hasGramStain (+/-)
+   - CellMotility: isMotile (boolean)
+   - OxygenTolerance: hasOxygenTolerance (aerobe, anaerobe, etc.)
+   - Enzyme: hasActivity, hasECNumber
+
+3. **Culture conditions**:
+   - CultureMedium: medium label, hasMediaLink
+   - CultureTemperature: hasTemperatureRangeStart/End
+   - CulturePH: hasPHRangeStart/End
+
+4. **Sequences**:
+   - 16SSequence: hasSequenceAccession, fromSequenceDB, hasSequenceLength
+   - GenomeSequence: hasSequenceAccession, fromSequenceDB
 
 ### Important Relationships
-- Hub-and-spoke: All entities link to Strain via `schema:describesStrain`
-- NCBI Taxonomy IDs (`schema:hasTaxID`) on all strains
-- Culture collection links to DSMZ, JCM, KCTC, ATCC, NBRC
-- Sequence accessions to ENA/GenBank
-- MediaDive links for culture media recipes
+- `schema:describesStrain` links phenotypes/conditions to strains
+- `schema:hasTaxID` links to NCBI Taxonomy
+- `schema:hasMediaLink` links to MediaDive
+- `schema:hasLink` in CultureCollectionNumber links to DSMZ, JCM, etc.
 
-### Query Patterns Observed
-- Keyword search using `bif:contains` with boolean operators
-- Temperature filtering with `schema:hasTemperatureRangeEnd >= value`
-- Type strain filtering with `schema:isTypeStrain true`
-- BacDive ID lookup with `schema:hasBacDiveID`
+### Query Patterns
+- Use `bif:contains` with single-quoted keywords and `option (score ?sc)`
+- Always use `OPTIONAL` for phenotypes due to incomplete coverage
+- Filter by genus/species with `CONTAINS(LCASE(?genus), 'name')`
 
 ## Search Queries Performed
 
-### Query 1: Thermotoga strains
-- **Search**: `bif:contains "'Thermotoga'"`
-- **Results**: 9 strains including:
-  - Thermotoga maritima 17060 (type strain, DSM 3109)
-  - Thermotoga petrophila 17068
-  - Thermotoga neapolitana 17061, 17062
+1. **Query**: Total strain count
+   - Results: 97,334 strains total
 
-### Query 2: Hyperthermophiles (>80°C growth)
-- **Search**: `schema:hasTemperatureRangeEnd >= 80`
-- **Results**: 221 strains capable of growth above 80°C
-- Top temperature: Pyrococcus kukulkanii at 112°C optimal growth
-- Other hyperthermophiles: Pyrolobus fumarii (103°C), Aeropyrum pernix (102°C)
+2. **Query**: Domain distribution
+   - Results: Bacteria (95,742), Archaea (1,049)
 
-### Query 3: Methanocaldococcus jannaschii details
-- **Search**: `bif:contains "'jannaschii'"`
-- **Results**: Found at BacDive ID 6981
-  - Culture medium: DSMZ Medium 282 (linked to MediaDive)
-  - Taxonomy confirmed: Methanocaldococcus genus (formerly Methanococcus)
+3. **Query**: Top genera by strain count
+   - Results: Streptomyces (24,747), Bacillus (3,332), Arthrobacter (2,045), Streptococcus (2,001), Escherichia (1,898)
 
-### Query 4: Culture collections for Thermotoga maritima
-- **Search**: Culture collection numbers for strain 17060
-- **Results**: 4 culture collection links:
-  - DSM 3109 (DSMZ)
-  - ATCC 43589
-  - JCM 10099
-  - NBRC 100826
+4. **Query**: Gram stain distribution
+   - Results: Gram-negative (10,747), Gram-positive (7,333), Gram-variable (135)
 
-### Query 5: Type strains count
-- **Search**: `schema:isTypeStrain true`
-- **Results**: 20,060 type strains (~21% of all strains)
+5. **Query**: Oxygen tolerance distribution
+   - Results: Aerobe (10,333), Anaerobe (5,801), Microaerophile (4,724), Facultative anaerobe (4,486)
+
+6. **Query**: Type strain count
+   - Results: 20,060 type strains
+
+7. **Query**: Hyperthermophiles (>70°C)
+   - Results: Pyrococcus kukulkanii (112°C max), Pyrolobus fumarii (103°C), Aeropyrum pernix (102°C)
 
 ## SPARQL Queries Tested
 
 ```sparql
-# Query 1: Search strains by keyword
+# Query 1: Count strains by domain
 PREFIX schema: <https://purl.dsmz.de/schema/>
+SELECT ?domain (COUNT(*) as ?count)
+FROM <http://rdfportal.org/dataset/bacdive>
+WHERE {
+  ?strain a schema:Strain .
+  ?strain schema:hasDomain ?domain .
+}
+GROUP BY ?domain
+# Results: Bacteria (95,742), Archaea (1,049)
+```
 
-SELECT ?strain ?label ?sc
+```sparql
+# Query 2: Find hyperthermophiles (growth above 70°C)
+PREFIX schema: <https://purl.dsmz.de/schema/>
+SELECT ?strain ?label ?bacdiveId ?tempStart ?tempEnd
+FROM <http://rdfportal.org/dataset/bacdive>
+WHERE {
+  ?strain a schema:Strain ;
+          rdfs:label ?label ;
+          schema:hasBacDiveID ?bacdiveId .
+  ?temp a schema:CultureTemperature ;
+        schema:describesStrain ?strain ;
+        schema:hasTemperatureRangeEnd ?tempEnd .
+  FILTER(?tempEnd > 70)
+}
+ORDER BY DESC(?tempEnd)
+LIMIT 10
+# Results: Pyrococcus kukulkanii (112°C), Pyrolobus fumarii (103°C), Aeropyrum pernix (102°C)
+```
+
+```sparql
+# Query 3: Keyword search for thermophilic bacteria
+PREFIX schema: <https://purl.dsmz.de/schema/>
+PREFIX dct: <http://purl.org/dc/terms/>
+SELECT ?strain ?label ?description ?sc
+FROM <http://rdfportal.org/dataset/bacdive>
+WHERE {
+  ?strain a schema:Strain ;
+          rdfs:label ?label ;
+          dct:description ?description .
+  ?description bif:contains "'thermophilic'" option (score ?sc) .
+}
+ORDER BY DESC(?sc)
+LIMIT 10
+# Results: Found strains with "thermophilic" in descriptions
+```
+
+```sparql
+# Query 4: Strains with 16S rRNA sequences
+PREFIX schema: <https://purl.dsmz.de/schema/>
+SELECT ?strain ?label ?accession ?seqDB ?length
 FROM <http://rdfportal.org/dataset/bacdive>
 WHERE {
   ?strain a schema:Strain ;
           rdfs:label ?label .
-  ?label bif:contains "'Thermotoga'" option (score ?sc) .
-}
-ORDER BY DESC(?sc)
-LIMIT 20
-# Results: 9 Thermotoga strains found
-```
-
-```sparql
-# Query 2: Find hyperthermophiles by temperature
-PREFIX schema: <https://purl.dsmz.de/schema/>
-
-SELECT ?strain ?strainLabel ?tempStart ?tempEnd
-FROM <http://rdfportal.org/dataset/bacdive>
-WHERE {
-  ?strain a schema:Strain ;
-          rdfs:label ?strainLabel .
-  ?temp a schema:CultureTemperature ;
-        schema:describesStrain ?strain ;
-        schema:hasTemperatureRangeEnd ?tempEnd .
-  FILTER(?tempEnd >= 80)
-}
-ORDER BY DESC(?tempEnd)
-LIMIT 30
-# Results: Pyrococcus kukulkanii tops at 112°C, 221 total hyperthermophiles
-```
-
-```sparql
-# Query 3: Get culture medium with MediaDive link
-PREFIX schema: <https://purl.dsmz.de/schema/>
-
-SELECT ?strain ?strainLabel ?medium ?mediaLink
-FROM <http://rdfportal.org/dataset/bacdive>
-WHERE {
-  ?strain a schema:Strain ;
-          rdfs:label ?strainLabel .
-  ?m a schema:CultureMedium ;
-     schema:describesStrain ?strain ;
-     rdfs:label ?medium .
-  OPTIONAL { ?m schema:hasMediaLink ?mediaLink }
-  FILTER(?strain = <https://purl.dsmz.de/bacdive/strain/6981>)
-}
-# Results: Methanocaldococcus jannaschii uses DSMZ Medium 282
-```
-
-```sparql
-# Query 4: Get culture collection numbers
-PREFIX schema: <https://purl.dsmz.de/schema/>
-
-SELECT ?strain ?strainLabel ?collectionLabel ?link
-FROM <http://rdfportal.org/dataset/bacdive>
-WHERE {
-  ?strain a schema:Strain ;
-          rdfs:label ?strainLabel .
-  ?ccn a schema:CultureCollectionNumber ;
+  ?seq a schema:16SSequence ;
        schema:describesStrain ?strain ;
-       rdfs:label ?collectionLabel .
-  OPTIONAL { ?ccn schema:hasLink ?link }
-  FILTER(?strain = <https://purl.dsmz.de/bacdive/strain/17060>)
+       schema:hasSequenceAccession ?accession ;
+       schema:fromSequenceDB ?seqDB .
 }
-# Results: DSM 3109, ATCC 43589, JCM 10099, NBRC 100826
+LIMIT 10
+# Results: Found sequences from ENA and nuccore databases
 ```
 
 ## Interesting Findings
 
-### Specific Entities for Good Questions
-1. **Thermotoga maritima**: BacDive ID 17060, DSM 3109, type strain
-2. **Pyrococcus kukulkanii**: Record for highest growth temperature (112°C)
-3. **Methanocaldococcus jannaschii**: BacDive ID 6981, uses DSMZ Medium 282
-4. **Pyrolobus fumarii**: Growth at 103°C
-5. **Aeropyrum pernix**: Growth at 102°C
+### Specific Entities for Questions
+- **Hyperthermophiles**: Pyrococcus kukulkanii (BacDive 132578, up to 112°C), Pyrolobus fumarii (103°C), Aeropyrum pernix (102°C)
+- **Major genera**: Streptomyces (24,747 strains), Bacillus (3,332), Pseudomonas (1,879)
+- **Type strains**: 20,060 designated type strains
 
-### Unique Properties/Patterns
-- Type strain designation enables quality filtering
-- Multiple culture collection cross-references per strain
-- MediaDive integration for culture recipes
-- Comprehensive temperature/pH growth data
+### Unique Properties
+- Detailed cultivation conditions (temperature ranges, pH ranges, media)
+- Oxygen tolerance classification (aerobe, anaerobe, microaerophile, etc.)
+- Gram stain results with variable option
+- 16S rRNA sequence lengths and database sources
 
-### Connections to Other Databases
-- **NCBI Taxonomy**: `schema:hasTaxID` on all strains
-- **DSMZ/JCM/KCTC/ATCC**: Culture collection links with URLs
-- **ENA/GenBank**: Sequence accessions
-- **MediaDive**: Culture medium recipes via `schema:hasMediaLink`
+### Cross-Database Connections
+- NCBI Taxonomy (100% of strains via hasTaxID)
+- Culture collections: DSMZ (>90%), JCM (~40%), KCTC (~30%)
+- Sequence databases: ENA (~60%), GenBank (~40%)
+- MediaDive (~20% of media links)
 
 ### Verifiable Facts
-- Total strains: 97,334
-- Type strains: 20,060 (21%)
-- 16S sequences: ~87,045 (35% coverage)
-- Enzyme records: 573,112
-- Hyperthermophiles (>80°C): 221 strains
-- Highest growth temperature: 112°C (Pyrococcus kukulkanii)
+- 97,334 total strain records
+- 95,742 bacterial strains, 1,049 archaeal strains
+- 20,060 type strains
+- 10,747 Gram-negative, 7,333 Gram-positive strains
+- Streptomyces is the most represented genus with 24,747 strains
+- Pyrococcus kukulkanii can grow at up to 112°C (highest temperature)
 
 ## Question Opportunities by Category
 
 ### Precision
-- "What is the BacDive ID for Thermotoga maritima type strain?" → 17060
-- "What is the DSM number for Thermotoga maritima?" → DSM 3109
-- "What culture medium does BacDive recommend for Methanocaldococcus jannaschii?" → DSMZ Medium 282
+- "What is the BacDive ID for Thermotoga maritima?" 
+- "What is the maximum growth temperature recorded for Pyrococcus kukulkanii?" (Answer: 112°C)
+- "How many type strains are in BacDive?" (Answer: 20,060)
 
 ### Completeness
-- "How many bacterial strains are recorded in BacDive?" → 97,334
-- "How many type strains are in BacDive?" → 20,060
-- "How many strains in BacDive can grow at temperatures above 80°C?" → 221
+- "How many bacterial strains vs archaeal strains are in BacDive?" (Answer: 95,742 bacteria, 1,049 archaea)
+- "What are all the oxygen tolerance categories in BacDive?" (List of categories)
+- "How many strains have Gram stain data?" (Answer: ~18,000)
 
 ### Integration
-- "What is the NCBI Taxonomy ID for Thermotoga maritima?" → 2336
-- "Which culture collections hold Thermotoga maritima strains?" → DSMZ, ATCC, JCM, NBRC
-- "Link BacDive strain to its MediaDive culture medium" → e.g., Medium 282 link
+- "Link BacDive strains to NCBI Taxonomy IDs" (via schema:hasTaxID)
+- "Find 16S rRNA sequence accessions for BacDive strains" (ENA/GenBank accessions)
+- "Link to MediaDive culture media recipes" (via schema:hasMediaLink)
 
 ### Currency
-- "What is the most recently characterized hyperthermophile in BacDive?"
-- "What strains have both genome sequences and 16S rRNA sequences available?"
+- "What are the most recently added strains to BacDive?"
 
 ### Specificity
-- "What is the highest growth temperature recorded in BacDive?" → 112°C (Pyrococcus kukulkanii)
-- "Which archaeal strain in BacDive has the highest temperature tolerance?" → Pyrococcus kukulkanii
-- "What is the oxygen tolerance of Methanococcus maripaludis?" → anaerobe
+- "What is the optimal growth temperature for Pyrolobus fumarii?" (Answer: 103°C)
+- "Find strains that can grow above 100°C" (hyperthermophiles)
+- "What is the BacDive ID for Methanopyrus kandleri?" (Answer: 161561)
 
 ### Structured Query
-- "Find all Gram-negative thermophilic bacteria in BacDive"
-- "List all type strains with 16S rRNA sequences from the Thermotogaceae family"
-- "Which anaerobic strains in BacDive can grow above 90°C?"
+- "Find all obligate anaerobic bacteria in BacDive"
+- "Find strains that are both thermophilic AND Gram-positive"
+- "List strains with temperature growth range above 70°C"
+- "Find Bacillus strains with complete culture condition data"
 
 ## Notes
 
 ### Limitations
-- Phenotype coverage varies (~40% for Gram stain, ~35% for 16S)
-- Some older strains have incomplete metadata
-- OLS4 search not applicable - use SPARQL with bif:contains
+- Phenotype coverage varies (~40% Gram stain, ~35% 16S sequences, ~55% enzyme data)
+- Use OPTIONAL clauses for all phenotype queries
+- Query timeouts possible without LIMIT on multi-join queries
 
 ### Best Practices
-- Always include `FROM <http://rdfportal.org/dataset/bacdive>` in SPARQL
-- Use `bif:contains` for keyword searches with `option (score ?sc)`
-- Use OPTIONAL for phenotype properties (coverage is incomplete)
-- Filter by `schema:isTypeStrain true` for high-quality characterized strains
-- Never use `?score` as variable name (reserved keyword)
-
-### Data Quality
-- 100% taxonomic coverage (all strains have taxonomy)
-- ~21% are type strains (well-characterized)
-- ~35% have 16S sequences
-- ~55% have enzyme activity data
-- ~40% have Gram stain data
+- Always specify `FROM <http://rdfportal.org/dataset/bacdive>`
+- Use `bif:contains` with `option (score ?sc)` for keyword search
+- Never use `?score` as variable name (reserved)
+- Use OPTIONAL for phenotype properties
+- Filter by genus/family before complex joins

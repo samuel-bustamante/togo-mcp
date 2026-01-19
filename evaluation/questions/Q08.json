@@ -2,85 +2,85 @@
   {
     "id": 85,
     "category": "Precision",
-    "question": "What is the ATC classification code for cetirizine according to ChEMBL?",
-    "expected_answer": "R06AE07",
-    "notes": "Database: ChEMBL. Verified in chembl_exploration.md via marketed drugs query. Cetirizine is an antihistamine. Tests drug classification codes."
+    "question": "What is the NCBI Protein ID linked to DDBJ locus tag Mal52_08030?",
+    "expected_answer": "QDU42347.1",
+    "notes": "Uses DDBJ database. Verified via SPARQL query on rdfs:seeAlso for ncbiprotein. Tests sequence-protein database linking."
   },
   {
     "id": 86,
     "category": "Precision",
-    "question": "What chromosome is the human BRCA1 gene located on?",
-    "expected_answer": "Chromosome 17",
-    "notes": "Database: NCBI Gene, Ensembl. Verified in ncbigene_exploration.md. BRCA1 (gene ID 672) is on chr17. Tests gene location precision."
+    "question": "What gene symbol is associated with DDBJ locus tag Mal52_08030?",
+    "expected_answer": "clpX (encoding ATP-dependent Clp protease ATP-binding subunit)",
+    "notes": "Uses DDBJ database. Verified via SPARQL query on nuc:gene property. Tests gene annotation retrieval."
   },
   {
     "id": 87,
     "category": "Completeness",
-    "question": "How many chemical entities are defined in ChEBI?",
-    "expected_answer": "223,078",
-    "notes": "Database: ChEBI. Verified in chebi_exploration.md via SPARQL COUNT. ChEBI covers small chemical compounds of biological interest. Tests chemical ontology completeness."
+    "question": "How many topical descriptors are in MeSH?",
+    "expected_answer": "30,248 topical descriptors",
+    "notes": "Uses MeSH database. Verified via SPARQL COUNT on meshv:TopicalDescriptor. Tests medical vocabulary statistics."
   },
   {
     "id": 88,
     "category": "Completeness",
-    "question": "How many glycoproteins are catalogued in GlyCosmos?",
-    "expected_answer": "153,178",
-    "notes": "Database: GlyCosmos. Verified in glycosmos_exploration.md. Glycoproteins are proteins modified with glycan chains. Tests glycoprotein database coverage."
+    "question": "How many clinical concepts are in MedGen?",
+    "expected_answer": "233,939 clinical concepts",
+    "notes": "Uses MedGen database. Verified via SPARQL COUNT on mo:ConceptID. Tests medical genetics database coverage."
   },
   {
     "id": 89,
     "category": "Integration",
-    "question": "What is the Ensembl gene ID corresponding to human TP53?",
-    "expected_answer": "ENSG00000141510",
-    "notes": "Database: Ensembl. Verified in ensembl_exploration.md. TP53 encodes the p53 tumor suppressor. Tests gene identifier conversion for a different gene than BRCA1."
+    "question": "What KEGG compound ID corresponds to ATP in biochemical databases?",
+    "expected_answer": "C00002",
+    "notes": "Uses ChEBI database. ATP (CHEBI:30616) links to KEGG C00002 via hasDbXref. Tests metabolic database cross-referencing."
   },
   {
     "id": 90,
     "category": "Integration",
-    "question": "What is the PDB ID for a high-resolution crambin structure?",
-    "expected_answer": "3NIR (0.48Å resolution)",
-    "notes": "Database: PDB. Verified in pdb_exploration.md. 3NIR is tied with 5D8V for highest resolution. Tests structure identification."
+    "question": "How many Reactome entities have ChEBI cross-references?",
+    "expected_answer": "37,569 entities have ChEBI references",
+    "notes": "Uses Reactome database. Verified via SPARQL query on bp:xref filtered by ChEBI. Tests pathway-chemical ontology integration."
   },
   {
     "id": 91,
     "category": "Currency",
-    "question": "What species has the most genes in Ensembl?",
-    "expected_answer": "Mouse (744,820 genes)",
-    "notes": "Database: Ensembl. Verified in ensembl_exploration.md via species gene count query. Mouse is the best-annotated model organism. Tests genome annotation statistics."
+    "question": "What laboratory typing method is most commonly used for antimicrobial susceptibility testing in AMR Portal?",
+    "expected_answer": "Broth dilution with 959,895 tests (56% of total)",
+    "notes": "Uses AMR Portal database. Verified via SPARQL GROUP BY laboratoryTypingMethod query. Tests antimicrobial resistance methodology tracking."
   },
   {
     "id": 92,
     "category": "Currency",
-    "question": "How many diseases in MONDO have OMIM cross-references?",
-    "expected_answer": "Approximately 33% (about 10,000 diseases)",
-    "notes": "Database: MONDO. Verified in mondo_exploration.md. OMIM coverage indicates genetic disease linkage. Tests disease ontology cross-reference currency."
+    "question": "How many genes are recorded in PubChem?",
+    "expected_answer": "167,172 genes",
+    "notes": "Uses PubChem database. Verified via SPARQL COUNT on gene graph. Tests current chemical-genomics integration statistics."
   },
   {
     "id": 93,
     "category": "Specificity",
-    "question": "What is the functional description of the human EXTL3 glycogene in GlyCosmos?",
-    "expected_answer": "exostosin like glycosyltransferase 3",
-    "notes": "Database: GlyCosmos. Verified in glycosmos_exploration.md. EXTL3 is involved in heparan sulfate biosynthesis. Tests glycogene annotation access."
+    "question": "What is the complete taxonomic lineage from Homo sapiens to the root in NCBI Taxonomy?",
+    "expected_answer": "Homo sapiens → Homo → Hominidae → Primates → Mammalia → Chordata → Metazoa → Eukaryota",
+    "notes": "Uses NCBI Taxonomy database. Verified via SPARQL query traversing rdfs:subClassOf. Tests hierarchical taxonomy navigation."
   },
   {
     "id": 94,
     "category": "Specificity",
-    "question": "What is the equation for Rhea reaction RHEA:10000?",
-    "expected_answer": "H2O + pentanamide = NH4(+) + pentanoate",
-    "notes": "Database: Rhea. Verified in rhea_exploration.md. RHEA:10000 is a simple hydrolysis reaction. Tests reaction equation retrieval."
+    "question": "What is the number of exons in the BRCA1 canonical transcript ENST00000357654?",
+    "expected_answer": "23 exons",
+    "notes": "Uses Ensembl database. Verified via SPARQL query on OrderedExon for the transcript. Tests detailed transcript structure access."
   },
   {
     "id": 95,
     "category": "Structured Query",
-    "question": "What percentage of ChEBI entities have molecular formulas?",
-    "expected_answer": "Approximately 86% (187,110 out of 223,078)",
-    "notes": "Database: ChEBI. Verified in chebi_exploration.md. Not all ChEBI entries are specific compounds. Tests chemical property coverage."
+    "question": "What organisms in BacDive can grow at temperatures above 100°C?",
+    "expected_answer": "Pyrococcus kukulkanii (112°C), Pyrolobus fumarii (103°C), Aeropyrum pernix (102°C)",
+    "notes": "Uses BacDive database. Verified via SPARQL query filtering by hasTemperatureRangeEnd > 100. Tests extremophile data filtering."
   },
   {
     "id": 96,
     "category": "Structured Query",
-    "question": "How many BacDive strains have 16S rRNA sequences available?",
-    "expected_answer": "Approximately 87,045 (about 35% coverage)",
-    "notes": "Database: BacDive. Verified in bacdive_exploration.md. 16S sequences are used for phylogenetic identification. Tests molecular data availability queries."
+    "question": "How many MeSH descriptors are in the Diseases category (C tree)?",
+    "expected_answer": "5,032 descriptors",
+    "notes": "Uses MeSH database. Verified via SPARQL query filtering by tree number starting with 'C'. Tests medical vocabulary category statistics."
   }
 ]

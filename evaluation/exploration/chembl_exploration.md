@@ -2,193 +2,205 @@
 
 ## Database Overview
 - **Purpose**: Manually curated database of bioactive molecules with drug-like properties
-- **Scope**: Drug discovery data linking compounds, targets, activities, mechanisms, and indications
-- **Key entities**: Molecules (2.4M+), Activities (20M), Assays (1.6M), Targets (13K)
-- **Data quality**: Expert curation, standardized bioactivity measurements
+- **Key data types**: Small molecules, bioactivity measurements, protein targets, assays, drug mechanisms, drug indications
+- **Scale**: 1.9M+ molecules, 21M+ activities, 1.7M+ assays, 15K+ targets
+- **Scope**: Drug discovery data including compound-target-activity relationships
 
 ## Schema Analysis (from MIE file)
 
-### Main Properties
-- `cco:SmallMolecule`: Central entity for drug-like compounds
-- `cco:chemblId`: ChEMBL identifier (e.g., "CHEMBL25")
-- `cco:highestDevelopmentPhase`: Drug development stage (1-4, 4=marketed)
-- `cco:atcClassification`: ATC drug classification codes
-- `cco:Activity`: Bioactivity measurements
-- `cco:standardType`: Activity type (IC50, EC50, Ki, etc.)
-- `cco:standardValue`: Numeric activity value
-- `cco:standardUnits`: Units (nM, uM, etc.)
+### Main Entity Types
+1. **SmallMolecule**: Core compound entity
+   - Properties: chemblId, substanceType, highestDevelopmentPhase, atcClassification
+   - Relationships: hasActivity, hasDrugIndication, hasMechanism, moleculeXref
 
-### Important Relationships
-- `cco:hasMolecule`: Links activities to molecules
-- `cco:hasAssay`: Links activities to assays
-- `cco:hasTarget`: Links assays to protein targets
-- `cco:hasTargetComponent`: Links targets to components
-- `skos:exactMatch`: Links to UniProt proteins
-- `cco:moleculeXref`: Cross-references (DrugBank, PubChem, ChEBI)
-- `cco:hasMechanism`: Drug mechanism of action
-- `cco:hasDrugIndication`: Disease indications
+2. **Activity**: Bioactivity measurement
+   - Properties: standardType (IC50, Ki, etc.), standardValue, standardUnits, pChembl
+   - Relationships: hasMolecule, hasAssay
+
+3. **Target**: Drug target (proteins, organisms, cells)
+   - Types: SingleProtein, ProteinComplex, ProteinFamily
+   - Properties: targetType, organismName
+   - Relationships: hasTargetComponent
+
+4. **Assay**: Experimental assay
+   - Properties: assayType (Functional, Binding, ADME, etc.)
+   - Relationships: hasTarget
+
+5. **DrugIndication**: Clinical indication
+   - Properties: hasMesh, hasMeshHeading, highestDevelopmentPhase
+   - Relationships: hasMolecule
 
 ### Query Patterns
-- Always use FROM <http://rdf.ebi.ac.uk/dataset/chembl>
-- Use bif:contains for text search (faster than FILTER/REGEX)
-- Filter activities by cco:standardType and cco:standardUnits
-- Start with specific types (cco:SingleProtein for targets)
+- Use `search_chembl_molecule` and `search_chembl_target` for keyword search
+- Use `bif:contains` for SPARQL full-text search
+- Always specify `FROM <http://rdf.ebi.ac.uk/dataset/chembl>`
+- Filter by activity units when comparing values
 
 ## Search Queries Performed
 
-1. **Query**: search_chembl_molecule("aspirin")
-   - Results: Found CHEMBL25 (ASPIRIN), CHEMBL5314595 (ASPIRIN TRELAMINE), etc.
-   - Total: 52 molecules
+1. **Query**: Search for imatinib
+   - Results: CHEMBL941 (IMATINIB), CHEMBL1642 (IMATINIB MESYLATE), plus 3 derivatives
 
-2. **Query**: search_chembl_molecule("imatinib")
-   - Results: Found CHEMBL941 (IMATINIB), CHEMBL1642 (IMATINIB MESYLATE)
-   - Total: 5 molecules
+2. **Query**: Search for BRCA1 targets
+   - Results: CHEMBL5990 (Breast cancer type 1 susceptibility protein), CHEMBL4105965, CHEMBL5291566, CHEMBL1293314
 
-3. **Query**: search_chembl_target("kinase human")
-   - Results: Found 1,711 targets including CHEMBL3886, CHEMBL4954
-   - Includes various kinase types
+3. **Query**: Total molecule count
+   - Results: 1,920,809 small molecules
 
-4. **Query**: search_chembl_target("EGFR")
-   - Results: Found CHEMBL203 (human EGFR), CHEMBL3608 (mouse EGFR)
-   - Also protein-protein interactions involving EGFR
+4. **Query**: Total activity count
+   - Results: 21,123,501 bioactivity measurements
 
-5. **Additional search**: Confirmed kinase targets with bioactivity data
+5. **Query**: Development phase distribution
+   - Results: Phase 4 (marketed): 3,678 | Phase 3: 1,105 | Phase 2: 6,442 | Phase 1: 959
+
+6. **Query**: Target type distribution
+   - Results: SINGLE PROTEIN (9,432), ORGANISM (2,353), CELL-LINE (1,920), PROTEIN COMPLEX (613)
+
+7. **Query**: Assay type distribution
+   - Results: Functional (831K), Binding (523K), ADME (297K), Toxicity (60K)
 
 ## SPARQL Queries Tested
 
 ```sparql
-# Query 1: Find marketed drugs (phase 4) with ATC classification
+# Query 1: Count molecules by development phase
 PREFIX cco: <http://rdf.ebi.ac.uk/terms/chembl#>
-
-SELECT ?molecule ?label ?phase ?atc
+SELECT ?phase (COUNT(?molecule) as ?moleculeCount)
 FROM <http://rdf.ebi.ac.uk/dataset/chembl>
 WHERE {
-  ?molecule a cco:SmallMolecule ;
-            rdfs:label ?label ;
-            cco:highestDevelopmentPhase ?phase .
-  OPTIONAL { ?molecule cco:atcClassification ?atc }
-  FILTER(?phase = 4)
+  ?molecule a cco:SmallMolecule .
+  ?molecule cco:highestDevelopmentPhase ?phase .
 }
-LIMIT 20
-# Results: CETIRIZINE (R06AE07), PENTAZOCINE (N02AD01), TOLMETIN (M01AB03), etc.
+GROUP BY ?phase
+ORDER BY ?phase
+# Results: Phase 4: 3,678 | Phase 3: 1,105 | Phase 2: 6,442 | Phase 1: 959
 ```
 
 ```sparql
-# Query 2: Find potent kinase inhibitors (IC50 < 10 nM)
+# Query 2: Target type distribution
 PREFIX cco: <http://rdf.ebi.ac.uk/terms/chembl#>
+SELECT ?targetType (COUNT(?target) as ?targetCount)
+FROM <http://rdf.ebi.ac.uk/dataset/chembl>
+WHERE {
+  ?target cco:targetType ?targetType .
+}
+GROUP BY ?targetType
+ORDER BY DESC(?targetCount)
+# Results: SINGLE PROTEIN (9,432), ORGANISM (2,353), etc.
+```
 
-SELECT ?molecule ?label ?target ?targetLabel ?value ?units
+```sparql
+# Query 3: Bioactivity data for imatinib (CHEMBL941)
+PREFIX cco: <http://rdf.ebi.ac.uk/terms/chembl#>
+SELECT ?activity ?type ?value ?units ?targetLabel
 FROM <http://rdf.ebi.ac.uk/dataset/chembl>
 WHERE {
   ?activity a cco:Activity ;
-            cco:standardType "IC50" ;
+            cco:hasMolecule <http://rdf.ebi.ac.uk/resource/chembl/molecule/CHEMBL941> ;
+            cco:standardType ?type ;
             cco:standardValue ?value ;
             cco:standardUnits ?units ;
-            cco:hasMolecule ?molecule ;
             cco:hasAssay/cco:hasTarget ?target .
-  ?target rdfs:label ?targetLabel ;
-          cco:organismName "Homo sapiens" .
-  ?molecule rdfs:label ?label .
-  ?targetLabel bif:contains "'kinase'" option (score ?sc)
-  FILTER(xsd:decimal(?value) < 10 && ?units = "nM")
+  ?target rdfs:label ?targetLabel .
 }
-ORDER BY ?value
 LIMIT 20
-# Results: Multiple compounds with sub-10nM IC50 against CDK5, GSK-3β, IRAK4, SYK, etc.
+# Results: Multiple activity types including AC50 against K562 (680 nM)
 ```
 
 ```sparql
-# Query 3: Find drug indications (from MIE examples)
+# Query 4: Assay type distribution
 PREFIX cco: <http://rdf.ebi.ac.uk/terms/chembl#>
-
-SELECT ?molecule ?moleculeLabel ?disease ?phase
+SELECT ?assayType (COUNT(?assay) as ?assayCount)
 FROM <http://rdf.ebi.ac.uk/dataset/chembl>
 WHERE {
-  ?indication a cco:DrugIndication ;
-              cco:hasMolecule ?molecule ;
-              cco:hasMeshHeading ?disease ;
-              cco:highestDevelopmentPhase ?phase .
-  ?molecule rdfs:label ?moleculeLabel .
-  FILTER(?phase >= 3)
+  ?assay a cco:Assay .
+  ?assay cco:assayType ?assayType .
 }
-ORDER BY DESC(?phase)
-LIMIT 100
-# Pattern verified - links molecules to disease indications with MeSH terms
+GROUP BY ?assayType
+ORDER BY DESC(?assayCount)
+# Results: Functional (831K), Binding (523K), ADME (297K)
 ```
 
 ## Interesting Findings
 
 ### Specific Entities for Questions
-- **CHEMBL25**: Aspirin - canonical small molecule drug
-- **CHEMBL941**: Imatinib - groundbreaking kinase inhibitor
-- **CHEMBL203**: Human EGFR target - important in oncology
-- **CHEMBL262**: GSK-3 beta - kinase target with potent inhibitors
-- **CHEMBL4036**: CDK5 - kinase with sub-nM inhibitors
-
-### Drug Development Phases
-- Phase 4 = Marketed drugs (has ATC classification)
-- Phase 3 = Clinical trials
-- Phase 2/1 = Earlier development
+- **Imatinib**: CHEMBL941 - tyrosine kinase inhibitor for CML
+- **BRCA1 target**: CHEMBL5990 - Breast cancer type 1 susceptibility protein
+- **Marketed drugs**: 3,678 compounds at Phase 4
+- **Single protein targets**: 9,432 targets available
 
 ### Unique Properties
-- ATC classification codes for drug classification
-- pChembl values for normalized activity comparison
-- Mechanism action types (INHIBITOR, AGONIST, etc.)
-- MeSH disease headings for indications
+- Development phase tracking (0.5 to 4)
+- Standardized activity units (nM, uM, %, etc.)
+- ATC (Anatomical Therapeutic Chemical) classification
+- Drug mechanisms with action types (INHIBITOR, AGONIST, etc.)
 
-### Database Connections
-- **UniProt**: Via TargetComponent skos:exactMatch (~11K)
-- **DrugBank**: Via moleculeXref (~8.4K)
-- **PubChem**: Via moleculeXref (~2.2M)
-- **ChEBI**: Via moleculeXref (~35K)
-- **MeSH**: Via hasMesh for indications (~51K)
+### Cross-Database Connections
+- PubChem (2.2M+ molecules)
+- DrugBank (8.4K molecules)
+- UniProt (via TargetComponent, 11K links)
+- ChEBI (35K molecules)
+- MeSH (51K drug indications)
+- PubMed (88K documents)
+- NCBI Taxonomy (organism info)
 
-### Key Statistics
-- 2.4M molecules, 20M bioactivities
-- 1,711 kinase-related targets in human
-- ~80% of molecules have activity data
-- ~85% of targets have UniProt mappings
+### Verifiable Facts
+- 1,920,809 small molecules in ChEMBL
+- 21,123,501 bioactivity measurements
+- 3,678 marketed drugs (Phase 4)
+- 9,432 single protein targets
+- Imatinib (CHEMBL941) is a tyrosine kinase inhibitor
+- 830,894 functional assays, 523,393 binding assays
 
 ## Question Opportunities by Category
 
 ### Precision
-- What is the ChEMBL ID for aspirin? (CHEMBL25)
-- What is the ChEMBL target ID for human EGFR? (CHEMBL203)
-- What is the highest development phase for imatinib? (4)
-- What is the ATC code for cetirizine? (R06AE07)
+- "What is the ChEMBL ID for imatinib?" (Answer: CHEMBL941)
+- "What is the ChEMBL target ID for BRCA1?" (Answer: CHEMBL5990)
+- "What is the ChEMBL ID for the human angiotensin-converting enzyme target?" (Answer: CHEMBL1808)
 
 ### Completeness
-- How many kinase targets are in ChEMBL for Homo sapiens? (~1,711)
-- How many marketed drugs (phase 4) are in ChEMBL?
-- List all drug indications for imatinib
-- Count compounds with IC50 < 100 nM against any kinase
+- "How many small molecules are in ChEMBL?" (Answer: 1,920,809)
+- "How many bioactivity measurements are in ChEMBL?" (Answer: 21,123,501)
+- "How many marketed drugs (Phase 4) are in ChEMBL?" (Answer: 3,678)
+- "What are all the target types in ChEMBL?" (List of types)
 
 ### Integration
-- What is the UniProt ID for ChEMBL target CHEMBL203?
-- Convert ChEMBL molecule ID to DrugBank ID
-- Link ChEMBL targets to PDB structures
-- What PubChem CID corresponds to CHEMBL25?
+- "What UniProt IDs are linked to ChEMBL target CHEMBL1808?" (via TargetComponent)
+- "What DrugBank ID is linked to CHEMBL941?" (via moleculeXref)
+- "Find ChEMBL molecules cross-referenced to PubChem"
 
 ### Currency
-- What are the newest Phase 3+ drug candidates?
-- Latest compounds tested against emerging targets
-- Recent additions to marketed drug list
+- "What are the most recently added ChEMBL assays?"
 
 ### Specificity
-- What compounds inhibit CDK5 with IC50 < 10 nM?
-- Find drugs with specific mechanism of action types
-- What is the mechanism of action for a specific drug?
+- "Find ChEMBL molecules in Phase 3 clinical trials for melanoma"
+- "What kinase inhibitors in ChEMBL have IC50 < 10 nM?"
+- "Find ChEMBL targets classified as PROTEIN COMPLEX"
 
 ### Structured Query
-- Find molecules with IC50 < 100 nM against kinases AND phase >= 2
-- Find EGFR inhibitors with published activity data
-- Find compounds with both mechanism and indication data
-- Filter drugs by ATC class AND development phase
+- "Find ChEMBL molecules with IC50 < 100 nM against kinase targets"
+- "List ChEMBL drugs with both DrugBank AND UniProt cross-references"
+- "Find binding assays for human single protein targets"
+- "Find molecules with Phase 4 development AND ATC classification"
 
 ## Notes
-- Always use FROM <http://rdf.ebi.ac.uk/dataset/chembl> clause
-- Use bif:contains for text search - much faster than FILTER/REGEX
-- Filter activities by standardType AND standardUnits to ensure comparability
-- Some activity values may be negative or zero (data quality issues)
-- Target-to-UniProt via TargetComponent path requires skos:exactMatch
-- Phase 4 drugs typically have ATC classification
+
+### Limitations
+- Not all molecules have complete chemical descriptors
+- Activity values may lack units (always check standardUnits)
+- Some targets lack UniProt mappings (especially non-human)
+- Development phase most complete for marketed drugs
+
+### Best Practices
+- Use search_chembl_molecule and search_chembl_target for keyword searches
+- Always include `FROM <http://rdf.ebi.ac.uk/dataset/chembl>` in SPARQL
+- Use `bif:contains` for full-text search with boolean operators
+- Always filter by standardUnits when comparing activity values
+- Filter by standardType (IC50, Ki, EC50) for meaningful comparisons
+- Use pChembl for normalized potency comparisons
+
+### Activity Value Handling
+- standardType: IC50, Ki, EC50, AC50, etc.
+- standardValue: Numeric value
+- standardUnits: nM, uM, %, U.L-1, etc.
+- pChembl: Negative log of activity value (normalized)

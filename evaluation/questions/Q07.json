@@ -2,85 +2,85 @@
   {
     "id": 73,
     "category": "Precision",
-    "question": "What is the MONDO disease ontology ID for diabetes mellitus?",
-    "expected_answer": "MONDO:0005015",
-    "notes": "Database: MONDO. Verified in mondo_exploration.md. Diabetes mellitus is a major metabolic disorder category. Tests disease ontology identification."
+    "question": "What is the GO term identifier for mitophagy (selective autophagy of mitochondria)?",
+    "expected_answer": "GO:0000423",
+    "notes": "Uses GO database. Verified using OLS4 search. Mitophagy is a descendant of autophagy (GO:0006914). Tests specific ontology term identification."
   },
   {
     "id": 74,
     "category": "Precision",
-    "question": "What is the DOI for PubMed article PMID 31558841?",
-    "expected_answer": "10.1038/s41431-019-0518-y",
-    "notes": "Database: PubMed. Verified in pubmed_exploration.md via SPARQL query. This article is about ADH1B and ALDH2 variants. Tests biomedical literature metadata retrieval."
+    "question": "What is the InChIKey for water according to ChEBI?",
+    "expected_answer": "XLYOFNOQVPJJNP-UHFFFAOYSA-N",
+    "notes": "Uses ChEBI database. Verified via SPARQL query on chebi:inchikey for CHEBI:15377. Tests chemical identifier retrieval."
   },
   {
     "id": 75,
     "category": "Completeness",
-    "question": "How many cellular_component terms are in the Gene Ontology?",
-    "expected_answer": "4,568",
-    "notes": "Database: GO. Verified in go_exploration.md via SPARQL COUNT by namespace. Cellular component is the smallest GO namespace. Tests ontology coverage."
+    "question": "How many type strains are catalogued in BacDive?",
+    "expected_answer": "20,060 type strains",
+    "notes": "Uses BacDive database. Verified via SPARQL query filtering by schema:isTypeStrain. Type strains are reference organisms for species definition."
   },
   {
     "id": 76,
     "category": "Completeness",
-    "question": "How many glycoepitopes are catalogued in GlyCosmos?",
-    "expected_answer": "173",
-    "notes": "Database: GlyCosmos. Verified in glycosmos_exploration.md. Glycoepitopes include blood group antigens like Lewis. Tests glycoscience epitope coverage."
+    "question": "How many disease classes are in the MONDO ontology?",
+    "expected_answer": "30,304 disease classes (26,371 active, 3,933 deprecated)",
+    "notes": "Uses MONDO database. Verified via SPARQL COUNT on owl:Class. Tests disease ontology coverage."
   },
   {
     "id": 77,
     "category": "Integration",
-    "question": "What is the UniProt ID for the human insulin receptor?",
-    "expected_answer": "P06213",
-    "notes": "Database: UniProt. Verified in uniprot_exploration.md via search for 'insulin receptor human'. Tests protein receptor identification."
+    "question": "What GO term is linked to Rhea reaction RHEA:10000?",
+    "expected_answer": "GO:0050168",
+    "notes": "Uses Rhea database. Verified via rdfs:seeAlso cross-reference. Tests biochemical reaction to function ontology linking."
   },
   {
     "id": 78,
     "category": "Integration",
-    "question": "What NCBI Gene ID corresponds to human BRCA1?",
-    "expected_answer": "672",
-    "notes": "Database: NCBI Gene, UniProt. Verified in ncbigene_exploration.md. BRCA1 is on chromosome 17. Tests gene identifier integration."
+    "question": "What HPO term corresponds to MedGen concept C0011849 (Diabetes mellitus)?",
+    "expected_answer": "HP:0000819 (or HP_0000819)",
+    "notes": "Uses MedGen database. Verified via SPARQL query on mo:mgconso rdfs:seeAlso. Tests medical genetics to phenotype ontology linking."
   },
   {
     "id": 79,
     "category": "Currency",
-    "question": "How many protein-coding genes are in the human genome according to NCBI Gene?",
-    "expected_answer": "20,595",
-    "notes": "Database: NCBI Gene. Verified in ncbigene_exploration.md. This is the current estimate of human protein-coding genes. Tests genome annotation currency."
+    "question": "How many protein entities are recorded in Reactome?",
+    "expected_answer": "233,200 protein entities",
+    "notes": "Uses Reactome database. Verified via SPARQL COUNT on bp:Protein. Tests current pathway database entity statistics."
   },
   {
     "id": 80,
     "category": "Currency",
-    "question": "How many kinase inhibitor structures are in the PDB?",
-    "expected_answer": "13,193",
-    "notes": "Database: PDB. Verified in pdb_exploration.md using search_pdb_entity('kinase inhibitor'). Kinase inhibitors are major drug class. Tests current structural drug discovery data."
+    "question": "How many insulin-related structures are available in PDB?",
+    "expected_answer": "5,265 insulin structures (or current count)",
+    "notes": "Uses PDB database. Verified using search_pdb_entity('insulin'). Tests access to current structural data for a key hormone."
   },
   {
     "id": 81,
     "category": "Specificity",
-    "question": "What is the MeSH term ID for Niemann-Pick disease?",
-    "expected_answer": "T028436",
-    "notes": "Database: MeSH. Verified in mesh_exploration.md via search_mesh_entity. Niemann-Pick is a lysosomal storage disorder. Tests rare disease terminology."
+    "question": "What is the most common crystallographic space group in PDB structures?",
+    "expected_answer": "P 21 21 21 (orthorhombic) with 39,753 structures",
+    "notes": "Uses PDB database. Verified via SPARQL GROUP BY space group query. Tests specialized crystallography metadata access."
   },
   {
     "id": 82,
     "category": "Specificity",
-    "question": "What is the NANDO ID for spinal and bulbar muscular atrophy (Kennedy disease)?",
-    "expected_answer": "NANDO:1200001",
-    "notes": "Database: NANDO. Verified in nando_exploration.md. SBMA has notification number 1 in the Japanese system. Tests rare neuromuscular disease identification."
+    "question": "What taxonomic group has the most strains in MediaDive?",
+    "expected_answer": "Bacterium with 32,662 strains",
+    "notes": "Uses MediaDive database. Verified via SPARQL GROUP BY belongsTaxGroup query. Tests microbial cultivation database coverage."
   },
   {
     "id": 83,
     "category": "Structured Query",
-    "question": "How many NANDO diseases have notification numbers assigned?",
-    "expected_answer": "Approximately 2,454 (88%)",
-    "notes": "Database: NANDO. Verified in nando_exploration.md. Notification numbers indicate government-designated intractable diseases. Tests rare disease classification queries."
+    "question": "How many single protein targets are in ChEMBL?",
+    "expected_answer": "9,432 single protein targets",
+    "notes": "Uses ChEMBL database. Verified via SPARQL query filtering by targetType='SINGLE PROTEIN'. Tests drug target statistics."
   },
   {
     "id": 84,
     "category": "Structured Query",
-    "question": "What beta-lactam resistance genes are found in carbapenem-resistant isolates in AMR Portal?",
-    "expected_answer": "Various bla genes, ampC, blaNDM-1, ompC (porin)",
-    "notes": "Database: AMR Portal. Verified in amrportal_exploration.md via genotype-phenotype correlation query. Tests resistance gene analysis."
+    "question": "How many MONDO diseases have OMIM cross-references?",
+    "expected_answer": "9,944 diseases have OMIM mappings (entity count)",
+    "notes": "Uses MONDO database. Entity count (diseases with at least one OMIM), not relationship count (10,039 total refs). Verified via SPARQL with COUNT(DISTINCT ?disease) filtering by OMIM prefix."
   }
 ]

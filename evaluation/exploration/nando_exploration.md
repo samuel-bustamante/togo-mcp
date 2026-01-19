@@ -1,226 +1,179 @@
 # NANDO (Nanbyo Data) Exploration Report
 
 ## Database Overview
-- **Purpose**: Comprehensive ontology for Japanese intractable (rare) diseases maintained by the Japanese government
-- **Scope**: 2,777 disease classes organized in hierarchical taxonomy
-- **Focus**: Designated intractable diseases eligible for government healthcare support
-- **Key features**: Multilingual labels (English, Japanese kanji, hiragana), notification numbers, cross-references to MONDO and KEGG
+- **Purpose**: Comprehensive ontology for Japanese intractable (rare) diseases maintained by Japanese government
+- **Scope**: 2,777 disease classes focusing on designated intractable diseases eligible for government support
+- **Key data types**: Disease classes with multilingual labels (English, Japanese kanji, hiragana), notification numbers, MONDO cross-references
 
 ## Schema Analysis (from MIE file)
 
-### Main Properties Available
-- `dct:identifier`: NANDO ID (e.g., "NANDO:1200010")
-- `rdfs:label`: Disease names in multiple languages (@en, @ja, @ja-hira)
-- `skos:prefLabel`: Preferred Japanese label
-- `skos:altLabel`: Alternative names/synonyms
-- `nando:hasNotificationNumber`: Government notification number
-- `dct:description`: Disease descriptions (mainly Japanese)
-- `rdfs:subClassOf`: Hierarchical parent-child relationships
-- `skos:closeMatch`: MONDO ontology mappings
-- `rdfs:seeAlso`: External resources (KEGG, government docs)
-- `dct:source`: Source documentation
+### Main Entity Types
+- **owl:Class** - Disease class with trilingual labels and metadata
 
-### Important Relationships
-- Hierarchical taxonomy: Intractable disease → Disease categories → Specific diseases
-- MONDO mappings via `skos:closeMatch` (84% coverage)
-- KEGG Disease links via `rdfs:seeAlso`
-- Government documentation via `dct:source` and `rdfs:seeAlso`
+### Key Properties
+- `dct:identifier` - NANDO identifier (e.g., "NANDO:1200010")
+- `rdfs:label` - Multilingual labels (@en, @ja, @ja-hira)
+- `skos:prefLabel` - Preferred Japanese label
+- `nando:hasNotificationNumber` - Government notification number (1-340+)
+- `skos:closeMatch` - Cross-references to MONDO
+- `rdfs:seeAlso` - External links (KEGG, government docs)
+- `dct:source` - Source documentation URLs
+- `skos:altLabel` - Alternative names/synonyms
+- `rdfs:subClassOf` - Hierarchical parent relationship
 
-### Query Patterns Observed
-- Disease category IDs: NANDO:11xxxxx
-- Specific disease IDs: NANDO:12xxxxx and NANDO:22xxxxx
-- Root class: NANDO:0000001
+### ID Structure
+- `NANDO:11xxxxx` - Disease categories
+- `NANDO:12xxxxx` - Specific designated diseases  
+- `NANDO:22xxxxx` - Additional diseases
 
 ## Search Queries Performed
 
-### Query 1: Parkinson-related diseases
-- **Search**: `bif:contains "'Parkinson*'"`
-- **Results**: 3 diseases found
-  - NANDO:1200010 - Parkinson's disease (notification #6)
-  - NANDO:1200524 - Rapid-onset dystonia-parkinsonism
-  - NANDO:1200036 - Multiple system atrophy, Parkinsonian type
+1. **Parkinson search** → Found 3 entries: Parkinson's disease (NANDO:1200010), Rapid-onset dystonia-parkinsonism, MSA Parkinsonian type
 
-### Query 2: Fabry disease variants
-- **Search**: `bif:contains "'Fabry*'"`
-- **Results**: 8 entries covering:
-  - NANDO:1200157/2200563 - Fabry disease
-  - NANDO:1200158/2201213 - Classical Fabry disease
-  - NANDO:1200159/2201214 - Variant Fabry disease
-  - NANDO:1200160/2201215 - Heterozygous Fabry disease
+2. **Disease categories** → Found 15 categories (Neuromuscular, Metabolic, Cardiovascular, etc.)
 
-### Query 3: Diseases by notification number
-- **Search**: Ordered by `nando:hasNotificationNumber`
-- **Results**: Notification #1 includes:
-  - NANDO:1200001 - Spinal and bulbar muscular atrophy
-  - NANDO:2200079 - Malignant thymoma
-  - NANDO:2200138 - Amyloid nephropathy
-  - NANDO:2200960 - Angelman syndrome
-  - NANDO:2201034 - Hereditary hemorrhagic telangiectasia
+3. **Diseases per category** → Neuromuscular leads with 84 diseases
 
-### Query 4: MONDO cross-references
-- **Search**: `skos:closeMatch` with MONDO filter
-- **Results**: Strong coverage of major disease categories
-  - Metabolic disease → MONDO:0004955, MONDO:0005066
-  - ALS → MONDO:0004976
-  - SMA types I-IV → specific MONDO IDs
+4. **First 10 notification numbers** → Spinal and bulbar muscular atrophy (notif 1), ALS (notif 2), etc.
 
-### Query 5: Disease categories
-- **Search**: Direct children of root category
-- **Results**: 15+ major categories including:
-  - Neuromuscular disease (NANDO:1100001)
-  - Metabolic disease (NANDO:1100002)
-  - Immune system disease (NANDO:1100004)
-  - Cardiovascular disease (NANDO:1100005)
+5. **MONDO cross-reference analysis** → 2,150 diseases with MONDO mappings, 2,341 total relationships
 
 ## SPARQL Queries Tested
 
 ```sparql
-# Query 1: Find diseases with English labels and identifiers
-PREFIX owl: <http://www.w3.org/2002/07/owl#>
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-PREFIX dct: <http://purl.org/dc/terms/>
-
-SELECT ?disease ?label ?identifier
+# Query 1: Count MONDO mappings (entity vs relationship counts)
+SELECT 
+  (COUNT(DISTINCT ?with_mondo) as ?diseases_with_mondo)
+  (COUNT(?mondo) as ?total_mondo_refs)
 FROM <http://nanbyodata.jp/ontology/nando>
 WHERE {
-  ?disease a owl:Class ;
-           rdfs:label ?label ;
-           dct:identifier ?identifier .
-  ?label bif:contains "'Parkinson*'" option (score ?sc) .
+  ?with_mondo a owl:Class ;
+              skos:closeMatch ?mondo .
+  FILTER(STRSTARTS(STR(?mondo), "http://purl.obolibrary.org/obo/MONDO_"))
 }
-ORDER BY DESC(?sc)
-LIMIT 20
-# Results: Found Parkinson's disease (NANDO:1200010), Multiple system atrophy Parkinsonian type, Rapid-onset dystonia-parkinsonism
+# Results: 2,150 diseases with MONDO, 2,341 total MONDO references
 ```
 
 ```sparql
-# Query 2: Designated diseases with notification numbers
-PREFIX owl: <http://www.w3.org/2002/07/owl#>
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-PREFIX dct: <http://purl.org/dc/terms/>
-PREFIX nando: <http://nanbyodata.jp/ontology/NANDO_>
-
-SELECT ?disease ?en_label ?notif_num ?identifier
-FROM <http://nanbyodata.jp/ontology/nando>
+# Query 2: Analyze MONDO mapping distribution
+SELECT ?mapping_count (COUNT(?disease) as ?num_diseases)
 WHERE {
-  ?disease a owl:Class ;
-           dct:identifier ?identifier ;
-           nando:hasNotificationNumber ?notif_num ;
-           rdfs:label ?en_label .
-  FILTER(LANG(?en_label) = "en")
+  {
+    SELECT ?disease (COUNT(?mondo) as ?mapping_count)
+    WHERE {
+      ?disease a owl:Class ;
+               skos:closeMatch ?mondo .
+      FILTER(STRSTARTS(STR(?mondo), "http://purl.obolibrary.org/obo/MONDO_"))
+    }
+    GROUP BY ?disease
+  }
 }
-ORDER BY xsd:integer(?notif_num)
-LIMIT 30
-# Results: 30 diseases ordered by notification number, starting with #1 (SBMA) through #2 (ALS)
+GROUP BY ?mapping_count
+ORDER BY ?mapping_count
+# Results: 1,976 (1 MONDO), 157 (2 MONDO), 17 (3 MONDO)
 ```
 
 ```sparql
-# Query 3: Diseases with MONDO mappings
-PREFIX owl: <http://www.w3.org/2002/07/owl#>
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-
-SELECT ?disease ?en_label ?mondo_id
+# Query 3: Get Parkinson's disease profile
+SELECT ?identifier ?en_label ?ja_label ?prefLabel ?notif_num ?mondo_id ?kegg
 FROM <http://nanbyodata.jp/ontology/nando>
 WHERE {
-  ?disease a owl:Class ;
-           rdfs:label ?en_label ;
-           skos:closeMatch ?mondo_id .
-  FILTER(STRSTARTS(STR(?mondo_id), "http://purl.obolibrary.org/obo/MONDO_"))
-  FILTER(LANG(?en_label) = "en")
+  nando:1200010 a owl:Class ;
+                dct:identifier ?identifier .
+  OPTIONAL { nando:1200010 rdfs:label ?en_label . FILTER(LANG(?en_label) = "en") }
+  OPTIONAL { nando:1200010 rdfs:label ?ja_label . FILTER(LANG(?ja_label) = "ja") }
+  OPTIONAL { nando:1200010 skos:prefLabel ?prefLabel }
+  OPTIONAL { nando:1200010 nando:hasNotificationNumber ?notif_num }
+  OPTIONAL { nando:1200010 skos:closeMatch ?mondo_id . FILTER(STRSTARTS(...)) }
 }
-LIMIT 20
-# Results: Strong MONDO mapping coverage - disease categories and specific diseases linked
+# Results: NANDO:1200010, "Parkinson's disease", "パーキンソン病", notif=6, MONDO:0005180
 ```
 
 ```sparql
-# Query 4: Total disease count
-PREFIX owl: <http://www.w3.org/2002/07/owl#>
-
-SELECT (COUNT(DISTINCT ?disease) AS ?total_diseases)
+# Query 4: List disease categories with counts
+SELECT ?category_label (COUNT(DISTINCT ?disease) as ?count)
 FROM <http://nanbyodata.jp/ontology/nando>
 WHERE {
-  ?disease a owl:Class .
+  ?category rdfs:subClassOf nando:1000001 ;
+            rdfs:label ?category_label .
+  ?disease rdfs:subClassOf ?category .
+  FILTER(LANG(?category_label) = "en")
 }
-# Results: 2,777 total disease classes
+GROUP BY ?category_label
+ORDER BY DESC(?count)
+# Results: Neuromuscular (84), Metabolic (45), Chromosome (42), etc.
 ```
 
 ## Interesting Findings
 
-### Specific Entities for Good Questions
-1. **Parkinson's disease**: NANDO:1200010 (notification #6, has MONDO mapping)
-2. **Spinal and bulbar muscular atrophy (Kennedy disease)**: NANDO:1200001 (notification #1)
-3. **Amyotrophic lateral sclerosis**: NANDO:1200002 (notification #2)
-4. **Fabry disease**: NANDO:1200157 (metabolic/lysosomal storage disorder)
-5. **Angelman syndrome**: NANDO:2200960 (chromosome abnormality)
-6. **Hereditary hemorrhagic telangiectasia**: NANDO:2201034
+### Specific Verifiable Facts
+- Parkinson's disease = NANDO:1200010 = notification number 6 = MONDO:0005180
+- Huntington's disease = NANDO:1200012 = notification number 8 = MONDO:0007739
+- Spinal and bulbar muscular atrophy = NANDO:1200001 = notification number 1
+- ALS = NANDO:1200002 = notification number 2 = MONDO:0004976
+- 2,454 diseases have notification numbers (88%)
 
-### Unique Properties/Patterns
-- Japanese government notification numbers are unique to this database
-- Trilingual labels: English, Japanese kanji, Japanese hiragana
-- Some diseases have multiple NANDO IDs (12xxxxx and 22xxxxx series)
-- 84% of diseases have MONDO mappings (2,341/2,777)
+### Disease Categories (15 total)
+1. Neuromuscular disease (84) - 神経・筋疾患
+2. Metabolic disease (45) - 代謝系疾患
+3. Chromosome abnormality (42) - 染色体または遺伝子に変化を伴う症候群
+4. Immune system disease (27) - 免疫系疾患
+5. Cardiovascular disease (21) - 循環器系疾患
 
-### Connections to Other Databases
-- **MONDO**: ~2,341 diseases mapped via `skos:closeMatch`
-- **KEGG Disease**: ~500 diseases linked via `rdfs:seeAlso`
-- **Government docs**: Ministry of Health documents (.docx)
-- **Nanbyou.or.jp**: Patient information PDFs
+### Multilingual Labels
+- All diseases have English, Japanese kanji, and Japanese hiragana labels
+- Hiragana labels can be identified with regex: `^[ぁ-ん]+$`
 
-### Verifiable Facts
-- Total diseases: 2,777
-- Diseases with notification numbers: ~2,454 (88%)
-- Diseases with MONDO mappings: ~2,341 (84%)
-- Diseases with descriptions: ~44%
-- Disease categories under root: 15+
+## Cross-Reference Mapping Analysis
+
+### ⚠️ MONDO Mappings (Critical for integration)
+- **Entity count**: 2,150 diseases have at least one MONDO mapping
+- **Relationship count**: 2,341 total MONDO cross-references
+- **Mapping Distribution**:
+  - 1,976 diseases → 1 MONDO ID
+  - 157 diseases → 2 MONDO IDs  
+  - 17 diseases → 3 MONDO IDs
+- **Average**: 1.09 MONDO mappings per mapped disease
+
+### External Links
+- KEGG Disease: ~500 diseases
+- Government documents (MHLW): ~2,397 diseases
+- Patient resources (nanbyou.or.jp): Official PDFs
 
 ## Question Opportunities by Category
 
-### Precision
-- "What is the NANDO identifier for Parkinson's disease?" → NANDO:1200010
-- "What is the notification number for spinal and bulbar muscular atrophy in NANDO?" → 1
-- "What is the NANDO identifier for Fabry disease?" → NANDO:1200157
+### Precision Questions
+- What is the NANDO ID for Parkinson's disease?
+- What notification number is assigned to Huntington's disease in NANDO?
+- What is the Japanese name (kanji) for ALS in NANDO?
+- What MONDO ID maps to NANDO:1200010?
 
-### Completeness
-- "How many rare disease classes are in the NANDO ontology?" → 2,777
-- "How many NANDO diseases have MONDO ontology mappings?" → ~2,341
-- "List all subtypes of Fabry disease in NANDO" → Classical, Variant, Heterozygous variants
+### Completeness Questions
+- How many diseases in NANDO have notification numbers?
+- How many NANDO diseases have MONDO cross-references? (Entity count: 2,150)
+- How many total NANDO→MONDO mapping relationships exist? (Relationship count: 2,341)
+- How many diseases in NANDO belong to the Neuromuscular disease category?
 
-### Integration
-- "What MONDO ID is mapped to NANDO Parkinson's disease (NANDO:1200010)?" → MONDO:0005180
-- "What is the NANDO ID for the disease with MONDO ID MONDO:0004976?" → NANDO:1200002 (ALS)
-- "Link NANDO Fabry disease to its MONDO equivalent"
+### Integration Questions
+- Convert NANDO:1200012 (Huntington's disease) to MONDO ID
+- Which NANDO diseases map to multiple MONDO IDs?
+- Find the KEGG Disease link for Parkinson's disease
 
-### Currency
-- "What rare diseases in NANDO have been designated by the Japanese government?" (tests current designations)
+### Specificity Questions
+- What Japanese rare diseases have notification number 1?
+- Which NANDO diseases are in the Metabolic disease category?
+- Find diseases with notification numbers 1-10
 
-### Specificity
-- "What is the Japanese kanji label for Parkinson's disease in NANDO?" → パーキンソン病
-- "Which NANDO disease has notification number 6?" → Parkinson's disease
-- "Find the NANDO identifier for Kennedy disease (SBMA)" → NANDO:1200001
-
-### Structured Query
-- "Find all neuromuscular diseases in NANDO with MONDO mappings"
-- "List NANDO diseases in the chromosome abnormality category"
-- "Which NANDO diseases have both KEGG links and MONDO mappings?"
+### Structured Query Questions
+- List all neuromuscular diseases with their MONDO mappings
+- Find diseases that have both KEGG and MONDO cross-references
+- Retrieve diseases with multiple MONDO mappings (one-to-many)
 
 ## Notes
-
-### Limitations
-- OLS4:searchClasses returns results from many ontologies, not just NANDO
-- Direct SPARQL queries on NANDO graph are most reliable
-- Some hiragana labels require regex pattern filtering
-
-### Best Practices
-- Always include `FROM <http://nanbyodata.jp/ontology/nando>` in SPARQL
-- Use `bif:contains` for keyword searches (much faster than REGEX)
-- Filter by language tag: `FILTER(LANG(?label) = "en")` for English
-- For kanji: `FILTER(LANG(?label) = "ja" && !REGEX(STR(?label), "^[ぁ-ん]+$"))`
-- For hiragana: `FILTER(REGEX(STR(?label), "^[ぁ-ん]+$"))`
-
-### Data Quality
-- 100% identifier coverage
-- 100% multilingual label coverage
-- 88% notification number coverage
-- 84% MONDO mapping coverage
-- 44% description coverage
+- Use `bif:contains` for keyword search (Virtuoso backend)
+- Language filtering essential: FILTER(LANG(?label) = "en")
+- Hiragana vs kanji: Use regex `^[ぁ-ん]+$` to distinguish
+- Notification numbers indicate official government designation order
+- Some diseases have multiple MONDO mappings (valid for disease variants)
+- Cross-reference to MONDO enables international disease harmonization
+- NANDO is the authoritative source for Japanese rare disease policy
