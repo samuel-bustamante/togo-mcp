@@ -75,35 +75,51 @@ class LLMEvaluator:
             return result
         
         # Build prompt for LLM evaluation
-        prompt = f"""You are an expert content evaluator. Your task is to assess whether the RESPONSE TEXT contains the 
-        same essential information as the EXPECTED ANSWER.
+        prompt = f"""You are an expert content evaluator specialized in semantic equivalence assessment.
 
-        Determine whether the RESPONSE adequately includes the key facts, claims, or conclusions found in the EXPECTED 
-        ANSWER.
-        - The RESPONSE may use different wording, synonyms, or paraphrasing.
-        - The RESPONSE may include additional information.
-        - The RESPONSE must correctly convey the core meaning of the EXPECTED ANSWER.
+        # TASK
+        Evaluate whether RESPONSE TEXT contains the essential information from EXPECTED ANSWER, regardless of additional context or expanded details.
 
-        OUTPUT FORMAT (must match exactly):
-        - MATCH: [YES/NO]
-        - CONFIDENCE: [HIGH/MEDIUM/LOW]
-        - REASON: [One concise sentence explaining the decision]
+        # CORE PRINCIPLE
+        **A response is CORRECT if it includes the expected information, even when providing extra details or context.**
 
-        EVALUATION RULES:
+        # EVALUATION CRITERIA
 
-        - MATCH = YES if the RESPONSE clearly and correctly includes the core information from the EXPECTED ANSWER, 
-        even if phrased differently or expanded upon.
-        - MATCH = NO if the RESPONSE omits the core information, or contradicts the EXPECTED ANSWER, or contains 
-        materially incorrect information related to the EXPECTED ANSWER.
-        - CONFIDENCE = HIGH if the match or mismatch is obvious and unambiguous.
-        - CONFIDENCE = MEDIUM if the alignment is partial or requires interpretation.
-        - CONFIDENCE = LOW if the information is vague, implicit, or uncertain.
+        ## Match Conditions (MATCH = YES)
+        - RESPONSE contains all core facts, claims, or conclusions from EXPECTED ANSWER
+        - Information may be paraphrased, reordered, or use different terminology
+        - RESPONSE may include additional relevant information or context
+        - The essential meaning and factual accuracy are preserved
 
-        EXPECTED ANSWER
+        ## Mismatch Conditions (MATCH = NO)
+        - RESPONSE omits critical information from EXPECTED ANSWER
+        - RESPONSE contradicts or misrepresents the EXPECTED ANSWER
+        - Core facts are materially incorrect or distorted
+
+        ## Confidence Levels
+        - **HIGH**: Clear semantic equivalence or obvious mismatch; no ambiguity
+        - **MEDIUM**: Partial alignment; requires interpretation or inference
+        - **LOW**: Vague, implicit, or uncertain correspondence
+
+        # OUTPUT FORMAT
+        Respond using this exact structure:
+
+        MATCH: [YES/NO]
+        CONFIDENCE: [HIGH/MEDIUM/LOW]
+        REASON: [Single sentence explaining the decision, focusing on presence/absence of core information]
+
+        # INPUT DATA
+
+        ## Expected Answer
         {expected_answer}
 
-        RESPONSE TEXT
+        ## Response Text
         {response_text}
+
+        # IMPORTANT NOTES
+        - Focus on semantic content, not exact wording
+        - Additional information in RESPONSE does not invalidate a match
+        - Prioritize factual accuracy and completeness of core claims
         """
 
         try:
