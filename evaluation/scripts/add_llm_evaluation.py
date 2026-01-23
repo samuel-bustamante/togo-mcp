@@ -39,7 +39,7 @@ class LLMEvaluator:
     if the response text contains the expected answer or discusses the same topic.
     """
     
-    def __init__(self, model: str = "llama3.2"):
+    def __init__(self, model: str = "qwen2.5:7b-instruct"):
         """
         Initialize LLM evaluator.
         
@@ -75,25 +75,36 @@ class LLMEvaluator:
             return result
         
         # Build prompt for LLM evaluation
-        prompt = f"""You are an expert evaluator. Your task is to determine if a RESPONSE text contains or discusses the same information as an EXPECTED ANSWER.
+        prompt = f"""You are an expert content evaluator. Your task is to assess whether the RESPONSE TEXT contains the 
+        same essential information as the EXPECTED ANSWER.
 
-    EXPECTED ANSWER:
-    {expected_answer}
+        Determine whether the RESPONSE adequately includes the key facts, claims, or conclusions found in the EXPECTED 
+        ANSWER.
+        - The RESPONSE may use different wording, synonyms, or paraphrasing.
+        - The RESPONSE may include additional information.
+        - The RESPONSE must correctly convey the core meaning of the EXPECTED ANSWER.
 
-    RESPONSE TEXT:
-    {response_text}
+        OUTPUT FORMAT (must match exactly):
+        - MATCH: [YES/NO]
+        - CONFIDENCE: [HIGH/MEDIUM/LOW]
+        - REASON: [One concise sentence explaining the decision]
 
-    Analyze if the RESPONSE contains the key information from the EXPECTED ANSWER. The response may have additional details, but the core information should match.
+        EVALUATION RULES:
 
-    Respond in this EXACT format (nothing else):
-    MATCH: [YES/NO]
-    CONFIDENCE: [HIGH/MEDIUM/LOW]
-    REASON: [One brief sentence explaining why]
+        - MATCH = YES if the RESPONSE clearly and correctly includes the core information from the EXPECTED ANSWER, 
+        even if phrased differently or expanded upon.
+        - MATCH = NO if the RESPONSE omits the core information, or contradicts the EXPECTED ANSWER, or contains 
+        materially incorrect information related to the EXPECTED ANSWER.
+        - CONFIDENCE = HIGH if the match or mismatch is obvious and unambiguous.
+        - CONFIDENCE = MEDIUM if the alignment is partial or requires interpretation.
+        - CONFIDENCE = LOW if the information is vague, implicit, or uncertain.
 
-    Rules:
-    - MATCH=YES if the response contains the expected information (even if phrased differently)
-    - MATCH=NO if the response doesn't address the expected answer or gives wrong information
-    - CONFIDENCE=HIGH if you're very sure, MEDIUM if somewhat sure, LOW if uncertain"""
+        EXPECTED ANSWER
+        {expected_answer}
+
+        RESPONSE TEXT
+        {response_text}
+        """
 
         try:
             response = ollama.chat(
@@ -277,7 +288,7 @@ def main():
     )
     parser.add_argument(
         "--llm-model",
-        default='llama3.2',
+        default='qwen2.5:7b-instruct',
         help="Ollama generative model for LLM evaluation (e.g., llama3.2, mistral)"
     )
     parser.add_argument(
